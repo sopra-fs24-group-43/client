@@ -1,0 +1,63 @@
+@import "../theme";
+
+.LandingPage {
+  &.container {
+    margin-top: 2em;
+    min-height: 300px;
+    /* we include the center mixin defined in _theme.scss and save three duplicate lines :) */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  &.form {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 60%;
+    max-width: 30em;
+    height: 40em;
+    font-size: 16px;
+    font-weight: 300;
+    padding-left: 37px;
+    padding-right: 37px;
+    border-radius: 0.75em;
+    background-color: $background;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: $dropShadow;
+  }
+  &.field {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  &.input {
+    height: 35px;
+    padding-left: 15px;
+    margin-left: -4px;
+    border: none;
+    border-radius: 0.75em;
+    margin-bottom: 20px;
+    background: transparentize(white, 0.85);
+    color: $textColor;
+  }
+  &.label {
+    color: $textColor;
+    margin-bottom: 10px;
+    text-transform: lowercase;
+    font-weight: 300;
+  }
+  &.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1em;
+    margin-bottom: 20em;
+  }
+//   &.game-rules {
+//     /* Add styles for the game rules textarea */
+//     margin-top: 1em;
+//     width: 100%; /* Set width to fill the container */
+//     height: 300px; /* Adjust height as needed */
+//     resize: vertical; /* Allow vertical resizing */
+//     /* Add any other styles as desired */
+//   }
+}

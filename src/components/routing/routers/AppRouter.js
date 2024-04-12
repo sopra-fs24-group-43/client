@@ -5,6 +5,7 @@ import GameRouter from "./GameRouter";
 import {LoginGuard} from "../routeProtectors/LoginGuard";
 import Login from "../../views/Login";
 import LoginOrRegister from "../../views/LoginOrRegister";
+import LandingPage from "../../views/LandingPage"
 
 /**
  * Main router of your application.
@@ -33,8 +34,9 @@ const AppRouter = () => {
         </Route>
 
         <Route path="/" element={
-          <Navigate to="/game" replace />
+          <Navigate to="LandingPage" replace />
         }/>
+        <Route path="/LandingPage" element={<LandingPage/>} />
 
       </Routes>
     </BrowserRouter>

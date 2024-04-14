@@ -13,8 +13,24 @@ import "../../styles/views/Header.scss";
  */
 const Header = props => (
   <div className="header container" style={{height: props.height}}>
-    <h1 className="header title">SoPra FS24 - Group 43</h1>
-    <ReactLogo width="60px" height="60px"/>
+    <div className="header title">
+      <h1 className="header logo">Freitagsmaler - Group 43</h1>
+      <ReactLogo/>
+    </div>
+    <div className="header navigation">
+      <a href="/leaderboard">
+        <img src="leaderboard.png" alt="Leaderboard Icon" className="header img"/>
+      </a>
+      <a href="/friends">
+        <img src="friends.png" alt="Friends Icon" className="header img"/>
+      </a>
+      <a href="/settings">
+        <img src="settings.png" alt="Settings Icon" className="header img"/>
+      </a>
+      <a href="/profile">
+        <img src="profile.png" alt="Profile Icon" className="header img"/>
+      </a>
+    </div>
   </div>
 );
 

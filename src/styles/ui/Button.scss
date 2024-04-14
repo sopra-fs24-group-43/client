@@ -21,7 +21,9 @@
   border-radius: $borderRadius;
   cursor: pointer;
   opacity: 1;
-  color: $background;
-  background-color: $accent;
+  // color: $background;
+  // background-color: $accent;
+  color:rgb(204, 204, 204);
+  background-color: #522e75;
   transition: all 0.3s ease;
 }

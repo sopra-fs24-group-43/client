@@ -50,14 +50,19 @@
     display: flex;
     justify-content: center;
     margin-top: 1em;
-    margin-bottom: 20em;
   }
-//   &.game-rules {
-//     /* Add styles for the game rules textarea */
-//     margin-top: 1em;
-//     width: 100%; /* Set width to fill the container */
-//     height: 300px; /* Adjust height as needed */
-//     resize: vertical; /* Allow vertical resizing */
-//     /* Add any other styles as desired */
-//   }
+  &.game-rules {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    width: 100%;
+    height: 300px;
+    resize: vertical; 
+  }
+  &.icon {
+    margin-top: 18em;
+    margin-bottom: 1em;
+    width: 100%;
+    height: 80px;
+    justify-content: space-between;
+  }
 }

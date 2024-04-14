@@ -29,6 +29,9 @@ const LandingPage = () => {
               Login Or Register
             </Button>
           </div>
+          <div className="LandingPage icon">
+            <img src="rules_icon.png" alt="Rule Icon" className="icon" />
+          </div>
           <div className="game-rules">{rules}</div>
         </div>
       </div>

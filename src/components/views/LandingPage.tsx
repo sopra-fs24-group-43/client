@@ -5,6 +5,7 @@ import "styles/views/LandingPage.scss"
 // import BaseContainer from "components/ui/BaseContainer";
 import Table from "../elements/Table";
 import LogOrRegAndRulesForm from "components/elements/LogOrRegAndRulesForm";
+import CreateJoinLobby from "../elements/CreateJoinLobby";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const LandingPage = () => {
       <div className="LandingPage container">
         <LogOrRegAndRulesForm/>
         <Table/>
+        <CreateJoinLobby/>
       </div>
     // </BaseContainer>
   );

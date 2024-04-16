@@ -29,16 +29,38 @@ FormField.propTypes = {
 
 const Login = () => {
   const navigate = useNavigate();
+  const [loginUsername, setLoginUsername] = useState<string>(null);
+  const [loginPassword, setLoginPassword] = useState<string>(null);
   const [name, setName] = useState<string>(null);
   const [username, setUsername] = useState<string>(null);
-  const [registerUsername, setRegisterUsername] = useState<string>(null);
-  const [registerName, setRegisterName] = useState<string>(null);
+  const [password, setPassword] = useState<string>(null);
+  
 
+
+  const doRegister = async () => {
+    try {
+      const requestBody = JSON.stringify({ username, name, password });
+      const response = await api.post("/users", requestBody);
+
+      // Get the returned user and update a new object.
+      const user = new User(response.data);
+
+      // Store the token into the local storage.
+      localStorage.setItem("token", user.token);
+
+      // Login successfully worked --> navigate to the route /game in the GameRouter
+      navigate("/game");
+    } catch (error) {
+      alert(
+        `Something went wrong during the login: \n${handleError(error)}`
+      );
+    }
+  };
 
   const doLogin = async () => {
     try {
-      const requestBody = JSON.stringify({ username, name });
-      const response = await api.post("/users", requestBody);
+      const requestBody = JSON.stringify({ username: loginUsername, password: loginPassword });
+      const response = await api.put("/users", requestBody);
 
       // Get the returned user and update a new object.
       const user = new User(response.data);
@@ -63,17 +85,16 @@ const Login = () => {
           <h2>Login</h2>
           <FormField
             label="Username"
-            value={username}
-            onChange={(un: string) => setUsername(un)}
+            value={loginUsername}
+            onChange={(un: string) => setLoginUsername(un)}
           />
           <FormField
-            label="Name"
-            value={name}
-            onChange={(n) => setName(n)}
+            label="Password"
+            value={loginPassword}
+            onChange={(un: string) => setLoginPassword(un)}
           />
           <div className="login button-container">
             <Button
-              disabled={!username || !name}
               width="100%"
               onClick={() => doLogin()}
             >
@@ -85,19 +106,23 @@ const Login = () => {
           <h2>Register</h2>
           <FormField
             label="Username"
-            value={registerUsername}
-            onChange={(un: string) => setRegisterUsername(un)}
+            value={username}
+            onChange={(un: string) => setUsername(un)}
           />
           <FormField
             label="Name"
-            value={registerName}
-            onChange={(n) => setRegisterName(n)}
+            value={name}
+            onChange={(n) => setName(n)}
+          />
+          <FormField
+            label="Password"
+            value={password}
+            onChange={(n) => setPassword(n)}
           />
           <div className="login button-container">
             <Button
-              disabled={!username || !name}
               width="100%"
-              onClick={() => doLogin()}
+              onClick={() => doRegister()}
             >
               Register
             </Button>

@@ -6,6 +6,7 @@ import {LoginGuard} from "../routeProtectors/LoginGuard";
 import Login from "../../views/Login";
 import LoginOrRegister from "../../views/LoginOrRegister";
 import LandingPage from "../../views/LandingPage"
+import Canvas from "../../elements/Canvas"
 
 /**
  * Main router of your application.
@@ -37,6 +38,8 @@ const AppRouter = () => {
           <Navigate to="LandingPage" replace />
         }/>
         <Route path="/LandingPage" element={<LandingPage/>} />
+
+        <Route path="/canvas" element={<Canvas/>} />
 
       </Routes>
     </BrowserRouter>

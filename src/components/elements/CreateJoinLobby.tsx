@@ -11,7 +11,7 @@ const CreateJoinLobby = () => {
       <div className="CreateJoinLobby button-container">
         <Button
           width="100%"
-          onClick={() => navigate("/lobby")}
+          onClick={() => navigate("/canvas")}
         >
           Create lobby
         </Button>

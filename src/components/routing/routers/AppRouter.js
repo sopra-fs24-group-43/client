@@ -7,6 +7,9 @@ import Login from "../../views/Login";
 import LoginOrRegister from "../../views/LoginOrRegister";
 import LandingPage from "../../views/LandingPage"
 
+import {SettingsviewGuard} from "../routeProtectors/SettingsviewGuard";
+import Settingsview from "../../views/Settingsview";
+
 /**
  * Main router of your application.
  * In the following class, different routes are rendered. In our case, there is a Login Route with matches the path "/login"
@@ -37,6 +40,10 @@ const AppRouter = () => {
           <Navigate to="LandingPage" replace />
         }/>
         <Route path="/LandingPage" element={<LandingPage/>} />
+
+        <Route path="/Settingsview" element={<SettingsviewGuard />}>
+          <Route path="/Settingsview" element={<Settingsview/>} />
+        </Route>
 
       </Routes>
     </BrowserRouter>

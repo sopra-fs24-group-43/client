@@ -8,6 +8,11 @@ import PropTypes from "prop-types";
 import { User } from "types";
 import "styles/views/Game.scss";
 
+import StompJs, {over} from 'stompjs';
+import SockJS from "sockjs-client";
+
+var stompClient = null;
+
 const Player = ({ user }: { user: User }) => (
   <div className="player container">
     
@@ -26,10 +31,53 @@ const Game = () => {
   const [prevPosition, setPrevPosition] = useState<{ x: number; y: number }>(
     null
   );
+  // const [renderPrevPosition, setRenderPrevPosition] = useState<{ x: number; y: number }>(
+  //   null
+  // );
 
   const logout = (): void => {
     localStorage.removeItem("token");
     navigate("/loginOrRegister");
+  };
+
+  const connect =()=>{
+    //const stompClient = StompJs.client('ws://localhost:8080/ws')
+    let Sock = new SockJS('http://localhost:8080/ws');
+    stompClient = over(Sock);
+    stompClient.connect({}, onConnected, onError);
+  }
+
+  const onConnected = () => {     //connectCallback
+    stompClient.subscribe('/settings', onMessageReceived);
+  }
+
+  const onMessageReceived = (payload) => {
+    var payloadData = JSON.parse(payload.body);
+    console.log("PayLoad:", payloadData);
+
+    // rendering of canvas
+    rendering(payloadData);
+  }
+
+  const onError = (err) => {      //errorcallback
+    console.log("Error: ", err);
+  }
+
+  // const sendCoordinates = (coordinates) => {
+  //   stompClient.send("/app/message", {}, JSON.stringify(coordinates));
+  // };
+
+  const rendering = (payloadData) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    
+    const { x, y } = payloadData;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y);
+    ctx.stroke();
   };
 
   useEffect(() => {
@@ -37,6 +85,7 @@ const Game = () => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
+      connect();
     } else {
       navigate("/loginOrRegister");
     }
@@ -58,18 +107,31 @@ const Game = () => {
     const handleMouseDown = (event: MouseEvent) => {
       setIsDrawing(true);
       setPrevPosition({ x: event.offsetX, y: event.offsetY });
+      // sendCoordinates({ x: event.offsetX, y: event.offsetY });
+      stompClient.send("/app/message", {}, JSON.stringify({ x: event.offsetX, y: event.offsetY }));
     };
 
     const handleMouseMove = (event: MouseEvent) => {
       if (!isDrawing) return;
       const { x, y } = prevPosition;
+      
+      // send coordinated
+      // sendCoordinates({ x, y });
+      console.log("REAL X: ", x, " REAL Y: ", y)
+      stompClient.send("/app/message", {}, JSON.stringify({ x, y }));
+
       const newX = event.offsetX;
       const newY = event.offsetY;
+
+      stompClient.send("/app/message", {}, JSON.stringify({ newX, newY }));
+
+      // stompClient.send("/app/message", {}, JSON.stringify({ newX, newY }));
 
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(newX, newY);
       ctx.stroke();
+
       setPrevPosition({ x: newX, y: newY });
     };
 

@@ -6,6 +6,7 @@ import {LoginGuard} from "../routeProtectors/LoginGuard";
 import Login from "../../views/Login";
 import LoginOrRegister from "../../views/LoginOrRegister";
 import LandingPage from "../../views/LandingPage"
+import Lobby from "../../views/Lobby";
 
 /**
  * Main router of your application.
@@ -35,6 +36,8 @@ const AppRouter = () => {
           <Navigate to="LandingPage" replace />
         }/>
         <Route path="/LandingPage" element={<LandingPage/>} />
+
+        <Route path="/lobby" element={<Lobby/>} />
 
       </Routes>
     </BrowserRouter>

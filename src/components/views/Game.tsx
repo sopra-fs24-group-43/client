@@ -8,10 +8,7 @@ import PropTypes from "prop-types";
 import { User } from "types";
 import "styles/views/Game.scss";
 
-import StompJs, {over} from 'stompjs';
-import SockJS from "sockjs-client";
-
-var stompClient = null;
+import WebSocketService from "../../helpers/WebSocketService";
 
 const Player = ({ user }: { user: User }) => (
   <div className="player container">
@@ -23,6 +20,8 @@ Player.propTypes = {
   user: PropTypes.object,
 };
 
+export const webSocketService = new WebSocketService();
+
 const Game = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -30,7 +29,7 @@ const Game = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [prevPosition, setPrevPosition] = useState<{ x: number; y: number }>(
     null
-  );
+  ); // problem in use state?
   // const [renderPrevPosition, setRenderPrevPosition] = useState<{ x: number; y: number }>(
   //   null
   // );
@@ -40,28 +39,29 @@ const Game = () => {
     navigate("/loginOrRegister");
   };
 
-  const connect =()=>{
-    //const stompClient = StompJs.client('ws://localhost:8080/ws')
-    let Sock = new SockJS('http://localhost:8080/ws');
-    stompClient = over(Sock);
-    stompClient.connect({}, onConnected, onError);
-  }
+  // const connect =()=>{
+  //   //const stompClient = StompJs.client('ws://localhost:8080/ws')
+  //   let Sock = new SockJS('http://localhost:8080/ws');
+  //   stompClient = over(Sock);
+  //   stompClient.connect({}, onConnected, onError);
+  // }
 
-  const onConnected = () => {     //connectCallback
-    stompClient.subscribe('/settings', onMessageReceived);
-  }
+  const onConnectedCallback = () => {     //connectCallback
+    // stompClient.subscribe('/settings', onMessageReceived);
+    webSocketService.subscribe('/settings', onMessageReceived);
+  };
 
+  const onErrorCallback = (err) => {      //errorcallback
+    console.log("Error: ", err);
+  };
+  
   const onMessageReceived = (payload) => {
     var payloadData = JSON.parse(payload.body);
     console.log("PayLoad:", payloadData);
 
     // rendering of canvas
     rendering(payloadData);
-  }
-
-  const onError = (err) => {      //errorcallback
-    console.log("Error: ", err);
-  }
+  };
 
   // const sendCoordinates = (coordinates) => {
   //   stompClient.send("/app/message", {}, JSON.stringify(coordinates));
@@ -85,7 +85,14 @@ const Game = () => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
-      connect();
+      
+      // connection
+      webSocketService.connect(
+        'http://localhost:8080/ws',
+        onConnectedCallback,
+        onErrorCallback
+      );
+  
     } else {
       navigate("/loginOrRegister");
     }
@@ -108,7 +115,8 @@ const Game = () => {
       setIsDrawing(true);
       setPrevPosition({ x: event.offsetX, y: event.offsetY });
       // sendCoordinates({ x: event.offsetX, y: event.offsetY });
-      stompClient.send("/app/message", {}, JSON.stringify({ x: event.offsetX, y: event.offsetY }));
+      // stompClient.send("/app/message", {}, JSON.stringify({ x: event.offsetX, y: event.offsetY }));
+      webSocketService.send("/app/message", {}, JSON.stringify({ x: event.offsetX, y: event.offsetY }));
     };
 
     const handleMouseMove = (event: MouseEvent) => {
@@ -118,12 +126,11 @@ const Game = () => {
       // send coordinated
       // sendCoordinates({ x, y });
       console.log("REAL X: ", x, " REAL Y: ", y)
-      stompClient.send("/app/message", {}, JSON.stringify({ x, y }));
+      // stompClient.send("/app/message", {}, JSON.stringify({ x, y }));
+      webSocketService.send("/app/message", {}, JSON.stringify({ x, y }));
 
       const newX = event.offsetX;
       const newY = event.offsetY;
-
-      stompClient.send("/app/message", {}, JSON.stringify({ newX, newY }));
 
       // stompClient.send("/app/message", {}, JSON.stringify({ newX, newY }));
 
@@ -147,6 +154,7 @@ const Game = () => {
       canvas.removeEventListener("mousedown", handleMouseDown);
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseup", handleMouseUp);
+      // webSocketService.disconnect();
     };
   }, [isLoggedIn, isDrawing, prevPosition]);
 

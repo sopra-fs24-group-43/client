@@ -13,6 +13,7 @@ const Game = () => {
   const [isFillToolSelected, setIsFillToolSelected] = useState(false);
   const [isDrawToolSelected, setIsDrawToolSelected] = useState(true);
   const [isEraserToolSelected, setIsEraserToolSelected] = useState(false);
+  const [strokeSize, setStrokeSize] = useState(3);
 
   const logout = (): void => {
     localStorage.removeItem("token");
@@ -37,7 +38,7 @@ const Game = () => {
     } else {
       ctx.globalCompositeOperation = "source-over"; 
       ctx.strokeStyle = selectedColor;
-      ctx.lineWidth = 3;
+      ctx.lineWidth = strokeSize;
     }
 
     ctx.lineCap = "round";
@@ -78,7 +79,7 @@ const Game = () => {
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDrawing, prevPosition, selectedColor, isFillToolSelected, isDrawToolSelected, isEraserToolSelected]);
+  }, [isDrawing, prevPosition, selectedColor, isFillToolSelected, isDrawToolSelected, isEraserToolSelected, strokeSize]);
 
   const handleEraserClick = () => {
     setIsEraserToolSelected(true);
@@ -147,17 +148,6 @@ const Game = () => {
       while (y++ < ctx.canvas.height - 1 && matchStartColor(getColorAtPixel(x, y), targetColor)) {
         setColorAtPixel(x, y);
 
-        if (x > 0) {
-          if (matchStartColor(getColorAtPixel(x - 1, y), targetColor)) {
-            if (!reachLeft) {
-              pixelStack.push([x - 1, y]);
-              reachLeft = true;
-            }
-          } else if (reachLeft) {
-            reachLeft = false;
-          }
-        }
-
         if (x < ctx.canvas.width - 1) {
           if (matchStartColor(getColorAtPixel(x + 1, y), targetColor)) {
             if (!reachRight) {
@@ -166,6 +156,17 @@ const Game = () => {
             }
           } else if (reachRight) {
             reachRight = false;
+          }
+        }
+
+        if (x > 0) {
+          if (matchStartColor(getColorAtPixel(x - 1, y), targetColor)) {
+            if (!reachLeft) {
+              pixelStack.push([x - 1, y]);
+              reachLeft = true;
+            }
+          } else if (reachLeft) {
+            reachLeft = false;
           }
         }
       }
@@ -182,10 +183,6 @@ const Game = () => {
       color[3] === targetColor[3]
     );
   };
-
-  const drawButtonClassName = isDrawToolSelected ? "selected" : "";
-  const fillButtonClassName = isFillToolSelected ? "selected" : "";
-  const eraserButtonClassName = isEraserToolSelected ? "selected" : "";
 
   return (
     <BaseContainer className="game container">
@@ -208,7 +205,6 @@ const Game = () => {
               />
             </div>
             <div className="color-button-row">
-              
               <button
                 className="color-button"
                 style={{ backgroundColor: "white", width: "25px", height: "25px" }}
@@ -317,33 +313,63 @@ const Game = () => {
         <div className="tools-container">
           <Button
             onClick={handleDrawToolClick}
-            className={`tool-button ${drawButtonClassName}`}
+            className={`tool-button ${isDrawToolSelected ? 'selected' : ''}`}
             style={{ marginRight: "4px", marginTop: "5px"}}
           >
             Draw
           </Button>
           <Button
             onClick={handleFillToolClick}
-            className={`tool-button ${fillButtonClassName}`}
+            className={`tool-button ${isFillToolSelected ? 'selected' : ''}`}
             style={{ marginRight: "4px", marginTop: "5px"}}
           >
             Fill
           </Button>
           <Button
             onClick={handleEraserClick}
-            className={`tool-button ${eraserButtonClassName}`}
+            className={`tool-button ${isEraserToolSelected ? 'selected' : ''}`}
             style={{ marginRight: "4px", marginTop: "5px"}}
           >
             Eraser
           </Button>
           <Button 
-          onClick={handleEraseAllClick}
-          
-          style={{ marginRight: "4px", marginTop: "5px"}}
+            onClick={handleEraseAllClick}
+            style={{ marginRight: "4px", marginTop: "5px"}}
           >
             Erase All
           </Button>
         </div>
+        <div className="stroke-size-buttons">
+  <button
+    className={`stroke-size-button ${strokeSize === 3 ? 'active' : ''}`}
+    onClick={() => setStrokeSize(3)}
+    style={{ width: "60px", height: "60px", marginTop: "5px", marginRight: "3px", outline: strokeSize === 3 ? "3px solid black" : "none" }}
+  >
+    3px
+  </button>
+  <button
+    className={`stroke-size-button ${strokeSize === 5 ? 'active' : ''}`}
+    onClick={() => setStrokeSize(5)}
+    style={{ width: "60px", height: "60px", marginTop: "5px", marginRight: "3px", outline: strokeSize === 5 ? "3px solid black" : "none" }}
+  >
+    5px
+  </button>
+  <button
+    className={`stroke-size-button ${strokeSize === 8 ? 'active' : ''}`}
+    onClick={() => setStrokeSize(8)}
+    style={{ width: "60px", height: "60px", marginTop: "5px", marginRight: "3px", outline: strokeSize === 8 ? "3px solid black" : "none" }}
+  >
+    8px
+  </button>
+  <button
+    className={`stroke-size-button ${strokeSize === 10 ? 'active' : ''}`}
+    onClick={() => setStrokeSize(10)}
+    style={{ width: "60px", height: "60px", marginTop: "5px", marginRight: "3px", outline: strokeSize === 10 ? "3px solid black" : "none" }}
+  >
+    10px
+  </button>
+</div>
+
       </div>
     </BaseContainer>
   );

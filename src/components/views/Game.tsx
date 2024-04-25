@@ -335,7 +335,7 @@ const Game = () => {
           <button
             className={`stroke-size-button ${strokeSize === 12 ? 'active' : ''}`}
             onClick={() => setStrokeSize(12)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", outline: strokeSize === 10 ? "3px solid black" : "none", position: "relative" }}
+            style={{ width: "50px", height: "50px", marginTop: "7px", outline: strokeSize === 12 ? "3px solid black" : "none", position: "relative" }}
           >
             <div className="stroke-circle" style={{ width: "28px", height: "28px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
           </button>

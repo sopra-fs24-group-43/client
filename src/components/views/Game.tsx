@@ -310,66 +310,66 @@ const Game = () => {
             </div>
           </div>
         </div>
+        <div className="stroke-size-buttons">
+          <button
+            className={`stroke-size-button ${strokeSize === 3 ? 'active' : ''}`}
+            onClick={() => setStrokeSize(3)}
+            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 3 ? "3px solid black" : "none", position: "relative" }}
+          >
+            <div className="stroke-circle" style={{ width: "10px", height: "10px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+          </button>
+          <button
+            className={`stroke-size-button ${strokeSize === 5 ? 'active' : ''}`}
+            onClick={() => setStrokeSize(5)}
+            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 5 ? "3px solid black" : "none", position: "relative" }}
+          >
+            <div className="stroke-circle" style={{ width: "15px", height: "15px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+          </button>
+          <button
+            className={`stroke-size-button ${strokeSize === 8 ? 'active' : ''}`}
+            onClick={() => setStrokeSize(8)}
+            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 8 ? "3px solid black" : "none", position: "relative" }}
+          >
+            <div className="stroke-circle" style={{ width: "20px", height: "20px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+          </button>
+          <button
+            className={`stroke-size-button ${strokeSize === 12 ? 'active' : ''}`}
+            onClick={() => setStrokeSize(12)}
+            style={{ width: "50px", height: "50px", marginTop: "7px", outline: strokeSize === 10 ? "3px solid black" : "none", position: "relative" }}
+          >
+            <div className="stroke-circle" style={{ width: "28px", height: "28px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+          </button>
+        </div>
         <div className="tools-container">
           <Button
             onClick={handleDrawToolClick}
             className={`tool-button ${isDrawToolSelected ? 'selected' : ''}`}
-            style={{ marginRight: "4px", marginTop: "5px"}}
+            style={{ marginRight: "4px", marginTop: "7px"}}
           >
             Draw
           </Button>
           <Button
             onClick={handleFillToolClick}
             className={`tool-button ${isFillToolSelected ? 'selected' : ''}`}
-            style={{ marginRight: "4px", marginTop: "5px"}}
+            style={{ marginRight: "4px", marginTop: "7px"}}
           >
             Fill
           </Button>
           <Button
             onClick={handleEraserClick}
             className={`tool-button ${isEraserToolSelected ? 'selected' : ''}`}
-            style={{ marginRight: "4px", marginTop: "5px"}}
+            style={{ marginRight: "4px", marginTop: "7px"}}
           >
             Eraser
           </Button>
           <Button 
             onClick={handleEraseAllClick}
-            style={{ marginRight: "4px", marginTop: "5px"}}
+            style={{ marginRight: "4px", marginTop: "7px"}}
           >
             Erase All
           </Button>
         </div>
-        <div className="stroke-size-buttons">
-  <button
-    className={`stroke-size-button ${strokeSize === 3 ? 'active' : ''}`}
-    onClick={() => setStrokeSize(3)}
-    style={{ width: "60px", height: "60px", marginTop: "5px", marginRight: "3px", outline: strokeSize === 3 ? "3px solid black" : "none" }}
-  >
-    3px
-  </button>
-  <button
-    className={`stroke-size-button ${strokeSize === 5 ? 'active' : ''}`}
-    onClick={() => setStrokeSize(5)}
-    style={{ width: "60px", height: "60px", marginTop: "5px", marginRight: "3px", outline: strokeSize === 5 ? "3px solid black" : "none" }}
-  >
-    5px
-  </button>
-  <button
-    className={`stroke-size-button ${strokeSize === 8 ? 'active' : ''}`}
-    onClick={() => setStrokeSize(8)}
-    style={{ width: "60px", height: "60px", marginTop: "5px", marginRight: "3px", outline: strokeSize === 8 ? "3px solid black" : "none" }}
-  >
-    8px
-  </button>
-  <button
-    className={`stroke-size-button ${strokeSize === 10 ? 'active' : ''}`}
-    onClick={() => setStrokeSize(10)}
-    style={{ width: "60px", height: "60px", marginTop: "5px", marginRight: "3px", outline: strokeSize === 10 ? "3px solid black" : "none" }}
-  >
-    10px
-  </button>
-</div>
-
+        
       </div>
     </BaseContainer>
   );

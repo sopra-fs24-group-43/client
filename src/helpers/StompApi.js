@@ -1,7 +1,7 @@
 import StompJs from 'stompjs';
 import SockJS from 'sockjs-client';
 
-class WebSocketService {
+class StompApi {
   constructor() {
     this.stompClient = null;
     this.subscriptions = {};
@@ -10,7 +10,7 @@ class WebSocketService {
   connect() {
     const socket = new SockJS('http://localhost:8080/ws');
     this.stompClient = StompJs.over(socket);
-    this.stompClient.connect({}, onConnectedCallback, onErrorCallback);
+    this.stompClient.connect({}, this.onConnectedCallback, this.onErrorCallback);
   }
 
   onConnectedCallback = () => {};
@@ -20,9 +20,9 @@ class WebSocketService {
   };
 
   subscribe(destination, onMessageReceived) {
-    if (!this.stompClient) {
-      throw new Error('WebSocket is not connected');
-    }
+    // if (!this.stompClient) {
+    //   throw new Error('WebSocket is not connected');
+    // }
     const subscription = this.stompClient.subscribe(destination, onMessageReceived);
     this.subscriptions[destination] = subscription;
     return subscription;
@@ -36,12 +36,12 @@ class WebSocketService {
     }
   }
 
-  send(destination, headers = {}, body) {
+  send(destination, body, headers = {}) {
     if (!this.stompClient || !this.stompClient.connected) {
       throw new Error(`WebSocket is not connected, the StompClient = ${JSON.stringify(this.stompClient)}`);
     }
     console.log("BEFORE SEND");
-    this.stompClient.send(destination, headers, body);
+    this.stompClient.send(destination, body, headers);
     console.log("AFTER  SEND");
   }
 
@@ -55,4 +55,4 @@ class WebSocketService {
   }
 }
 
-export default WebSocketService;
+export default StompApi;

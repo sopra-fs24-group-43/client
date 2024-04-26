@@ -1,17 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "styles/views/Table.scss"
+import { stompApi } from "components/views/LandingPage";
 
-const UserTable = () => {
-  // const [users, setUsers] = useState([]);
+const Table = () => {
+  useEffect(() => {
+    const subscribeWithTimeout = () => {
+      setTimeout(() => {
+        stompApi.subscribe('/topic/landing/getallgames', onMessageReceived);
+      }, 1000); 
+    };
 
-  // const createUser = (lobbyName) => {
-  //   // When creating a user, add them to the list of users
-  //   const newUser = {
-  //     lobbyName: lobbyName,
-  //     username: "User" // Here you should get the username entered during login
-  //   };
-  //   setUsers([...users, newUser]);
-  // };
+    stompApi.connect();
+    subscribeWithTimeout();
+  }, []);
+
+  const onMessageReceived = (payload) => {
+    var payloadData = JSON.parse(payload.body);
+    console.log(":", payloadData);
+  };
 
   return (
     <div className="Table container">
@@ -40,4 +46,4 @@ const UserTable = () => {
   );
 };
 
-export default UserTable;
+export default Table;

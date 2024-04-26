@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import { User } from "types";
 import "styles/views/Game.scss";
 
-import WebSocketService from "../../helpers/WebSocketService";
+import WebSocketService from "../../helpers/StompApi";
 
 const Player = ({ user }: { user: User }) => (
   <div className="player container">

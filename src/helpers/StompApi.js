@@ -1,5 +1,5 @@
-import StompJs from 'stompjs';
-import SockJS from 'sockjs-client';
+import StompJs from "stompjs";
+import SockJS from "sockjs-client";
 
 class StompApi {
   constructor() {
@@ -8,7 +8,7 @@ class StompApi {
   }
 
   connect() {
-    const socket = new SockJS('http://localhost:8080/ws');
+    const socket = new SockJS("http://localhost:8080/ws");
     this.stompClient = StompJs.over(socket);
     this.stompClient.connect({}, this.onConnectedCallback, this.onErrorCallback);
   }
@@ -25,6 +25,7 @@ class StompApi {
     // }
     const subscription = this.stompClient.subscribe(destination, onMessageReceived);
     this.subscriptions[destination] = subscription;
+    
     return subscription;
   }
 

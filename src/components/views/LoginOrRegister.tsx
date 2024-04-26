@@ -101,8 +101,8 @@ const Login = () => {
                 Login
               </Button>
             </div>
-            </div>
-            <div className="login-column">
+          </div>
+          <div className="login-column">
             <h2>Register</h2>
             <FormField
               label="Username"

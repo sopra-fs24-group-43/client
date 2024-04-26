@@ -35,8 +35,6 @@ const Login = () => {
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
   
-
-
   const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({ username, name, password });
@@ -68,7 +66,7 @@ const Login = () => {
 
       // Store the token into the local storage.
       localStorage.setItem("token", user.token);
-      localStorage.setItem("username", username);
+      localStorage.setItem("username", loginUsername);
 
       // Login successfully worked --> navigate to the route /game in the GameRouter
       navigate("/game");
@@ -84,51 +82,51 @@ const Login = () => {
       <div className="login container">
         <div className="login form">
           <div className="login-column">
-          <h2>Login</h2>
-          <FormField
-            label="Username"
-            value={loginUsername}
-            onChange={(un: string) => setLoginUsername(un)}
-          />
-          <FormField
-            label="Password"
-            value={loginPassword}
-            onChange={(un: string) => setLoginPassword(un)}
-          />
-          <div className="login button-container">
-            <Button
-              width="100%"
-              onClick={() => doLogin()}
-            >
-              Login
-            </Button>
-          </div>
-          </div>
-          <div className="login-column">
-          <h2>Register</h2>
-          <FormField
-            label="Username"
-            value={username}
-            onChange={(un: string) => setUsername(un)}
-          />
-          <FormField
-            label="Name"
-            value={name}
-            onChange={(n) => setName(n)}
-          />
-          <FormField
-            label="Password"
-            value={password}
-            onChange={(n) => setPassword(n)}
-          />
-          <div className="login button-container">
-            <Button
-              width="100%"
-              onClick={() => doRegister()}
-            >
-              Register
-            </Button>
-          </div>
+            <h2>Login</h2>
+            <FormField
+              label="Username"
+              value={loginUsername}
+              onChange={(un: string) => setLoginUsername(un)}
+            />
+            <FormField
+              label="Password"
+              value={loginPassword}
+              onChange={(un: string) => setLoginPassword(un)}
+            />
+            <div className="login button-container">
+              <Button
+                width="100%"
+                onClick={() => doLogin()}
+              >
+                Login
+              </Button>
+            </div>
+            </div>
+            <div className="login-column">
+            <h2>Register</h2>
+            <FormField
+              label="Username"
+              value={username}
+              onChange={(un: string) => setUsername(un)}
+            />
+            <FormField
+              label="Name"
+              value={name}
+              onChange={(n) => setName(n)}
+            />
+            <FormField
+              label="Password"
+              value={password}
+              onChange={(n) => setPassword(n)}
+            />
+            <div className="login button-container">
+              <Button
+                width="100%"
+                onClick={() => doRegister()}
+              >
+                Register
+              </Button>
+            </div>
           </div>
         </div>
       </div>

@@ -25,8 +25,6 @@ const AppRouter = () => {
           <Route path="/game/*" element={<GameRouter base="/game"/>} />
         </Route>
 
-        
-
         <Route path="/loginOrRegister" element={<LoginGuard />}>
           <Route path="/loginOrRegister" element={<LoginOrRegister/>} />
         </Route>

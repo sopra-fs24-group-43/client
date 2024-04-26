@@ -38,7 +38,7 @@ const Table = () => {
           ))} */}
           <tr>
             <td>Simon&apos;s lobby</td>
-            <td>Simon The GOAT</td>
+            <td>Simon2004</td>
           </tr>
         </tbody>
       </table>

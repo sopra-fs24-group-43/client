@@ -7,17 +7,18 @@ import LogOrRegAndRulesForm from "../elements/landingPage/LogOrRegAndRulesForm";
 import CreateJoinLobby from "../elements/landingPage/CreateJoinLobby";
 
 import StompApi from "../../helpers/StompApi";
+
 export const stompApi = new StompApi();
 
 const LandingPage = () => {
 
   return (
     // <BaseContainer>
-      <div className="LandingPage container">
-        <LogOrRegAndRulesForm/>
-        <Table/>
-        <CreateJoinLobby/>
-      </div>
+    <div className="LandingPage container">
+      <LogOrRegAndRulesForm/>
+      <Table/>
+      <CreateJoinLobby/>
+    </div>
     // </BaseContainer>
   );
 };

@@ -1,417 +1,110 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
+import { api, handleError } from "helpers/api";
+import { Spinner } from "components/ui/Spinner";
 import { Button } from "components/ui/Button";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
+import PropTypes from "prop-types";
 import "styles/views/Game.scss";
+import { User } from "types";
+
+const Player = ({ user }: { user: User }) => (
+  <div className="player container">
+    <div className="player username">{user.username}</div>
+    <div className="player name">{user.name}</div>
+    <div className="player id">id: {user.id}</div>
+  </div>
+);
+
+Player.propTypes = {
+  user: PropTypes.object,
+};
 
 const Game = () => {
+  // use react-router-dom's hook to access navigation, more info: https://reactrouter.com/en/main/hooks/use-navigate 
   const navigate = useNavigate();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [prevPosition, setPrevPosition] = useState<{ x: number; y: number }>(null);
-  const [selectedColor, setSelectedColor] = useState<string>("black");
-  const [isFillToolSelected, setIsFillToolSelected] = useState(false);
-  const [isDrawToolSelected, setIsDrawToolSelected] = useState(true);
-  const [isEraserToolSelected, setIsEraserToolSelected] = useState(false);
-  const [strokeSize, setStrokeSize] = useState(3);
-  const [chatMessages, setChatMessages] = useState<string[]>([]);
-  const [currentMessage, setCurrentMessage] = useState<string>("");
-  const chatMessagesRef = useRef(null);
+
+  // define a state variable (using the state hook).
+  // if this variable changes, the component will re-render, but the variable will
+  // keep its value throughout render cycles.
+  // a component can have as many state variables as you like.
+  // more information can be found under https://react.dev/learn/state-a-components-memory and https://react.dev/reference/react/useState 
+  const [users, setUsers] = useState<User[]>(null);
 
   const logout = (): void => {
     localStorage.removeItem("token");
     navigate("/loginOrRegister");
   };
 
+  // the effect hook can be used to react to change in your component.
+  // in this case, the effect hook is only run once, the first time the component is mounted
+  // this can be achieved by leaving the second argument an empty array.
+  // for more information on the effect hook, please see https://react.dev/reference/react/useEffect 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/loginOrRegister");
-    }
-  }, [navigate]);
+    // effect callbacks are synchronous to prevent race conditions. So we put the async function inside:
+    async function fetchData() {
+      try {
+        const response = await api.get("/users");
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+        // delays continuous execution of an async operation for 1 second.
+        // This is just a fake async call, so that the spinner can be displayed
+        // feel free to remove it :)
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    if (isEraserToolSelected) {
-      ctx.globalCompositeOperation = "destination-out"; 
-      ctx.lineWidth = 10; 
-    } else {
-      ctx.globalCompositeOperation = "source-over"; 
-      ctx.strokeStyle = selectedColor;
-      ctx.lineWidth = strokeSize;
-    }
+        // Get the returned users and update the state.
+        setUsers(response.data);
 
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+        // This is just some data for you to see what is available.
+        // Feel free to remove it.
+        console.log("request to:", response.request.responseURL);
+        console.log("status code:", response.status);
+        console.log("status text:", response.statusText);
+        console.log("requested data:", response.data);
 
-    const handleMouseDown = (event: MouseEvent) => {
-      if (isFillToolSelected) {
-        fillArea(event.offsetX, event.offsetY, ctx);
-      } else if (isDrawToolSelected || isEraserToolSelected) {
-        setIsDrawing(true);
-        setPrevPosition({ x: event.offsetX, y: event.offsetY });
-      }
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!isDrawing || isFillToolSelected || (!isDrawToolSelected && !isEraserToolSelected)) return;
-      const { x, y } = prevPosition;
-      const newX = event.offsetX;
-      const newY = event.offsetY;
-
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(newX, newY);
-      ctx.stroke();
-      setPrevPosition({ x: newX, y: newY });
-    };
-
-    const handleMouseUp = () => {
-      setIsDrawing(false);
-    };
-
-    canvas.addEventListener("mousedown", handleMouseDown);
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      canvas.removeEventListener("mousedown", handleMouseDown);
-      canvas.removeEventListener("mousemove", handleMouseMove);
-      canvas.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDrawing, prevPosition, selectedColor, isFillToolSelected, isDrawToolSelected, isEraserToolSelected, strokeSize]);
-
-  const handleEraserClick = () => {
-    setIsEraserToolSelected(true);
-    setIsDrawToolSelected(false);
-    setIsFillToolSelected(false);
-  };
-
-  const handleEraseAllClick = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  };
-
-  const handleColorButtonClick = (color: string) => {
-    setSelectedColor(color);
-  };
-
-  const handleFillToolClick = () => {
-    setIsFillToolSelected(true);
-    setIsDrawToolSelected(false);
-    setIsEraserToolSelected(false);
-  };
-
-  const handleDrawToolClick = () => {
-    setIsDrawToolSelected(true);
-    setIsFillToolSelected(false);
-    setIsEraserToolSelected(false);
-  };
-
-  const fillArea = (startX: number, startY: number, ctx: CanvasRenderingContext2D) => {
-    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-    const pixelStack = [[startX, startY]];
-
-    const getColorAtPixel = (x: number, y: number) => {
-      const position = (y * ctx.canvas.width + x) * 4;
-      return [
-        imageData.data[position],
-        imageData.data[position + 1],
-        imageData.data[position + 2],
-        imageData.data[position + 3]
-      ];
-    };
-
-    const setColorAtPixel = (x: number, y: number) => {
-      const position = (y * ctx.canvas.width + x) * 4;
-      imageData.data[position] = parseInt(selectedColor.substr(1, 2), 16);
-      imageData.data[position + 1] = parseInt(selectedColor.substr(3, 2), 16);
-      imageData.data[position + 2] = parseInt(selectedColor.substr(5, 2), 16);
-      imageData.data[position + 3] = 255;
-    };
-
-    const targetColor = getColorAtPixel(startX, startY);
-    if (targetColor.toString() === selectedColor) return;
-
-    while (pixelStack.length) {
-      const newPos = pixelStack.pop();
-      const x = newPos[0];
-      let y = newPos[1];
-
-      while (y-- >= 0 && matchStartColor(getColorAtPixel(x, y), targetColor)) {}
-      y++;
-      let reachLeft = false;
-      let reachRight = false;
-
-      while (y++ < ctx.canvas.height - 1 && matchStartColor(getColorAtPixel(x, y), targetColor)) {
-        setColorAtPixel(x, y);
-
-        if (x < ctx.canvas.width - 1) {
-          if (matchStartColor(getColorAtPixel(x + 1, y), targetColor)) {
-            if (!reachRight) {
-              pixelStack.push([x + 1, y]);
-              reachRight = true;
-            }
-          } else if (reachRight) {
-            reachRight = false;
-          }
-        }
-
-        if (x > 0) {
-          if (matchStartColor(getColorAtPixel(x - 1, y), targetColor)) {
-            if (!reachLeft) {
-              pixelStack.push([x - 1, y]);
-              reachLeft = true;
-            }
-          } else if (reachLeft) {
-            reachLeft = false;
-          }
-        }
+        // See here to get more data.
+        console.log(response);
+      } catch (error) {
+        console.error(
+          `Something went wrong while fetching the users: \n${handleError(
+            error
+          )}`
+        );
+        console.error("Details:", error);
+        alert(
+          "Something went wrong while fetching the users! See the console for details."
+        );
       }
     }
 
-    ctx.putImageData(imageData, 0, 0);
-  };
+    fetchData();
+  }, []);
 
-  const matchStartColor = (color: number[], targetColor: number[]) => {
-    return (
-      color[0] === targetColor[0] &&
-      color[1] === targetColor[1] &&
-      color[2] === targetColor[2] &&
-      color[3] === targetColor[3]
+  let content = <Spinner />;
+
+  if (users) {
+    content = (
+      <div className="game">
+        <ul className="game user-list">
+          {users.map((user: User) => (
+            <li key={user.id}>
+              <Player user={user} />
+            </li>
+          ))}
+        </ul>
+        <Button width="100%" onClick={() => logout()}>
+          Logout
+        </Button>
+      </div>
     );
-  };
+  }
 
-  const handleSendMessage = () => {
-    if (currentMessage.trim() !== '') {
-      const newMessage = localStorage.username +": "+ `${currentMessage}`;
-      setChatMessages([...chatMessages, newMessage]);
-      setCurrentMessage('');
-    }
-  };
-
-  useEffect(() => {
-    if (chatMessagesRef.current) {
-      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
-    }
-  }, [chatMessages]);
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-  
   return (
     <BaseContainer className="game container">
-      <div className="game-container">
-        <div className="canvas-container">
-          <canvas
-            ref={canvasRef}
-            width={800}
-            height={600}
-            style={{ border: "1px solid black", background: "white" }}
-          />
-          <Button onClick={logout}>Logout</Button>
-        </div>
-        <div className="color-buttons-container">
-          <div className="color-buttons">
-            <div className="color-button" style={{ width: "50px", height: "50px" }}>
-              <button
-                style={{ backgroundColor: selectedColor, width: "50px", height: "50px" }}
-                onClick={() => handleColorButtonClick(selectedColor)}
-              />
-            </div>
-            <div className="color-button-row">
-              <button
-                className="color-button"
-                style={{ backgroundColor: "white", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("white")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#d3d3d3", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#d3d3d3")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#6E95FB", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#6E95FB")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "red", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("red")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#66DA3D", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#66DA3D")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#E9ED20", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#E9ED20")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#FA8633", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#FA8633")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#B149F1", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#B149F1")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#EE49F1", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#EE49F1")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#A44E1E", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#A44E1E")}
-              />
-            </div>
-            <div className="color-button-row">
-              <button
-                className="color-button"
-                style={{ backgroundColor: "black", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("black")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#A9A9A9", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#A9A9A9")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#0A53E1", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#0A53E1")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#CF0808", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#CF0808")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#0CAA09", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#0CAA09")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#C9CD03", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#C9CD03")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#EF6A0A", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#EF6A0A")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#82109E", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#82109E")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#9E106E", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#9E106E")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#703717", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#703717")}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="stroke-size-buttons">
-          <button
-            className={`stroke-size-button ${strokeSize === 3 ? 'active' : ''}`}
-            onClick={() => setStrokeSize(3)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 3 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "10px", height: "10px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-          <button
-            className={`stroke-size-button ${strokeSize === 5 ? 'active' : ''}`}
-            onClick={() => setStrokeSize(5)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 5 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "15px", height: "15px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-          <button
-            className={`stroke-size-button ${strokeSize === 8 ? 'active' : ''}`}
-            onClick={() => setStrokeSize(8)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 8 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "20px", height: "20px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-          <button
-            className={`stroke-size-button ${strokeSize === 12 ? 'active' : ''}`}
-            onClick={() => setStrokeSize(12)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", outline: strokeSize === 12 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "28px", height: "28px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-        </div>
-        <div className="tools-container">
-          <Button
-            onClick={handleDrawToolClick}
-            className={`tool-button ${isDrawToolSelected ? 'selected' : ''}`}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Draw
-          </Button>
-          <Button
-            onClick={handleFillToolClick}
-            className={`tool-button ${isFillToolSelected ? 'selected' : ''}`}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Fill
-          </Button>
-          <Button
-            onClick={handleEraserClick}
-            className={`tool-button ${isEraserToolSelected ? 'selected' : ''}`}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Eraser
-          </Button>
-          <Button 
-            onClick={handleEraseAllClick}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Erase All
-          </Button>
-        </div>
-        <div className="chat-container">
-          <div className="chat-title">Guessing Chat</div>
-          <div className="chat-messages" ref={chatMessagesRef}>
-            {chatMessages.map((message, index) => (
-              <div key={index}>{message}</div>
-            ))}
-          </div>
-          <div className="chat-input">
-            <input
-              type="text"
-              value={currentMessage}
-              onChange={(e) => setCurrentMessage(e.target.value)}
-              onKeyDown={handleKeyPress} 
-              placeholder="Your Guess"
-            />
-            <button onClick={handleSendMessage}>Send</button>
-          </div>
-        </div>
-      </div>
+      <h2>Happy Coding!</h2>
+      <p className="game paragraph">
+        Get all users from secure endpoint:
+      </p>
+      {content}
     </BaseContainer>
   );
 };

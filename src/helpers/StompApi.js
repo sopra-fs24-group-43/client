@@ -40,9 +40,7 @@ class StompApi {
     if (!this.stompClient || !this.stompClient.connected) {
       throw new Error(`WebSocket is not connected, the StompClient = ${JSON.stringify(this.stompClient)}`);
     }
-    console.log("BEFORE SEND");
-    this.stompClient.send(destination, body, headers);
-    console.log("AFTER  SEND");
+    this.stompClient.send(destination, headers, body);
   }
 
   disconnect() {

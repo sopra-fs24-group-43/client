@@ -3,6 +3,9 @@ import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Game.scss";
+import RenderingGame from "../elements/game/RenderingGame"
+
+import { stompApi } from "./LandingPage";
 
 const Game = () => {
   const navigate = useNavigate();
@@ -14,18 +17,43 @@ const Game = () => {
   const [isDrawToolSelected, setIsDrawToolSelected] = useState(true);
   const [isEraserToolSelected, setIsEraserToolSelected] = useState(false);
   const [strokeSize, setStrokeSize] = useState(3);
+  const [chatMessages, setChatMessages] = useState<string[]>([]);
+  const [currentMessage, setCurrentMessage] = useState<string>("");
+  const chatMessagesRef = useRef(null);
+
+  const [prevRenderPosition, setPrevRenderPosition] = useState<{ x: number; y: number }>(null);
 
   const logout = (): void => {
     localStorage.removeItem("token");
     navigate("/loginOrRegister");
   };
 
+  const gameId = 1;
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/loginOrRegister");
     }
+
+    stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse);
   }, [navigate]);
+
+  const onHandleResponse = (payload) => {
+    const renderCanvas = canvasRef.current;
+    if (!renderCanvas) return;
+    const ctx = renderCanvas.getContext("2d");
+
+    const payloadData = JSON.parse(payload.body);
+    console.log("payload::::", payloadData);
+    
+    const { x, y } = payloadData;
+  
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -50,6 +78,7 @@ const Game = () => {
       } else if (isDrawToolSelected || isEraserToolSelected) {
         setIsDrawing(true);
         setPrevPosition({ x: event.offsetX, y: event.offsetY });
+        stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x: event.offsetX, y: event.offsetY }));
       }
     };
 
@@ -58,9 +87,11 @@ const Game = () => {
       const { x, y } = prevPosition;
       const newX = event.offsetX;
       const newY = event.offsetY;
+      // stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ newX, newY}));
 
       ctx.beginPath();
       ctx.moveTo(x, y);
+      stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x, y }));
       ctx.lineTo(newX, newY);
       ctx.stroke();
       setPrevPosition({ x: newX, y: newY });
@@ -116,6 +147,7 @@ const Game = () => {
 
     const getColorAtPixel = (x: number, y: number) => {
       const position = (y * ctx.canvas.width + x) * 4;
+
       return [
         imageData.data[position],
         imageData.data[position + 1],
@@ -184,6 +216,27 @@ const Game = () => {
     );
   };
 
+  const handleSendMessage = () => {
+    if (currentMessage.trim() !== "") {
+      const newMessage = localStorage.username +": "+ `${currentMessage}`;
+      setChatMessages([...chatMessages, newMessage]);
+      setCurrentMessage("");
+    }
+  };
+
+  useEffect(() => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+  
   return (
     <BaseContainer className="game container">
       <div className="game-container">
@@ -312,28 +365,28 @@ const Game = () => {
         </div>
         <div className="stroke-size-buttons">
           <button
-            className={`stroke-size-button ${strokeSize === 3 ? 'active' : ''}`}
+            className={`stroke-size-button ${strokeSize === 3 ? "active" : ""}`}
             onClick={() => setStrokeSize(3)}
             style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 3 ? "3px solid black" : "none", position: "relative" }}
           >
             <div className="stroke-circle" style={{ width: "10px", height: "10px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
           </button>
           <button
-            className={`stroke-size-button ${strokeSize === 5 ? 'active' : ''}`}
+            className={`stroke-size-button ${strokeSize === 5 ? "active" : ""}`}
             onClick={() => setStrokeSize(5)}
             style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 5 ? "3px solid black" : "none", position: "relative" }}
           >
             <div className="stroke-circle" style={{ width: "15px", height: "15px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
           </button>
           <button
-            className={`stroke-size-button ${strokeSize === 8 ? 'active' : ''}`}
+            className={`stroke-size-button ${strokeSize === 8 ? "active" : ""}`}
             onClick={() => setStrokeSize(8)}
             style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 8 ? "3px solid black" : "none", position: "relative" }}
           >
             <div className="stroke-circle" style={{ width: "20px", height: "20px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
           </button>
           <button
-            className={`stroke-size-button ${strokeSize === 12 ? 'active' : ''}`}
+            className={`stroke-size-button ${strokeSize === 12 ? "active" : ""}`}
             onClick={() => setStrokeSize(12)}
             style={{ width: "50px", height: "50px", marginTop: "7px", outline: strokeSize === 12 ? "3px solid black" : "none", position: "relative" }}
           >
@@ -343,21 +396,21 @@ const Game = () => {
         <div className="tools-container">
           <Button
             onClick={handleDrawToolClick}
-            className={`tool-button ${isDrawToolSelected ? 'selected' : ''}`}
+            className={`tool-button ${isDrawToolSelected ? "game selected" : ""}`}
             style={{ marginRight: "4px", marginTop: "7px"}}
           >
             Draw
           </Button>
           <Button
             onClick={handleFillToolClick}
-            className={`tool-button ${isFillToolSelected ? 'selected' : ''}`}
+            className={`tool-button ${isFillToolSelected ? "game selected" : ""}`}
             style={{ marginRight: "4px", marginTop: "7px"}}
           >
             Fill
           </Button>
           <Button
             onClick={handleEraserClick}
-            className={`tool-button ${isEraserToolSelected ? 'selected' : ''}`}
+            className={`tool-button ${isEraserToolSelected ? "game selected" : ""}`}
             style={{ marginRight: "4px", marginTop: "7px"}}
           >
             Eraser
@@ -369,7 +422,24 @@ const Game = () => {
             Erase All
           </Button>
         </div>
-        
+        <div className="chat-container">
+          <div className="chat-title">Guessing Chat</div>
+          <div className="chat-messages" ref={chatMessagesRef}>
+            {chatMessages.map((message, index) => (
+              <div key={index}>{message}</div>
+            ))}
+          </div>
+          <div className="chat-input">
+            <input
+              type="text"
+              value={currentMessage}
+              onChange={(e) => setCurrentMessage(e.target.value)}
+              onKeyDown={handleKeyPress} 
+              placeholder="Your Guess"
+            />
+            <button onClick={handleSendMessage}>Send</button>
+          </div>
+        </div>
       </div>
     </BaseContainer>
   );

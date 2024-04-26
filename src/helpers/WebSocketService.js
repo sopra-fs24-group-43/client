@@ -7,13 +7,17 @@ class WebSocketService {
     this.subscriptions = {};
   }
 
-  connect(endpoint, onConnectedCallback, onErrorCallback) {
-    const socket = new SockJS(endpoint);
+  connect() {
+    const socket = new SockJS('http://localhost:8080/ws');
     this.stompClient = StompJs.over(socket);
-    console.log("STOMP CLIENT = ", this.stompClient);
     this.stompClient.connect({}, onConnectedCallback, onErrorCallback);
-    console.log("AFTER CONNECTION");
   }
+
+  onConnectedCallback = () => {};
+
+  onErrorCallback = (err) => {      
+    console.log("Error: ", err);
+  };
 
   subscribe(destination, onMessageReceived) {
     if (!this.stompClient) {
@@ -33,16 +37,16 @@ class WebSocketService {
   }
 
   send(destination, headers = {}, body) {
-    // if (!this.stompClient || !this.stompClient.connected) {
-    //   throw new Error('WebSocket is not connected');
-    // }
+    if (!this.stompClient || !this.stompClient.connected) {
+      throw new Error(`WebSocket is not connected, the StompClient = ${JSON.stringify(this.stompClient)}`);
+    }
     console.log("BEFORE SEND");
     this.stompClient.send(destination, headers, body);
     console.log("AFTER  SEND");
   }
 
   disconnect() {
-    if (this.stompClient && this.stompClient.connected) {
+    if (this.stompClient) {
       Object.values(this.subscriptions).forEach((subscription) => {
         subscription.unsubscribe();
       });

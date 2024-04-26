@@ -7,7 +7,7 @@ const Table = () => {
     const subscribeWithTimeout = () => {
       setTimeout(() => {
         stompApi.subscribe("/topic/landing/getallgames", onMessageReceived);
-      }, 1000); 
+      }, 5000); 
     };
 
     stompApi.connect();

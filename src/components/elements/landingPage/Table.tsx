@@ -6,7 +6,7 @@ const Table = () => {
   useEffect(() => {
     const subscribeWithTimeout = () => {
       setTimeout(() => {
-        stompApi.subscribe('/topic/landing/getallgames', onMessageReceived);
+        stompApi.subscribe("/topic/landing/getallgames", onMessageReceived);
       }, 1000); 
     };
 

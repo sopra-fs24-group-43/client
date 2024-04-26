@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "../../styles/views/Lobby.scss"
 
-import {stompApi} from "../../components/views/LandingPage";
+import {stompApi} from "./LandingPage";
 
 
 const Lobby = () => {
   useEffect(() => {
-    stompApi.subscribe('/topic/coordinates', onMessageReceived);
+    stompApi.subscribe("/topic/coordinates", onMessageReceived);
 
     return () => {
     };
@@ -19,7 +19,7 @@ const Lobby = () => {
 
   return (
     <div className="Lobby container">
-      <h1>Hello man</h1>
+      <h1>Lobby..</h1>
     </div>
   );
 };

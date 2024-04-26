@@ -14,6 +14,9 @@ const Game = () => {
   const [isDrawToolSelected, setIsDrawToolSelected] = useState(true);
   const [isEraserToolSelected, setIsEraserToolSelected] = useState(false);
   const [strokeSize, setStrokeSize] = useState(3);
+  const [chatMessages, setChatMessages] = useState<string[]>([]);
+  const [currentMessage, setCurrentMessage] = useState<string>("");
+  const chatMessagesRef = useRef(null);
 
   const logout = (): void => {
     localStorage.removeItem("token");
@@ -184,6 +187,27 @@ const Game = () => {
     );
   };
 
+  const handleSendMessage = () => {
+    if (currentMessage.trim() !== '') {
+      const newMessage = localStorage.username +": "+ `${currentMessage}`;
+      setChatMessages([...chatMessages, newMessage]);
+      setCurrentMessage('');
+    }
+  };
+
+  useEffect(() => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+  
   return (
     <BaseContainer className="game container">
       <div className="game-container">
@@ -369,7 +393,24 @@ const Game = () => {
             Erase All
           </Button>
         </div>
-        
+        <div className="chat-container">
+          <div className="chat-title">Guessing Chat</div>
+          <div className="chat-messages" ref={chatMessagesRef}>
+            {chatMessages.map((message, index) => (
+              <div key={index}>{message}</div>
+            ))}
+          </div>
+          <div className="chat-input">
+            <input
+              type="text"
+              value={currentMessage}
+              onChange={(e) => setCurrentMessage(e.target.value)}
+              onKeyDown={handleKeyPress} 
+              placeholder="Your Guess"
+            />
+            <button onClick={handleSendMessage}>Send</button>
+          </div>
+        </div>
       </div>
     </BaseContainer>
   );

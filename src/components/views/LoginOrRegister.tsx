@@ -35,8 +35,6 @@ const Login = () => {
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
   
-
-
   const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({ username, name, password });

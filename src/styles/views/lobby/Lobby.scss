@@ -1,6 +1,6 @@
-@import "../theme";
+@import "../../theme";
 
-.Lobbby {
+.Lobby {
   &.container {
     margin-top: 2em;
     min-height: 300px;
@@ -9,6 +9,6 @@
     margin-right: 21px;
     display: flex;
     flex-direction: row;
-    // align-items: flex-start;
+    align-items:flex-start;
   }
 }

@@ -3,7 +3,7 @@ import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Game.scss";
-import RenderingGame from "../elements/game/RenderingGame"
+import ButtonComponent from "components/elements/game/ButtonComponent";
 
 import { stompApi } from "./LandingPage";
 
@@ -20,8 +20,6 @@ const Game = () => {
   const [chatMessages, setChatMessages] = useState<string[]>([]);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const chatMessagesRef = useRef(null);
-
-  const [prevRenderPosition, setPrevRenderPosition] = useState<{ x: number; y: number }>(null);
 
   const logout = (): void => {
     localStorage.removeItem("token");
@@ -46,12 +44,15 @@ const Game = () => {
 
     const payloadData = JSON.parse(payload.body);
     console.log("payload::::", payloadData);
+    console.log("selected color:::::", selectedColor);
     
-    const { x, y } = payloadData;
-  
+    const { x, y, newX, newY, color } = payloadData;
+
+    ctx.lineWidth = strokeSize;
+    ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.moveTo(x, y);
-    ctx.lineTo(x, y);
+    ctx.lineTo(newX, newY);
     ctx.stroke();
   }
 
@@ -78,7 +79,6 @@ const Game = () => {
       } else if (isDrawToolSelected || isEraserToolSelected) {
         setIsDrawing(true);
         setPrevPosition({ x: event.offsetX, y: event.offsetY });
-        stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x: event.offsetX, y: event.offsetY }));
       }
     };
 
@@ -87,11 +87,10 @@ const Game = () => {
       const { x, y } = prevPosition;
       const newX = event.offsetX;
       const newY = event.offsetY;
-      // stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ newX, newY}));
+      stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x, y, newX, newY, selectedColor}));
 
       ctx.beginPath();
       ctx.moveTo(x, y);
-      stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x, y }));
       ctx.lineTo(newX, newY);
       ctx.stroke();
       setPrevPosition({ x: newX, y: newY });
@@ -126,6 +125,7 @@ const Game = () => {
   };
 
   const handleColorButtonClick = (color: string) => {
+    console.log("IN Button", color, "    and ", selectedColor);
     setSelectedColor(color);
   };
 
@@ -273,11 +273,7 @@ const Game = () => {
                 style={{ backgroundColor: "#6E95FB", width: "25px", height: "25px" }}
                 onClick={() => handleColorButtonClick("#6E95FB")}
               />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "red", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("red")}
-              />
+              <ButtonComponent color={"red"} changeColor={handleColorButtonClick}/>
               <button
                 className="color-button"
                 style={{ backgroundColor: "#66DA3D", width: "25px", height: "25px" }}

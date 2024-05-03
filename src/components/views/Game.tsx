@@ -48,7 +48,7 @@ const Game = () => {
     
     const { x, y, newX, newY, color } = payloadData;
 
-    ctx.lineWidth = strokeSize;
+   
     ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -87,7 +87,7 @@ const Game = () => {
       const { x, y } = prevPosition;
       const newX = event.offsetX;
       const newY = event.offsetY;
-      stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x, y, newX, newY, selectedColor}));
+      stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x, y, newX, newY}));
 
       ctx.beginPath();
       ctx.moveTo(x, y);
@@ -273,7 +273,7 @@ const Game = () => {
                 style={{ backgroundColor: "#6E95FB", width: "25px", height: "25px" }}
                 onClick={() => handleColorButtonClick("#6E95FB")}
               />
-              <ButtonComponent color={"red"} changeColor={handleColorButtonClick}/>
+              <ButtonComponent color={"red"} changeColor={handleColorButtonClick}/> 
               <button
                 className="color-button"
                 style={{ backgroundColor: "#66DA3D", width: "25px", height: "25px" }}
@@ -419,8 +419,10 @@ const Game = () => {
           </Button>
         </div>
         <div className="chat-container">
-          <div className="chat-title">Guessing Chat</div>
+          <div className="chat-title">Guessing Chat</div> 
+
           <div className="chat-messages" ref={chatMessagesRef}>
+            
             {chatMessages.map((message, index) => (
               <div key={index}>{message}</div>
             ))}

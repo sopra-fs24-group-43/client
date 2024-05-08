@@ -3,7 +3,7 @@ import "../../../styles/views/lobby/Settings.scss"
 
 import { stompApi } from "../../views/LandingPage";
 
-const LobbySettings = () => {
+const Settings = () => {
   useEffect(() => {
     stompApi.subscribe("/topic/coordinates", onMessageReceived);
 
@@ -67,4 +67,4 @@ const LobbySettings = () => {
   );
 };
   
-export default LobbySettings;
+export default Settings;

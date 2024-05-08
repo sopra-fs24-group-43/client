@@ -9,7 +9,7 @@ import LandingPage from "../../views/LandingPage"
 
 import {SettingsviewGuard} from "../routeProtectors/SettingsviewGuard";
 import Settingsview from "../../views/Settingsview";
-
+import Lobby from "../../views/Lobby";
 /**
  * Main router of your application.
  * In the following class, different routes are rendered. In our case, there is a Login Route with matches the path "/login"
@@ -44,7 +44,7 @@ const AppRouter = () => {
         <Route path="/Settingsview" element={<SettingsviewGuard />}>
           <Route path="/Settingsview" element={<Settingsview/>} />
         </Route>
-
+        <Route path="/Lobby" element={<Lobby/>}></Route>
       </Routes>
 
     </BrowserRouter>

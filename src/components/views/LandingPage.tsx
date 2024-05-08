@@ -14,7 +14,7 @@ const LandingPage = () => {
   return (
     // <BaseContainer>
       <div className="LandingPage container">
-
+        <LogOrRegAndRulesForm/>
         <Table/>
         <CreateJoinLobby/>
       </div>

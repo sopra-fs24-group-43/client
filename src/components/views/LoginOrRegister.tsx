@@ -35,8 +35,6 @@ const Login = () => {
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
 
-
-
   const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({ username, name, password });
@@ -46,10 +44,13 @@ const Login = () => {
       const user = new User(response.data);
 
       // Store the token into the local storage.
-      localStorage.setItem("token", user.token);
 
+      localStorage.setItem("token", user.token);
+      localStorage.setItem("username", user.username);
+      localStorage.setItem("userId", user.id);
+      localStorage.setItem("friends", user.friends);
       // Login successfully worked --> navigate to the route /game in the GameRouter
-      navigate("/LandingPage", {state:{username:response.data.username, userId: response.data.id}});
+      navigate("/LandingPage", {state:{username:response.data.username, userId: response.data.id, friends: response.data.friends}});
     } catch (error) {
       alert(
         `Something went wrong during the login: \n${handleError(error)}`
@@ -66,9 +67,12 @@ const Login = () => {
 
       // Store the token into the local storage.
       localStorage.setItem("token", user.token);
-
+      localStorage.setItem("username", user.username);
+      localStorage.setItem("userId", user.id);
+      localStorage.setItem("friends", user.friends);
+      console.log("this is friends!: "+user.friends)
       // Login successfully worked --> navigate to the route /game in the GameRouter
-      navigate("/LandingPage", {state:{username: response.data.username, userId: response.data.id}});
+      navigate("/LandingPage", {state:{username: response.data.username, userId: response.data.id, friends: response.data.friends}});
     } catch (error) {
       alert(
         `Something went wrong during the login: \n${handleError(error)}`

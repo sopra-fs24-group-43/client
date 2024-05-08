@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "styles/views/Table.scss"
 import {useLocation, useNavigate} from "react-router-dom";
 import StompApi from "../../helpers/StompApi";
@@ -9,32 +9,60 @@ const UserTable = () => {
 
   const navigate = useNavigate();
   let [games, setgames] = useState(null)
-  var registered = false;
-  var username =null;
-  var userId= null;
-  const friends = [];
-  var role;
-  if (useLocation()["state"] === null){}
+  let [checkedgames, setcheckedgames] = useState(false)
+  let [florian, setflorian] = useState(0)
+  let registered = false;
+  let username =null;
+  let userId= null;
+  let friends = null;
+  let role;
+  console.log("registered: "+registered)
+  console.log("username, userId: " + username + ", " + userId)
+  if (useLocation()["state"] === null){
+    if (localStorage.getItem("username")=== null && localStorage.getItem("userId")=== null && localStorage.getItem("friends")=== null){
+      registered = false
+    }
+    else {
+      console.log("gettings credentials from localStorage")
+      username = localStorage.getItem("username")
+      userId = parseInt(localStorage.getItem("userId"))
+      friends = localStorage.getItem("friends") //is the String "null" if user has no friends
+
+      if (friends === "null") {friends = []}
+      registered = true;
+    }
+  }
   else{
-    console.log("registered: "+registered)
-    console.log("username: " + username)
-    console.log("userId: "+ userId)
-    registered = true;
+    console.log("gettings credentials from useLocation")
     username = useLocation()["state"]["username"];
     userId = useLocation()["state"]["userId"];
-    console.log("registered after: "+registered)
-    console.log("username after: " + username)
-    console.log("userId after: "+ userId)
+    friends = useLocation()["state"]["friends"];// is object null if user has no friends
+    if (friends === null) {friends = []}
+    registered = true;
   }
+
+  console.log("registered after: "+registered)
+  console.log("username, userId after: " + username + ", " + userId)
+
   const logout = (): void => {
     localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("userId");
     navigate("/loginOrRegister");
   };
 
   const gamestorender = () => {
+    console.log("new render?????")
+    console.log("checkedout in render: " + checkedgames)
+
+
     if (registered === false){
       console.log("need to be logged in to see lobbies!")
       return "log in to view and join available lobbies!"
+    }
+    else if (checkedgames === false) {
+      console.log("hasn't handled any response from getallgames")
+      return "haha"
     }
     else if (games === null || games.length === 0)  {
       console.log("no lobbies have been created yet!")
@@ -46,11 +74,12 @@ const UserTable = () => {
       const joingame = (gameId, inboundPlayer) => {
         console.log(inboundPlayer)
         stompApi.send("/app/games/" + gameId + "/joingame", JSON.stringify(inboundPlayer))
-        stompApi.unsubscribe("/topic/landing/" + userId)
-        stompApi.unsubscribe("/topic/landing")
-        navigate("/lobby", {state:{inboundPlayer:inboundPlayer}})
+        //stompApi.disconnect()
+        //stompApi.unsubscribe("/topic/landing/" + userId)
+        //stompApi.unsubscribe("/topic/landing")
+        navigate("/lobby",{state: {username: inboundPlayer.username, userId: inboundPlayer.userId, friends: inboundPlayer.friends, gameId: inboundPlayer.gameId, role: inboundPlayer.role}})
       }
-      games.forEach((game, index) =>  {
+      games.forEach((game, index) => {
         const inboundPlayer = {
           type: "inboundPlayer",
           username: username,
@@ -59,9 +88,6 @@ const UserTable = () => {
           friends: friends,
           role: "player"
         }
-
-
-
         gamesList.push(
           <tr>
             <td>{game[0]}</td>
@@ -82,7 +108,7 @@ const UserTable = () => {
   const handleResponse = (payload) => {
     var body = JSON.parse(payload.body)
 
-    if (body.type === "inboundPlayer" && registered){
+    if (body.type === "creategame" && registered){
       stompApi.send("/app/landing/" + userId + "/getallgames" , "");
     }
 
@@ -94,12 +120,6 @@ const UserTable = () => {
       var playerss = body.players
       var gamePasswords = body.gamePassword
 
-
-      console.log(body)
-      console.log(body.lobbyName)
-      console.log(body.gameId)
-      console.log(body.maxPlayers)
-      console.log(body.players)
       setgames(null)
       let templist = []
       for (var i = 0; i < lobbyNames.length; i++) {
@@ -110,21 +130,27 @@ const UserTable = () => {
         templist = [...templist, game]
         game = []
       }
+      console.log("everything: reged, games, checkedgames ", registered, games, checkedgames)
       setgames(templist)
-
+      setcheckedgames(true)
+      console.log("checkedout in handle: " + checkedgames)
       console.log("games (below):")
       console.log(games)
-
+      console.log(templist)
+      console.log("everything: reged, games, checkedgames ", registered, games, checkedgames)
+      console.log("florian: " + florian)
+      setflorian(1)
     }
     else {
-      console.log("no games created yet")
+      setcheckedgames(true)
+      console.log("no games received in getallgames")
     }
   }
   function timeout(delay: number) {
     return new Promise( res => setTimeout(res, delay) );
   }
-  const send = async () => {
-    await timeout(1500);
+  const getallgames = async () => {
+    await timeout(1000);
     stompApi.send("/app/landing/" + userId + "/getallgames" , "");
   }
   const connect = async ()  => {
@@ -136,13 +162,17 @@ const UserTable = () => {
     stompApi.send("/app/landing/" + userId + "/getallgames" , "");
   }
   useEffect(() => {
+
     console.log("run useEffect!")
     if (!stompApi.isConnected() && registered) {    //need to be registerd and not connected already to connect
       console.log("connecting to ws in Table view")
       connect();
     }
-    //send()
-
+    console.log("checkedgames in useEffect: "+checkedgames)
+    if (checkedgames === false && stompApi.isConnected() && registered){
+      console.log("this in checkedgame")
+      getallgames()
+    }
 
   });
   return (
@@ -167,6 +197,7 @@ const UserTable = () => {
       {gamestorender()}
       </tbody>
     </table>
+    {florian}
   </div>
 )
   ;

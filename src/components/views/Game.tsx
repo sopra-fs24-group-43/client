@@ -23,6 +23,9 @@ const Game = () => {
 
   const logout = (): void => {
     localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("friends");
     navigate("/loginOrRegister");
   };
 

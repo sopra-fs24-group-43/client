@@ -20,6 +20,8 @@ const Lobby = () => {
   //   var payloadData = JSON.parse(payload.body);
   //   console.log("PayLoad Lobby:", payloadData);
   // };
+  let a = useLocation()["state"];
+  console.log("this is useLocation in Lobby: " + JSON.stringify(a));
   const navigate = useNavigate();
 
   return (

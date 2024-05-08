@@ -36,6 +36,7 @@ const AppRouter = () => {
         <Route path="/lobby" element={<Lobby/>} />
 
       </Routes>
+
     </BrowserRouter>
   );
 };

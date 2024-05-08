@@ -33,9 +33,10 @@ const AppRouter = () => {
 
         <Route path="/LandingPage" element={<LandingPage/>} />
 
-        <Route path="/lobby" element={<Lobby/>} />
+        <Route path="/lobby/:gameId" element={<Lobby/>} />
 
       </Routes>
+
     </BrowserRouter>
   );
 };

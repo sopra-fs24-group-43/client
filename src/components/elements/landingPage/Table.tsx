@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "styles/views/Table.scss"
 import {useLocation, useNavigate} from "react-router-dom";
-import StompApi from "../../helpers/StompApi";
-import lobby from "../views/Lobby";
-import {Button} from "../ui/Button";
+import StompApi from "../../../helpers/StompApi";
+// import lobby from "../../views/Lobby";
+import {Button} from "../../ui/Button";
 const stompApi = new StompApi();
-const UserTable = () => {
+const Table = () => {
 
   const navigate = useNavigate();
   let [games, setgames] = useState(null)

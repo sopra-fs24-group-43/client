@@ -1,9 +1,8 @@
 import React, {useEffect} from "react";
 import {useNavigate, useLocation} from "react-router-dom";
 import "styles/views/CreateJoinLobby.scss";
-import StompApi from "../../helpers/StompApi";
+import StompApi from "../../../helpers/StompApi";
 import { Button } from "components/ui/Button";
-import game from "../views/Game";
 
 const stompApi = new StompApi();
 const CreateJoinLobby = () => {
@@ -59,7 +58,7 @@ const CreateJoinLobby = () => {
         //stompApi.disconnect()
         //stompApi.unsubscribe("/topic/landing")
         console.log("username, userId, gameId, role: ", username, userId, gameId, role)
-        navigate("/lobby", {state: {username: username, userId: userId, friends: friends, gameId: gameId, role: role}})
+        navigate("/lobby", {state: {username: username, userId: userId, friends: friends, gameId: gameId, role: role}}) // is sent to the lobby
       }
       else {
         console.log("creategame from other user")

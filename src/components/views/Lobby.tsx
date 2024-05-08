@@ -9,21 +9,10 @@ import Settings from "components/elements/lobby/Settings";
 // import { stompApi } from "./LandingPage";
 
 const Lobby = () => {
-  // useEffect(() => {
-  //   stompApi.subscribe("/topic/coordinates", onMessageReceived);
-
-  //   return () => {
-  //   };
-  // }, []);
-
-  // const onMessageReceived = (payload) => {
-  //   var payloadData = JSON.parse(payload.body);
-  //   console.log("PayLoad Lobby:", payloadData);
-  // };
-  let a = useLocation()["state"];
-  console.log("this is useLocation in Lobby: " + JSON.stringify(a));
+  let rawUserData = useLocation()["state"];
+  console.log("this is useLocation in Lobby: " + JSON.stringify(rawUserData));
   const navigate = useNavigate();
-
+  //userData={userData}
   return (
     <div className="Lobby container">
       <Players/>

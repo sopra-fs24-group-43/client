@@ -1,20 +1,41 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation, useParams} from "react-router-dom";
+import PropTypes from "prop-types";
 import "../../../styles/views/lobby/Settings.scss"
 
 import { stompApi } from "../../views/LandingPage";
 
-const Settings = () => {
-  useEffect(() => {
-    stompApi.subscribe("/topic/coordinates", onMessageReceived);
+const Settings = () => { //{userData}
+  // useEffect(() => {
+  //   stompApi.subscribe("/topic/coordinates", onMessageReceived);
 
-    return () => {
-    };
-  }, []);
+  //   return () => {
+  //   };
+  // }, []);
 
-  const onMessageReceived = (payload) => {
-    var payloadData = JSON.parse(payload.body);
-    console.log("PayLoad Lobby:", payloadData);
-  };
+  // const onMessageReceived = (payload) => {
+  //   var payloadData = JSON.parse(payload.body);
+  //   console.log("PayLoad Lobby:", payloadData);
+  // };
+  const { gameId } = useParams();
+  const lobbyId = parseInt(gameId);
+
+  function timeout(delay: number) {
+    return new Promise( res => setTimeout(res, delay) );
+  }
+
+  // const  connect = async ()=>{
+  //   stompApi.connect();
+  //   await timeout(1000);
+  //   stompApi.subscribe(`/topic/games/${lobbyId}`, handleResponse)
+  // }
+  // useEffect(() => {
+  //   console.log("user is connected: " + registered)
+  //   if (registered && !stompApi.isConnected()){
+  //     console.log("connecting to ws in CreateJoinLobby view")
+  //     connect();
+  //   }
+  // }, );
 
   const [maxPlayers, setMaxPlayers] = useState(5);
   const [maxRounds, setMaxRounds] = useState(5);
@@ -66,5 +87,15 @@ const Settings = () => {
     </div>
   );
 };
+
+// Settings.propTypes = {
+//   data: PropTypes.shape({
+//     username: PropTypes.string.isRequired,
+//     userId: PropTypes.number.isRequired,
+//     friends: PropTypes.list.isRequired,
+//     gameId: PropTypes.number.isRequired,
+//     role: PropTypes.string.isRequired,
+//   }).isRequired,
+// };
   
 export default Settings;

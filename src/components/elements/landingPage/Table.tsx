@@ -77,7 +77,7 @@ const Table = () => {
         //stompApi.disconnect()
         //stompApi.unsubscribe("/topic/landing/" + userId)
         //stompApi.unsubscribe("/topic/landing")
-        navigate("/lobby",{state: {username: inboundPlayer.username, userId: inboundPlayer.userId, friends: inboundPlayer.friends, gameId: inboundPlayer.gameId, role: inboundPlayer.role}})
+        navigate(`/lobby/${gameId}`,{state: {username: inboundPlayer.username, userId: inboundPlayer.userId, friends: inboundPlayer.friends, gameId: inboundPlayer.gameId, role: inboundPlayer.role}})
       }
       games.forEach((game, index) => {
         const inboundPlayer = {

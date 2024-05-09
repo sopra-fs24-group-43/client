@@ -379,8 +379,8 @@ const Game = () => {
             <div className="color-button-row">
               <button
                 className="color-button"
-                style={{ backgroundColor: "white", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("white")}
+                style={{ backgroundColor: "#FFFFFF", width: "25px", height: "25px" }}
+                onClick={() => handleColorButtonClick("#FFFFFF")}
               />
               <button
                 className="color-button"
@@ -427,8 +427,8 @@ const Game = () => {
             <div className="color-button-row">
               <button
                 className="color-button"
-                style={{ backgroundColor: "black", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("black")}
+                style={{ backgroundColor: "#000000", width: "25px", height: "25px" }}
+                onClick={() => handleColorButtonClick("#000000")}
               />
               <button
                 className="color-button"

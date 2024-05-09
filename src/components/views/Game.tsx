@@ -252,10 +252,10 @@ const Game = () => {
   const fillArea = (startX: number, startY: number, ctx: CanvasRenderingContext2D) => {
     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
     const pixelStack = [[startX, startY]];
-    
+    const visitedPixels = new Set();
+  
     const getColorAtPixel = (x: number, y: number) => {
       const position = (y * ctx.canvas.width + x) * 4;
-
       return [
         imageData.data[position],
         imageData.data[position + 1],
@@ -263,7 +263,7 @@ const Game = () => {
         imageData.data[position + 3]
       ];
     };
-
+  
     const setColorAtPixel = (x: number, y: number) => {
       const position = (y * ctx.canvas.width + x) * 4;
       imageData.data[position] = parseInt(selectedColor.substr(1, 2), 16);
@@ -271,23 +271,30 @@ const Game = () => {
       imageData.data[position + 2] = parseInt(selectedColor.substr(5, 2), 16);
       imageData.data[position + 3] = 255;
     };
-
+  
     const targetColor = getColorAtPixel(startX, startY);
     if (targetColor.toString() === selectedColor) return;
-
+  
     while (pixelStack.length) {
       const newPos = pixelStack.pop();
       const x = newPos[0];
       let y = newPos[1];
-
+  
+      if (visitedPixels.has(`${x},${y}`)) {
+        continue; 
+      }
+  
+      visitedPixels.add(`${x},${y}`);
+  
       while (y-- >= 0 && matchStartColor(getColorAtPixel(x, y), targetColor)) {}
       y++;
+  
       let reachLeft = false;
       let reachRight = false;
-
-      while (y++ < ctx.canvas.height - 1 && matchStartColor(getColorAtPixel(x, y), targetColor)) {
+  
+      while (y < ctx.canvas.height && matchStartColor(getColorAtPixel(x, y), targetColor)) {
         setColorAtPixel(x, y);
-
+  
         if (x < ctx.canvas.width - 1) {
           if (matchStartColor(getColorAtPixel(x + 1, y), targetColor)) {
             if (!reachRight) {
@@ -298,7 +305,7 @@ const Game = () => {
             reachRight = false;
           }
         }
-
+  
         if (x > 0) {
           if (matchStartColor(getColorAtPixel(x - 1, y), targetColor)) {
             if (!reachLeft) {
@@ -309,14 +316,16 @@ const Game = () => {
             reachLeft = false;
           }
         }
+  
+        y++;
       }
     }
-
+  
     ctx.putImageData(imageData, 0, 0);
     const dataURL = ctx.canvas.toDataURL();
     stompApi.send(`/app/games/${gameId}/fill`, JSON.stringify(dataURL));
   };
-
+  
   const matchStartColor = (color: number[], targetColor: number[]) => {
     return (
       color[0] === targetColor[0] &&
@@ -325,7 +334,7 @@ const Game = () => {
       color[3] === targetColor[3]
     );
   };
-
+  
   const handleSendMessage = () => {
     if (currentMessage.trim() !== "") {
       const newMessage = localStorage.username +": "+ `${currentMessage}`;

@@ -39,6 +39,7 @@ const Game = () => {
     stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse);
     stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse);
     stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse);
+    stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse);
   }, [navigate]);
 
   const onHandleResponse = (payload) => {
@@ -49,12 +50,16 @@ const Game = () => {
     const payloadData = JSON.parse(payload.body);
     console.log("payload::::", payloadData);
 
-    const { x, y, newX, newY, selectedColor, strokeSize } = payloadData;
-
+    const { x, y, newX, newY, selectedColor, strokeSize, eraserSelected } = payloadData;
+    console.log("isEraserToolSelected::::::", isEraserToolSelected);
     console.log("selected color:::::", selectedColor);
-    
+    if (eraserSelected) {
+      ctx.lineWidth = 15;
+    }
+    if (!eraserSelected) {
+      ctx.lineWidth = strokeSize;
+    }
     ctx.strokeStyle = selectedColor;
-    ctx.lineWidth = strokeSize;
     
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -70,11 +75,12 @@ const Game = () => {
 
     if (isEraserToolSelected) {
       ctx.globalCompositeOperation = "destination-out"; 
-      ctx.lineWidth = 10; 
-    } else {
+      ctx.lineWidth = 15; 
+    } 
+    if (!isEraserToolSelected) {
+      ctx.lineWidth = strokeSize;
       ctx.globalCompositeOperation = "source-over"; 
       ctx.strokeStyle = selectedColor;
-      ctx.lineWidth = strokeSize;
     }
 
     ctx.lineCap = "round";
@@ -83,7 +89,6 @@ const Game = () => {
     const handleMouseDown = (event: MouseEvent) => {
       if (isFillToolSelected) {
         fillArea(event.offsetX, event.offsetY, ctx);
-
         
       } else if (isDrawToolSelected || isEraserToolSelected) {
         setIsDrawing(true);
@@ -100,11 +105,13 @@ const Game = () => {
       console.log("isEraserToolSelected::::::", isEraserToolSelected);
       if (isEraserToolSelected) {
         eraserSelected = true;
+        ctx.lineWidth = 15;
       }
       if (!isEraserToolSelected) {
         eraserSelected = false;
+        ctx.lineWidth = strokeSize;
       }
-      stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x, y, newX, newY, selectedColor, strokeSize}));
+      stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x, y, newX, newY, selectedColor, strokeSize, eraserSelected}));
 
       ctx.beginPath();
       ctx.moveTo(x, y);
@@ -145,7 +152,7 @@ const Game = () => {
     setIsDrawToolSelected(false);
     setIsFillToolSelected(false);
     ctx.globalCompositeOperation = "destination-out"; 
-    ctx.lineWidth = 10; 
+    ctx.lineWidth = 15; 
     
   }
 
@@ -182,10 +189,25 @@ const Game = () => {
     setSelectedColor(color);
   };
 
+  const onHandleFillToolResponse = (payload) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const payloadData = JSON.parse(payload.body);
+    const { fillSelected } = payloadData;
+    console.log(fillSelected);
+    setIsFillToolSelected(true);
+    setIsDrawToolSelected(false);
+    setIsEraserToolSelected(false);
+    
+  };
+
   const handleFillToolClick = () => {
     setIsFillToolSelected(true);
     setIsDrawToolSelected(false);
     setIsEraserToolSelected(false);
+    const fillSelected = true;
+    stompApi.send(`/app/games/${gameId}/fillTool`, JSON.stringify({fillSelected}));
   };
 
   const onHandleDrawResponse = (payload) => {

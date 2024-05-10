@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "./components/views/Header";
 import AppRouter from "./components/routing/routers/AppRouter";
+import {ContextProvider} from "./context/Context";
 /**
  * Happy coding!
  * React Template by Lucas Pelloni
@@ -9,13 +10,14 @@ import AppRouter from "./components/routing/routers/AppRouter";
  */
 const App = () => {
   return (
+    <ContextProvider>
+      <Header height="100" />
+      <AppRouter />
+    </ContextProvider>
 
-    <div>
-        <Header height="100" />
-        <AppRouter />
-    </div>
 
   );
 };
+
 
 export default App;

@@ -5,7 +5,7 @@ import { stompApi } from "../../views/LandingPage";
 
 const Settings = () => {
   useEffect(() => {
-    stompApi.subscribe("/topic/coordinates", onMessageReceived);
+    //stompApi.subscribe("/topic/coordinates", onMessageReceived);
 
     return () => {
     };

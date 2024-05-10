@@ -58,16 +58,15 @@ const CreateJoinLobby = () => {
         //stompApi.disconnect()
         //stompApi.unsubscribe("/topic/landing")
         console.log("username, userId, gameId, role: ", username, userId, gameId, role)
-        navigate("/lobby", {state: {username: username, userId: userId, friends: friends, gameId: gameId, role: role}}) // is sent to the lobby
+        localStorage.setItem("role", "admin");
+        navigate(`/lobby/${gameId}`, {state: {username: username, userId: userId, friends: friends, gameId: gameId, role: role}}) // is sent to the lobby
       }
       else {
         console.log("creategame from other user")
       }
     }
     else {console.log("not creategame")}
-
-
-  }
+  };
 
   const  connect = async ()=>{
     stompApi.connect();

@@ -8,16 +8,16 @@ class StompApi {
         this._connected = false;
     }
 
-    connect() {
+    connect(onConnectedCallback = this.defaultOnConnectedCallback) {
         const socket = new SockJS('http://localhost:8080/ws');
         this.stompClient = StompJs.over(socket);
-        this.stompClient.connect({}, this.onConnectedCallback, this.onErrorCallback); //changed!!!
+        this.stompClient.connect({}, onConnectedCallback, this.onErrorCallback); //changed!!!
         this._connected = true
     }
     isConnected() {
         return this._connected;
     }
-    onConnectedCallback = () => {};
+    defaultOnConnectedCallback = () => {};
 
     onErrorCallback = (err) => {
         console.log("Error: ", err);

@@ -5,9 +5,11 @@ import "../../../styles/views/lobby/Settings.scss"
 
 import { stompApi } from "../../views/LandingPage";
 
+
 const Settings = () => { //{userData}
   // useEffect(() => {
   //   stompApi.subscribe("/topic/coordinates", onMessageReceived);
+
 
   //   return () => {
   //   };

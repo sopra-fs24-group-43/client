@@ -1,10 +1,12 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useContext} from "react";
 import {useNavigate, useLocation} from "react-router-dom";
 import "styles/views/CreateJoinLobby.scss";
 import StompApi from "../../../helpers/StompApi";
 import { Button } from "components/ui/Button";
+import {Context} from "../../../context/Context";
 
-const stompApi = new StompApi();
+const stompApi = new StompApi()
+export const changeview = false;
 const CreateJoinLobby = () => {
   const navigate = useNavigate();
   var registered = false;
@@ -13,6 +15,8 @@ const CreateJoinLobby = () => {
   var friends = null;
   var role;
   var gameId;
+  const context = useContext(Context)
+  const {stompApi} = context
 
   console.log("1registered: "+registered)
   console.log("1username, userId: " + username + ", " + userId)
@@ -42,10 +46,6 @@ const CreateJoinLobby = () => {
   console.log("1registered after: "+registered)
   console.log("1username, userId after: " + username + ", " + userId)
 
-
-  function timeout(delay: number) {
-    return new Promise( res => setTimeout(res, delay) );
-  }
   const handleResponse = (payload) => {
     var body = JSON.parse(payload.body)
     if (body.type === "creategame"){
@@ -55,32 +55,25 @@ const CreateJoinLobby = () => {
       console.log("handle: " + userId)
       if (body.userId === userId) {
         gameId = body.gameId
-        //stompApi.disconnect()
-        //stompApi.unsubscribe("/topic/landing")
         console.log("username, userId, gameId, role: ", username, userId, gameId, role)
+        localStorage.setItem("role", role)
         navigate("/lobby", {state: {username: username, userId: userId, friends: friends, gameId: gameId, role: role}}) // is sent to the lobby
       }
       else {
         console.log("creategame from other user")
       }
     }
-    else {console.log("not creategame")}
+    else {console.log("received something that is not creategame (in CreateJoinLobby)")}
 
 
   }
 
-  const  connect = async ()=>{
-    stompApi.connect();
-    await timeout(1000);
-    stompApi.subscribe("/topic/landing", handleResponse)
-  }
   useEffect(() => {
-    console.log("user is connected: " + registered)
-    if (registered && !stompApi.isConnected()){
-      console.log("connecting to ws in CreateJoinLobby view")
-      connect();
+    return () => {  //this gets executed when navigating another page
+      console.log("unsubscribing when navigating to different view from CreateJoinLobby!")
+      stompApi.unsubscribe("/topic/landing", "CreateJoinLobby")
     }
-  }, );
+  }, []);
 
   const creategame = () => {
     const inboundPlayer = {
@@ -91,9 +84,14 @@ const CreateJoinLobby = () => {
       friends: friends,
       role: "admin"
     }
-
+    console.log("trying to sub: " + stompApi.isConnected())
     role = "admin"
-    stompApi.send("/app/landing/creategame", JSON.stringify(inboundPlayer));
+    if (stompApi.isConnected()){
+      console.log("trying to sub: ")
+      stompApi.subscribe("/topic/landing", handleResponse, "CreateJoinLobby")
+      stompApi.send("/app/landing/creategame", JSON.stringify(inboundPlayer));
+    }
+
   }
   return (
     <div className="CreateJoinLobby container">

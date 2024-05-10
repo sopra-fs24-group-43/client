@@ -5,38 +5,48 @@ class StompApi {
     constructor() {
         this.stompClient = null;
         this.subscriptions = {};
-        this._connected = false;
+        this.connected = false;
     }
-
-    connect() {
+    connect(onConnectedCallback = this.defaultOnConnectedCallback) {
         const socket = new SockJS('http://localhost:8080/ws');
         this.stompClient = StompJs.over(socket);
-        this.stompClient.connect({}, this.onConnectedCallback, this.onErrorCallback); //changed!!!
-        this._connected = true
+        this.stompClient.connect({}, onConnectedCallback, this.onErrorCallback); //changed!!!
     }
     isConnected() {
-        return this._connected;
+        return this.connected;
     }
-    onConnectedCallback = () => {};
+
+    defaultOnConnectedCallback = () => {};
 
     onErrorCallback = (err) => {
         console.log("Error: ", err);
     };
 
-    subscribe(destination, onMessageReceived) {
+    subscribe(destination, onMessageReceived, filename = "") {
         if (!this.stompClient) {
             throw new Error('WebSocket is not connected');
         }
         const subscription = this.stompClient.subscribe(destination, (payload) => onMessageReceived(payload));
-        this.subscriptions[destination] = subscription;
+        this.subscriptions[destination + filename] = subscription;
         return subscription;
     }
-
-    unsubscribe(destination) {
-        const subscription = this.subscriptions[destination];
+    issubscribedto(destination, filename= ""){
+        const subscription = this.subscriptions[destination + filename]
+        //console.log(destination+filename)
+        //console.log("subscription:" + typeof subscription)
+        //console.log("subscription:" + subscription)
+        if (subscription === undefined){
+            return false
+        }
+        else {
+            return true
+        }
+    }
+    unsubscribe(destination, filename = "") {
+        const subscription = this.subscriptions[destination + filename];
         if (subscription) {
             subscription.unsubscribe();
-            delete this.subscriptions[destination];
+            delete this.subscriptions[destination + filename];
         }
     }
 
@@ -51,10 +61,12 @@ class StompApi {
 
     disconnect() {
         if (this.stompClient) {
+            console.log(JSON.stringify(this.subscriptions))
             Object.values(this.subscriptions).forEach((subscription) => {
                 subscription.unsubscribe();
             });
             this.stompClient.disconnect();
+            this.connected = false;
         }
     }
 }

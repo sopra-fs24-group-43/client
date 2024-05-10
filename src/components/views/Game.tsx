@@ -37,7 +37,7 @@ const Game = () => {
       navigate("/loginOrRegister");
     }
 
-    stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse);
+    //stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse); //changed!!!
   }, [navigate]);
 
   const onHandleResponse = (payload) => {

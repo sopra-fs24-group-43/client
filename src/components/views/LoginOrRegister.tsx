@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react"; //added
 import { api, handleError } from "helpers/api";
 import User from "models/User";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +6,7 @@ import { Button } from "components/ui/Button";
 import "styles/views/Login.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
-
+import { Context } from "../../context/Context"; //added
 const FormField = (props) => {
   return (
     <div className="login field">
@@ -34,7 +34,9 @@ const Login = () => {
   const [name, setName] = useState<string>(null);
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
-
+  const context = useContext(Context) //added
+  const username1 = context.username;
+  const setUsername1 = context.setUsername;
   const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({ username, name, password });
@@ -44,7 +46,7 @@ const Login = () => {
       const user = new User(response.data);
 
       // Store the token into the local storage.
-
+      setUsername1(user.username)//added
       localStorage.setItem("token", user.token);
       localStorage.setItem("username", user.username);
       localStorage.setItem("userId", user.id);

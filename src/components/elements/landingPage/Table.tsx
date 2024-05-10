@@ -1,21 +1,24 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, {useState, useEffect, useCallback, useContext} from "react";
 import "styles/views/Table.scss"
 import {useLocation, useNavigate} from "react-router-dom";
-import StompApi from "../../../helpers/StompApi";
-// import lobby from "../../views/Lobby";
 import {Button} from "../../ui/Button";
-const stompApi = new StompApi();
+import { Context } from "../../../context/Context";
+
+
 const Table = () => {
 
   const navigate = useNavigate();
   let [games, setgames] = useState(null)
   let [checkedgames, setcheckedgames] = useState(false)
-  let [florian, setflorian] = useState(0)
   let registered = false;
   let username =null;
   let userId= null;
   let friends = null;
-  let role;
+  const context = useContext(Context)
+  const {stompApi} = context  //or const stompApi = context.stompApi
+  const username1 = context.username;
+  const setUsername1 = context.setUsername;
+
   console.log("registered: "+registered)
   console.log("username, userId: " + username + ", " + userId)
   if (useLocation()["state"] === null){
@@ -24,6 +27,7 @@ const Table = () => {
     }
     else {
       console.log("gettings credentials from localStorage")
+      //setUsername1(localStorage.getItem("username")) //temporary!!!
       username = localStorage.getItem("username")
       userId = parseInt(localStorage.getItem("userId"))
       friends = localStorage.getItem("friends") //is the String "null" if user has no friends
@@ -43,13 +47,7 @@ const Table = () => {
 
   console.log("registered after: "+registered)
   console.log("username, userId after: " + username + ", " + userId)
-
-  const logout = (): void => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("userId");
-    navigate("/loginOrRegister");
-  };
+  console.log("username1: " + username1)//temporary
 
   const gamestorender = () => {
     console.log("new render?????")
@@ -62,7 +60,7 @@ const Table = () => {
     }
     else if (checkedgames === false) {
       console.log("hasn't handled any response from getallgames")
-      return "haha"
+      return ""
     }
     else if (games === null || games.length === 0)  {
       console.log("no lobbies have been created yet!")
@@ -74,10 +72,8 @@ const Table = () => {
       const joingame = (gameId, inboundPlayer) => {
         console.log(inboundPlayer)
         stompApi.send("/app/games/" + gameId + "/joingame", JSON.stringify(inboundPlayer))
-        //stompApi.disconnect()
-        //stompApi.unsubscribe("/topic/landing/" + userId)
-        //stompApi.unsubscribe("/topic/landing")
-        navigate(`/lobby/${gameId}`,{state: {username: inboundPlayer.username, userId: inboundPlayer.userId, friends: inboundPlayer.friends, gameId: inboundPlayer.gameId, role: inboundPlayer.role}})
+        localStorage.setItem("role", inboundPlayer.role)
+        navigate("/lobby",{state: {username: inboundPlayer.username, userId: inboundPlayer.userId, friends: inboundPlayer.friends, gameId: inboundPlayer.gameId, role: inboundPlayer.role}})
       }
       games.forEach((game, index) => {
         const inboundPlayer = {
@@ -104,11 +100,13 @@ const Table = () => {
     }
   }
 
-
   const handleResponse = (payload) => {
     var body = JSON.parse(payload.body)
-
+    if (body.type === "deletegame" && registered) {
+      console.log("deletegame received")
+    }
     if (body.type === "creategame" && registered){
+      console.log("receiving crategame inside Table")
       stompApi.send("/app/landing/" + userId + "/getallgames" , "");
     }
 
@@ -138,43 +136,58 @@ const Table = () => {
       console.log(games)
       console.log(templist)
       console.log("everything: reged, games, checkedgames ", registered, games, checkedgames)
-      console.log("florian: " + florian)
-      setflorian(1)
     }
     else {
       setcheckedgames(true)
       console.log("no games received in getallgames")
     }
   }
-  function timeout(delay: number) {
-    return new Promise( res => setTimeout(res, delay) );
-  }
-  const getallgames = async () => {
-    await timeout(1000);
-    stompApi.send("/app/landing/" + userId + "/getallgames" , "");
-  }
-  const connect = async ()  => {
 
-    stompApi.connect();
-    await timeout(1000);
-    stompApi.subscribe("/topic/landing/" + userId, handleResponse)
-    stompApi.subscribe("/topic/landing", handleResponse)
-    stompApi.send("/app/landing/" + userId + "/getallgames" , "");
+
+  const connect = async ()  => {
+    await stompApi.connect(() => {
+      stompApi.subscribe("/topic/landing/" + userId, handleResponse, "Table")
+      stompApi.subscribe("/topic/landing", handleResponse, "Table")
+      stompApi.send("/app/landing/" + userId + "/getallgames" , "");
+      stompApi.connected = true //important!!! needs to be set during the onConnectedCallback, otherwise it might happen that it connected gets set true before the ws
+                                //is fully setup
+    });
+
+
   }
   useEffect(() => {
+    const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
+      console.log("disconnecting before reloading page!")
+      stompApi.disconnect()
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
-    console.log("run useEffect!")
     if (!stompApi.isConnected() && registered) {    //need to be registerd and not connected already to connect
-      console.log("connecting to ws in Table view")
+      console.log("connecting to ws!")
       connect();
     }
-    console.log("checkedgames in useEffect: "+checkedgames)
-    if (checkedgames === false && stompApi.isConnected() && registered){
-      console.log("this in checkedgame")
-      getallgames()
+    if (checkedgames === false && stompApi.isConnected() && registered){  //this is for when you navigate back to Landingpage and you are already connected to ws but
+                                                                          //you are not subscribed to any channel. (checks if subscribed and if not it does so
+      let subscribed = stompApi.issubscribedto("/topic/landing/" + userId, "Table")
+
+      if (!subscribed){
+        stompApi.subscribe("/topic/landing/" + userId, handleResponse, "Table")
+      }
+      subscribed= stompApi.issubscribedto("/topic/landing", "Table")
+      if (!subscribed){
+        stompApi.subscribe("/topic/landing", handleResponse, "Table")
+      }
+      stompApi.send("/app/landing/" + userId + "/getallgames" , "");
+    }
+    return () => {  //this gets executed when navigating another page
+      console.log("unsubscribing and cleaning up when navigating to different view from Table!")
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      stompApi.unsubscribe("/topic/landing/" + userId, "Table")
+      stompApi.unsubscribe("/topic/landing", "Table")
     }
 
-  });
+
+  }, []);
   return (
 
 
@@ -197,7 +210,6 @@ const Table = () => {
       {gamestorender()}
       </tbody>
     </table>
-    {florian}
   </div>
 )
   ;

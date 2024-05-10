@@ -4,6 +4,7 @@ import "../../../styles/views/lobby/Settings.scss"
 
 import { stompApi } from "../../views/LandingPage";
 
+
 const Settings = () => {
   // setting up the gameSettings
   const [maxPlayers, setMaxPlayers] = useState(5);

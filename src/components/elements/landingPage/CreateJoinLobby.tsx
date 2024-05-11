@@ -57,7 +57,7 @@ const CreateJoinLobby = () => {
         gameId = body.gameId
         console.log("username, userId, gameId, role: ", username, userId, gameId, role)
         localStorage.setItem("role", role)
-        navigate("/lobby", {state: {username: username, userId: userId, friends: friends, gameId: gameId, role: role}}) // is sent to the lobby
+        navigate(`/lobby/${gameId}`, {state: {username: username, userId: userId, friends: friends, gameId: gameId, role: role}}) // is sent to the lobby
       }
       else {
         console.log("creategame from other user")

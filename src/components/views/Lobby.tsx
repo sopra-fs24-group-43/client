@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "../../styles/views/lobby/Lobby.scss"
 
@@ -13,6 +13,11 @@ const Lobby = () => {
   console.log("this is useLocation in Lobby: " + JSON.stringify(rawUserData));
   const navigate = useNavigate();
   //userData={userData}
+
+  // getting the gameId from the url
+  const { gameId } = useParams();
+  const lobbyId = parseInt(gameId);
+  
   return (
     <div className="Lobby container">
       <Players/>
@@ -20,7 +25,7 @@ const Lobby = () => {
         <Settings/>
         <Button
           width="100%"
-          onClick={() => navigate("/game")}
+          onClick={() => navigate(`/game/${lobbyId}`)}
         >
           Start Game
         </Button>

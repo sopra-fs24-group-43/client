@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../../../styles/views/lobby/Settings.scss"
 
-import { stompApi } from "../../views/LandingPage";
-
+import { Context } from "../../../context/Context";
 
 const Settings = () => {
   // setting up the gameSettings
@@ -14,6 +13,10 @@ const Settings = () => {
   // getting the gameId from the url
   const { gameId } = useParams();
   const lobbyId = parseInt(gameId);
+  
+  // getting contex
+  const context = useContext(Context)
+  const {stompApi} = context  //or const stompApi = context.stompApi
 
   // websocket connection establishing
   function timeout(delay: number) {
@@ -21,18 +24,32 @@ const Settings = () => {
   };
 
   const connect = async ()=>{
-    stompApi.connect();
+    stompApi.connect((() => {
+      stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
+      stompApi.connected = true;
+    }));
     await timeout(1000);
-    stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse);
   };
 
   useEffect(() => {
-    // connecting
+    // reload hadling
+    const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
+      console.log("disconnecting before reloading page!")
+      stompApi.disconnect()
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // subscribing
+    if (stompApi.isConnected()){
+      stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
+    };
+
+    // if not connected
     if (!stompApi.isConnected()){
       console.log("connecting to ws in Lobby view");
       connect();
       console.log("connected");
-    }
+    };
 
     // sending the data to the server only if user is a creator of a lobby
     if (localStorage.getItem("role") === "admin"){
@@ -45,6 +62,13 @@ const Settings = () => {
       if (stompApi.isConnected()){
         sendData(settings);
       };
+    };
+
+    // unsub
+    return () => {  //this gets executed when navigating another page
+      console.log("unsubscribing and cleaning up when navigating to different view from Settings!");
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Settings");
     };
   }, );
 

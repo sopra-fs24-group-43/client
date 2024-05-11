@@ -5,7 +5,8 @@ import "../../../styles/views/lobby/Players.scss"
 import { stompApi } from "../../views/LandingPage";
 
 const Players = () => {
-
+  // not needed handleBeforeUnload
+  
   return (
     <div className="Players container">
       <div className="Players header">

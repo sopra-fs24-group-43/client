@@ -23,9 +23,6 @@ const Game = () => {
 
   const logout = (): void => {
     localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("friends");
     navigate("/loginOrRegister");
   };
 
@@ -37,26 +34,38 @@ const Game = () => {
       navigate("/loginOrRegister");
     }
 
-    //stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse); //changed!!!
+    stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse);
+    stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse);
+    stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse);
+    stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse);
+    stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse);
+    stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse);
   }, [navigate]);
 
   const onHandleResponse = (payload) => {
     const renderCanvas = canvasRef.current;
     if (!renderCanvas) return;
     const ctx = renderCanvas.getContext("2d");
-
+    
     const payloadData = JSON.parse(payload.body);
     console.log("payload::::", payloadData);
-    console.log("selected color:::::", selectedColor);
-    
-    const { x, y, newX, newY, color } = payloadData;
 
-    ctx.lineWidth = strokeSize;
-    ctx.strokeStyle = color;
+    const { x, y, newX, newY, selectedColor, strokeSize, eraserSelected } = payloadData;
+    console.log("isEraserToolSelected::::::", isEraserToolSelected);
+    console.log("selected color:::::", selectedColor);
+    if (eraserSelected) {
+      ctx.lineWidth = 15;
+    }
+    if (!eraserSelected) {
+      ctx.lineWidth = strokeSize;
+    }
+    ctx.strokeStyle = selectedColor;
+    
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(newX, newY);
     ctx.stroke();
+    
   }
 
   useEffect(() => {
@@ -66,11 +75,12 @@ const Game = () => {
 
     if (isEraserToolSelected) {
       ctx.globalCompositeOperation = "destination-out"; 
-      ctx.lineWidth = 10; 
-    } else {
+      ctx.lineWidth = 15; 
+    } 
+    if (!isEraserToolSelected) {
+      ctx.lineWidth = strokeSize;
       ctx.globalCompositeOperation = "source-over"; 
       ctx.strokeStyle = selectedColor;
-      ctx.lineWidth = strokeSize;
     }
 
     ctx.lineCap = "round";
@@ -79,6 +89,7 @@ const Game = () => {
     const handleMouseDown = (event: MouseEvent) => {
       if (isFillToolSelected) {
         fillArea(event.offsetX, event.offsetY, ctx);
+        
       } else if (isDrawToolSelected || isEraserToolSelected) {
         setIsDrawing(true);
         setPrevPosition({ x: event.offsetX, y: event.offsetY });
@@ -90,7 +101,17 @@ const Game = () => {
       const { x, y } = prevPosition;
       const newX = event.offsetX;
       const newY = event.offsetY;
-      stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x, y, newX, newY, selectedColor}));
+      var eraserSelected = false;
+      console.log("isEraserToolSelected::::::", isEraserToolSelected);
+      if (isEraserToolSelected) {
+        eraserSelected = true;
+        ctx.lineWidth = 15;
+      }
+      if (!isEraserToolSelected) {
+        eraserSelected = false;
+        ctx.lineWidth = strokeSize;
+      }
+      stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x, y, newX, newY, selectedColor, strokeSize, eraserSelected}));
 
       ctx.beginPath();
       ctx.moveTo(x, y);
@@ -114,17 +135,53 @@ const Game = () => {
     };
   }, [isDrawing, prevPosition, selectedColor, isFillToolSelected, isDrawToolSelected, isEraserToolSelected, strokeSize]);
 
+  const onHandleEraserResponse = (payload) => {
+    const renderCanvas = canvasRef.current;
+    if (!renderCanvas) return;
+    const ctx = renderCanvas.getContext("2d");
+
+    const payloadData = JSON.parse(payload.body);
+    console.log("payload::::", payloadData);
+
+    const { x, y, newX, newY, selectedColor, eraserSelected } = payloadData;
+
+    console.log("selected color:::::", selectedColor);
+    console.log("isEraserSelected:", eraserSelected);
+
+    setIsEraserToolSelected(eraserSelected);
+    setIsDrawToolSelected(false);
+    setIsFillToolSelected(false);
+    ctx.globalCompositeOperation = "destination-out"; 
+    ctx.lineWidth = 15; 
+    
+  }
+
   const handleEraserClick = () => {
     setIsEraserToolSelected(true);
     setIsDrawToolSelected(false);
     setIsFillToolSelected(false);
+    const eraserSelected = true;
+    stompApi.send(`/app/games/${gameId}/eraser`, JSON.stringify({eraserSelected}));
   };
 
+  const onHandleEraseAllResponse = (payload) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const payloadData = JSON.parse(payload.body);
+    const { eraseAllVar } = payloadData;
+    console.log("THE VAR IS:", eraseAllVar);
+    if (eraseAllVar === "EraseAll")
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+  
   const handleEraseAllClick = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const eraseAllVar = "EraseAll";
+    stompApi.send(`/app/games/${gameId}/eraseAll`, JSON.stringify(eraseAllVar));
   };
 
   const handleColorButtonClick = (color: string) => {
@@ -132,25 +189,73 @@ const Game = () => {
     setSelectedColor(color);
   };
 
+  const onHandleFillToolResponse = (payload) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const payloadData = JSON.parse(payload.body);
+    const { fillSelected } = payloadData;
+    console.log(fillSelected);
+    setIsFillToolSelected(true);
+    setIsDrawToolSelected(false);
+    setIsEraserToolSelected(false);
+    
+  };
+
   const handleFillToolClick = () => {
     setIsFillToolSelected(true);
     setIsDrawToolSelected(false);
     setIsEraserToolSelected(false);
+    const fillSelected = true;
+    stompApi.send(`/app/games/${gameId}/fillTool`, JSON.stringify({fillSelected}));
+  };
+
+  const onHandleDrawResponse = (payload) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const payloadData = JSON.parse(payload.body);
+    const { drawSelected } = payloadData;
+    console.log(drawSelected);
+    setIsFillToolSelected(false);
+    setIsDrawToolSelected(true);
+    setIsEraserToolSelected(false);
+    
   };
 
   const handleDrawToolClick = () => {
     setIsDrawToolSelected(true);
     setIsFillToolSelected(false);
     setIsEraserToolSelected(false);
+    const drawSelected = true;
+    stompApi.send(`/app/games/${gameId}/draw`, JSON.stringify({drawSelected}));
   };
 
+  const onHandleFillResponse = (payload) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+  
+    const payloadData = JSON.parse(payload.body);
+    const { imageDataBuffer } = payloadData;
+  
+    const img = new Image();
+    
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0); 
+    };
+  
+    img.src = imageDataBuffer;
+  };
+   
   const fillArea = (startX: number, startY: number, ctx: CanvasRenderingContext2D) => {
     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
     const pixelStack = [[startX, startY]];
-
+    const visitedPixels = new Set();
+  
     const getColorAtPixel = (x: number, y: number) => {
       const position = (y * ctx.canvas.width + x) * 4;
-
       return [
         imageData.data[position],
         imageData.data[position + 1],
@@ -158,7 +263,7 @@ const Game = () => {
         imageData.data[position + 3]
       ];
     };
-
+  
     const setColorAtPixel = (x: number, y: number) => {
       const position = (y * ctx.canvas.width + x) * 4;
       imageData.data[position] = parseInt(selectedColor.substr(1, 2), 16);
@@ -166,23 +271,30 @@ const Game = () => {
       imageData.data[position + 2] = parseInt(selectedColor.substr(5, 2), 16);
       imageData.data[position + 3] = 255;
     };
-
+  
     const targetColor = getColorAtPixel(startX, startY);
     if (targetColor.toString() === selectedColor) return;
-
+  
     while (pixelStack.length) {
       const newPos = pixelStack.pop();
       const x = newPos[0];
       let y = newPos[1];
-
+  
+      if (visitedPixels.has(`${x},${y}`)) {
+        continue; 
+      }
+  
+      visitedPixels.add(`${x},${y}`);
+  
       while (y-- >= 0 && matchStartColor(getColorAtPixel(x, y), targetColor)) {}
       y++;
+  
       let reachLeft = false;
       let reachRight = false;
-
-      while (y++ < ctx.canvas.height - 1 && matchStartColor(getColorAtPixel(x, y), targetColor)) {
+  
+      while (y < ctx.canvas.height && matchStartColor(getColorAtPixel(x, y), targetColor)) {
         setColorAtPixel(x, y);
-
+  
         if (x < ctx.canvas.width - 1) {
           if (matchStartColor(getColorAtPixel(x + 1, y), targetColor)) {
             if (!reachRight) {
@@ -193,7 +305,7 @@ const Game = () => {
             reachRight = false;
           }
         }
-
+  
         if (x > 0) {
           if (matchStartColor(getColorAtPixel(x - 1, y), targetColor)) {
             if (!reachLeft) {
@@ -204,12 +316,16 @@ const Game = () => {
             reachLeft = false;
           }
         }
+  
+        y++;
       }
     }
-
+  
     ctx.putImageData(imageData, 0, 0);
+    const dataURL = ctx.canvas.toDataURL();
+    stompApi.send(`/app/games/${gameId}/fill`, JSON.stringify(dataURL));
   };
-
+  
   const matchStartColor = (color: number[], targetColor: number[]) => {
     return (
       color[0] === targetColor[0] &&
@@ -218,7 +334,7 @@ const Game = () => {
       color[3] === targetColor[3]
     );
   };
-
+  
   const handleSendMessage = () => {
     if (currentMessage.trim() !== "") {
       const newMessage = localStorage.username +": "+ `${currentMessage}`;
@@ -263,8 +379,8 @@ const Game = () => {
             <div className="color-button-row">
               <button
                 className="color-button"
-                style={{ backgroundColor: "white", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("white")}
+                style={{ backgroundColor: "#FFFFFF", width: "25px", height: "25px" }}
+                onClick={() => handleColorButtonClick("#FFFFFF")}
               />
               <button
                 className="color-button"
@@ -276,7 +392,7 @@ const Game = () => {
                 style={{ backgroundColor: "#6E95FB", width: "25px", height: "25px" }}
                 onClick={() => handleColorButtonClick("#6E95FB")}
               />
-              <ButtonComponent color={"red"} changeColor={handleColorButtonClick}/>
+              <ButtonComponent color={"red"} changeColor={handleColorButtonClick}/> 
               <button
                 className="color-button"
                 style={{ backgroundColor: "#66DA3D", width: "25px", height: "25px" }}
@@ -311,8 +427,8 @@ const Game = () => {
             <div className="color-button-row">
               <button
                 className="color-button"
-                style={{ backgroundColor: "black", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("black")}
+                style={{ backgroundColor: "#000000", width: "25px", height: "25px" }}
+                onClick={() => handleColorButtonClick("#000000")}
               />
               <button
                 className="color-button"
@@ -422,8 +538,10 @@ const Game = () => {
           </Button>
         </div>
         <div className="chat-container">
-          <div className="chat-title">Guessing Chat</div>
+          <div className="chat-title">Guessing Chat</div> 
+
           <div className="chat-messages" ref={chatMessagesRef}>
+
             {chatMessages.map((message, index) => (
               <div key={index}>{message}</div>
             ))}

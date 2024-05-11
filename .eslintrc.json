@@ -18,6 +18,8 @@
         }
     },
     "rules": {
+        "react/no-children-prop": "off",
+        "react/prop-types": "off",
         "eqeqeq": "error",
         "no-unreachable": "error",
         "no-duplicate-imports": "error",
@@ -31,4 +33,6 @@
         ]
     },
     "ignorePatterns": ["node_modules", "build", "dist", "public"]
+
+
 }

@@ -1,57 +1,74 @@
-import StompJs from "stompjs";
-import SockJS from "sockjs-client";
+import StompJs from 'stompjs';
+import SockJS from 'sockjs-client';
 
 class StompApi {
-  constructor() {
-    this.stompClient = null;
-    this.subscriptions = {};
-  }
-
-  connect() {
-    const socket = new SockJS("http://localhost:8080/ws");
-    this.stompClient = StompJs.over(socket);
-    this.stompClient.connect({}, this.onConnectedCallback, this.onErrorCallback);
-  }
-
-  onConnectedCallback = () => {};
-
-  onErrorCallback = (err) => {      
-    console.log("Error: ", err);
-  };
-
-  subscribe(destination, onMessageReceived) {
-    // if (!this.stompClient) {
-    //   throw new Error('WebSocket is not connected');
-    // }
-    const subscription = this.stompClient.subscribe(destination, onMessageReceived);
-    this.subscriptions[destination] = subscription;
-    
-    return subscription;
-  }
-
-  unsubscribe(destination) {
-    const subscription = this.subscriptions[destination];
-    if (subscription) {
-      subscription.unsubscribe();
-      delete this.subscriptions[destination];
+    constructor() {
+        this.stompClient = null;
+        this.subscriptions = {};
+        this.connected = false;
     }
-  }
-
-  send(destination, body, headers = {}) {
-    if (!this.stompClient || !this.stompClient.connected) {
-      throw new Error(`WebSocket is not connected, the StompClient = ${JSON.stringify(this.stompClient)}`);
+    connect(onConnectedCallback = this.defaultOnConnectedCallback) {
+        const socket = new SockJS('http://localhost:8080/ws');
+        this.stompClient = StompJs.over(socket);
+        this.stompClient.connect({}, onConnectedCallback, this.onErrorCallback); //changed!!!
     }
-    this.stompClient.send(destination, headers, body);
-  }
-
-  disconnect() {
-    if (this.stompClient) {
-      Object.values(this.subscriptions).forEach((subscription) => {
-        subscription.unsubscribe();
-      });
-      this.stompClient.disconnect();
+    isConnected() {
+        return this.connected;
     }
-  }
+
+    defaultOnConnectedCallback = () => {};
+
+    onErrorCallback = (err) => {
+        console.log("Error: ", err);
+    };
+
+    subscribe(destination, onMessageReceived, filename = "") {
+        if (!this.stompClient) {
+            throw new Error('WebSocket is not connected');
+        }
+        const subscription = this.stompClient.subscribe(destination, (payload) => onMessageReceived(payload));
+        this.subscriptions[destination + filename] = subscription;
+        return subscription;
+    }
+    issubscribedto(destination, filename= ""){
+        const subscription = this.subscriptions[destination + filename]
+        //console.log(destination+filename)
+        //console.log("subscription:" + typeof subscription)
+        //console.log("subscription:" + subscription)
+        if (subscription === undefined){
+            return false
+        }
+        else {
+            return true
+        }
+    }
+    unsubscribe(destination, filename = "") {
+        const subscription = this.subscriptions[destination + filename];
+        if (subscription) {
+            subscription.unsubscribe();
+            delete this.subscriptions[destination + filename];
+        }
+    }
+
+    send(destination, body ) {
+        if (!this.stompClient || !this.stompClient.connected) {
+            throw new Error(`WebSocket is not connected, the StompClient = ${JSON.stringify(this.stompClient)}`);
+        }
+        if (body === ""){this.stompClient.send(destination);}
+        else{this.stompClient.send(destination, {}, body);}
+
+    }
+
+    disconnect() {
+        if (this.stompClient) {
+            console.log(JSON.stringify(this.subscriptions))
+            Object.values(this.subscriptions).forEach((subscription) => {
+                subscription.unsubscribe();
+            });
+            this.stompClient.disconnect();
+            this.connected = false;
+        }
+    }
 }
 
 export default StompApi;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react"; //added
 import { api, handleError } from "helpers/api";
 import User from "models/User";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +6,7 @@ import { Button } from "components/ui/Button";
 import "styles/views/Login.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
-
+import { Context } from "../../context/Context"; //added
 const FormField = (props) => {
   return (
     <div className="login field">
@@ -34,21 +34,25 @@ const Login = () => {
   const [name, setName] = useState<string>(null);
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
-  
+  const context = useContext(Context) //added
+  const username1 = context.username;
+  const setUsername1 = context.setUsername;
   const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({ username, name, password });
       const response = await api.post("/users", requestBody);
-
       // Get the returned user and update a new object.
+
       const user = new User(response.data);
 
       // Store the token into the local storage.
+      setUsername1(user.username)//added
       localStorage.setItem("token", user.token);
-      localStorage.setItem("username", username);
-
+      localStorage.setItem("username", user.username);
+      localStorage.setItem("userId", user.id);
+      localStorage.setItem("friends", user.friends);
       // Login successfully worked --> navigate to the route /game in the GameRouter
-      navigate("/game");
+      navigate("/LandingPage", {state:{username:response.data.username, userId: response.data.id, friends: response.data.friends}});
     } catch (error) {
       alert(
         `Something went wrong during the login: \n${handleError(error)}`
@@ -60,16 +64,17 @@ const Login = () => {
     try {
       const requestBody = JSON.stringify({ username: loginUsername, password: loginPassword });
       const response = await api.put("/users", requestBody);
-
       // Get the returned user and update a new object.
       const user = new User(response.data);
 
       // Store the token into the local storage.
       localStorage.setItem("token", user.token);
-      localStorage.setItem("username", loginUsername);
-
+      localStorage.setItem("username", user.username);
+      localStorage.setItem("userId", user.id);
+      localStorage.setItem("friends", user.friends);
+      console.log("this is friends!: "+user.friends)
       // Login successfully worked --> navigate to the route /game in the GameRouter
-      navigate("/game");
+      navigate("/LandingPage", {state:{username: response.data.username, userId: response.data.id, friends: response.data.friends}});
     } catch (error) {
       alert(
         `Something went wrong during the login: \n${handleError(error)}`

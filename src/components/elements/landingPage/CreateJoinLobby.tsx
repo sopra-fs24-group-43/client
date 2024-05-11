@@ -105,15 +105,6 @@ const CreateJoinLobby = () => {
           Create lobby
         </Button>
       </div>
-
-      <div className="CreateJoinLobby button-container">
-        <Button
-          width="100%"
-          onClick={() => {}}
-        >
-          does nothing, was join before
-        </Button>
-      </div>
     </div>
   );
 };

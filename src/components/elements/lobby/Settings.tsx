@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../../../styles/views/lobby/Settings.scss"
 
-import { stompApi } from "../../views/LandingPage";
-
+import { Context } from "../../../context/Context";
 
 const Settings = () => {
+  console.log("I'm in the Settings");
   // setting up the gameSettings
   const [maxPlayers, setMaxPlayers] = useState(5);
   const [maxRounds, setMaxRounds] = useState(5);
@@ -14,80 +14,79 @@ const Settings = () => {
   // getting the gameId from the url
   const { gameId } = useParams();
   const lobbyId = parseInt(gameId);
+  
+  // getting contex
+  const context = useContext(Context)
+  const {stompApi} = context  //or const stompApi = context.stompApi
 
   // websocket connection establishing
   function timeout(delay: number) {
     return new Promise( res => setTimeout(res, delay) );
   };
 
-  const connect = async ()=>{
-    stompApi.connect();
-    await timeout(1000);
-    stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse);
-  };
+  // const connect = async ()=>{
+  //   stompApi.connect((() => {
+  //     stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
+  //     stompApi.connected = true;
+  //   }));
+  //   await timeout(1000);
+  // };
 
   useEffect(() => {
-    // connecting
-    if (!stompApi.isConnected()){
-      console.log("connecting to ws in Lobby view");
-      connect();
-      console.log("connected");
-    }
+    // reload hadling
+    // const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
+    //   console.log("disconnecting before reloading page!")
+    //   stompApi.disconnect()
+    // };
+    // window.addEventListener('beforeunload', handleBeforeUnload);
 
+    // subscribing
+    if (stompApi.isConnected()){
+      stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
+      console.log("subscribed when was connected to the websocket in Settings");
+    };
+
+    // if not connected
+    // if (!stompApi.isConnected()){
+    //   console.log("connecting to ws in Settings view");
+    //   connect();
+    //   console.log("connected");
+    // };
+
+    // unsub
+    return () => {  //this gets executed when navigating another page
+      console.log("unsubscribing and cleaning up when navigating to different view from Settings!");
+      // window.removeEventListener('beforeunload', handleBeforeUnload)
+      stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Settings");
+    };
+  }, []);
+
+  useEffect(() => {
     // sending the data to the server only if user is a creator of a lobby
     if (localStorage.getItem("role") === "admin"){
-        const settings = {
-        type: "gameSettings",
-        maxPlayers: maxPlayers,
-        maxRounds: maxRounds,
-        turnLength: turnLength
-      };
-      if (stompApi.isConnected()){
-        sendData(settings);
-      };
+      const settings = {
+      type: "gameSettings",
+      maxPlayers: maxPlayers,
+      maxRounds: maxRounds,
+      turnLength: turnLength
     };
-  }, );
+    if (stompApi.isConnected()){
+      sendData(settings);
+    };
+  };
+
+  }, ) 
 
   const sendData = async (settings) => { // needed for delaying the send function, so the connection is established
     await timeout(1000);
+    console.log("sending the message from the settings");
     stompApi.send(`/app/games/${lobbyId}/updategamesettings`, JSON.stringify(settings));
   };
-
-  // sending the data to the server
-  useEffect(() => {
-    if (localStorage.getItem("role") === "admin"){
-      const settings = {
-        type: "gameSettings",
-        maxPlayers: maxPlayers,
-        maxRounds: maxRounds,
-        turnLength: turnLength
-      };
-      if (stompApi.isConnected()){
-        sendData(settings);
-      };
-    };
-  }, [maxPlayers, maxRounds, turnLength]);
-
-  // fetching the data
-  // useEffect(() => {
-  //   const fetchInitialSettings = async () => {
-  //     // Fetch initial settings from the server
-  //     const response = await fetch(`/topic/games/${lobbyId}/general`);
-  //     const initialSettings = await JSON.parse;
-      
-  //     // Update state with initial settings
-  //     setMaxPlayers(initialSettings.maxPlayers);
-  //     setMaxRounds(initialSettings.maxRounds);
-  //     setTurnLength(initialSettings.turnLength);
-  //   };
-  
-  //   fetchInitialSettings();
-  // }, []);
 
   // handling the response
   const handleResponse = (payload) => {
     const responseData = JSON.parse(payload.body); // response data from the server
-    console.log("payload: ", responseData);
+    console.log("Settings' payload: ", responseData);
     if (responseData.type === "gameSettings"){
       setMaxPlayers(responseData.maxPlayers);
       setMaxRounds(responseData.maxRounds);
@@ -114,6 +113,17 @@ const Settings = () => {
         break;
     };
   };
+
+  // disabling the select element if user is not the creator of a lobby ("admin")
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+    if (role !== "admin") {
+      const selects = document.querySelectorAll(".Settings.slide-down-menu");
+      selects.forEach((select) => {
+        (select as HTMLSelectElement).disabled = true;
+      });
+    }
+  }, []);
 
   return (
     <div className="Settings container">

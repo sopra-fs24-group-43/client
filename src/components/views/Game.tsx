@@ -12,7 +12,7 @@ const Game = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [prevPosition, setPrevPosition] = useState<{ x: number; y: number }>(null);
-  const [selectedColor, setSelectedColor] = useState<string>("black");
+  const [selectedColor, setSelectedColor] = useState<string>("#000000");
   const [isFillToolSelected, setIsFillToolSelected] = useState(false);
   const [isDrawToolSelected, setIsDrawToolSelected] = useState(true);
   const [isEraserToolSelected, setIsEraserToolSelected] = useState(false);
@@ -27,6 +27,33 @@ const Game = () => {
   };
 
   const gameId = 1;
+
+   useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "e":
+          handleEraserClick();
+          break;
+        case "c":
+          handleEraseAllClick();
+          break;
+        case "f":
+          handleFillToolClick();
+          break;
+        case "d": 
+          handleDrawToolClick();
+          break;
+        default:
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");

@@ -30,6 +30,33 @@ const Game = () => {
   const gameId = 1;
 
   useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "e":
+          handleEraserClick();
+          break;
+        case "c":
+          handleEraseAllClick();
+          break;
+        case "f":
+          handleFillToolClick();
+          break;
+        case "d": 
+          handleDrawToolClick();
+          break;
+        default:
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
+  
+  useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/loginOrRegister");

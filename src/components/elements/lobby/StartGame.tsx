@@ -28,6 +28,12 @@ const StartGame = () => {
     if (stompApi.isConnected()){
       stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "StartGame");
     };
+
+    //unsub
+    return () => {  //this gets executed when navigating another page
+      console.log("unsubscribing and cleaning up when navigating to different view from StartGame!");
+      stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "StartGame");
+    };
   },[]);
 
   const startGame = () => {

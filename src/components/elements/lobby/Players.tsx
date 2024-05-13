@@ -51,8 +51,15 @@ const Players = () => {
       sendData();
     };
  
-    // unsub
+    // cleaning up
     return () => {  //this gets executed when navigating another page
+      if (localStorage.getItem("role") === "admin"){
+        deleteLobby();
+      }
+      if (localStorage.getItem("role") === "player"){
+        leaveLobby();
+      }
+      // unsub
       console.log("unsubscribing and cleaning up when navigating to different view from Players!");
       stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Players");
     };
@@ -101,6 +108,16 @@ const Players = () => {
       setRenderedPlayers(playersArray); // Set the array of player components in the state
     }
   };
+
+  // deleting the lobby if you the creator
+  const deleteLobby = () => {
+    stompApi.send(`/app/games/${lobbyId}/leavegame`, "");
+  }
+
+  // leaving from the lobby if you are a player
+  const leaveLobby = () => {
+    stompApi.send(`/app/games/${lobbyId}/leavegame`, JSON.stringify({gameId: lobbyId, indoundPlayer: "indoundPlayer"}));
+  }
 
   return (
     <div className="Players container">

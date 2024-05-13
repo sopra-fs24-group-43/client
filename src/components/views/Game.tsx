@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext} from "react";
 import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Game.scss";
 import ButtonComponent from "components/elements/game/ButtonComponent";
-
-import { stompApi } from "./LandingPage";
+import { Context } from "../../context/Context";
 
 const Game = () => {
   const navigate = useNavigate();
@@ -20,6 +19,8 @@ const Game = () => {
   const [chatMessages, setChatMessages] = useState<string[]>([]);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const chatMessagesRef = useRef(null);
+  const context = useContext(Context);
+  const {stompApi} = context;  //or const stompApi = context.stompApi
 
   const logout = (): void => {
     localStorage.removeItem("token");
@@ -28,45 +29,18 @@ const Game = () => {
 
   const gameId = 1;
 
-   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "e":
-          handleEraserClick();
-          break;
-        case "c":
-          handleEraseAllClick();
-          break;
-        case "f":
-          handleFillToolClick();
-          break;
-        case "d": 
-          handleDrawToolClick();
-          break;
-        default:
-          break;
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, []);
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/loginOrRegister");
     }
 
-    stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse);
-    stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse);
-    stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse);
-    stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse);
-    stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse);
-    stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse);
+    stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse, "Game");
+    stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse, "Game");
+    stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse, "Game");
+    stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse, "Game");
+    stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse, "Game");
+    stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse, "Game");
   }, [navigate]);
 
   const onHandleResponse = (payload) => {

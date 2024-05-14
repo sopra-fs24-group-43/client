@@ -16,6 +16,8 @@
     flex-direction: column;
     align-items: center;
     box-shadow: $dropShadow;
+    border: 3px solid #2a2c2e;
+    border-radius: 8px;
   }
   &.user-list {
     list-style: none;
@@ -59,53 +61,4 @@
     font-family: $fontMono;
     font-weight: 300;
   }
-}
-
-.chat-container {
-  position: fixed;
-  top: 50%; 
-  right: 10px;
-  margin-right: 50px;
-  transform: translateY(-50%); 
-  width: 280px; 
-  padding: 20px;
-  background-color: #dd9441bc;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
-.chat-messages {
-  height: 350px; 
-  overflow-y: auto;
-}
-
-.chat-input {
-  margin-top: 15px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-
-.chat-input input {
-  width: 100%;
-  flex: 1; 
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box; 
-  background-color: white; 
-  overflow: hidden; 
-}
-
-.chat-input button {
-  margin-left: 10px; 
-}
-
-.chat-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: white;
-  margin-top: -12px;
-  margin-bottom: 12px; 
-  text-align: center;
 }

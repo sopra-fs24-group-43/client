@@ -16,6 +16,8 @@
     flex-direction: column;
     align-items: center;
     box-shadow: $dropShadow;
+    border: 3px solid #2a2c2e;
+    border-radius: 8px;
   }
   &.user-list {
     list-style: none;

@@ -7,6 +7,7 @@
     min-height: 300px;
     @include center;
     flex-direction: column;
+    
   }
   &.form {
     display: flex;
@@ -23,6 +24,8 @@
     background-color: $background;
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;
+    border: 3px solid #2a2c2e;
+    border-radius: 8px;
   }
   .login-column {
     flex: 1;

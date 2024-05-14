@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useContext} from "react";
 import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import BaseContainer from "components/ui/BaseContainer";
-import "styles/views/Game.scss";
+import "styles/views/Chat.scss";
 import ButtonComponent from "components/elements/game/ButtonComponent";
 import { Context } from "../../context/Context";
 
@@ -26,10 +26,16 @@ const Chat = () => {
   }, [navigate]);
 
   const handleSendMessage = () => {
+    console.log(chatMessages);
+
     if (currentMessage.trim() !== "") {
       const newMessage = localStorage.username +": "+ `${currentMessage}`;
+      const username = localStorage.username;
+      const answerString = currentMessage;
       setChatMessages([...chatMessages, newMessage]);
       setCurrentMessage("");
+      console.log(chatMessages);
+      stompApi.send(`/topic/games/${gameId}/sendguess`, JSON.stringify({username, answerString}));
     }
   };
 

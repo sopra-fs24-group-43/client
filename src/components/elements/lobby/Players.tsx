@@ -1,15 +1,26 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Button } from "components/ui/Button";
 import "../../../styles/views/lobby/Players.scss"
 
 import { Context } from "../../../context/Context";
 
 const Players = () => {
   // not needed handleBeforeUnload
+  const navigate = useNavigate();
 
   // getting the gameId from the url
   const { gameId } = useParams();
   const lobbyId = parseInt(gameId);
+
+  // checking if a user is a creator of a lobby
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // checking if a user is a creator of a lobby 
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+    setIsAdmin(role === "admin");
+  }, []);
 
   // getting contex
   const context = useContext(Context);
@@ -53,12 +64,12 @@ const Players = () => {
  
     // cleaning up
     return () => {  //this gets executed when navigating another page
-      if (localStorage.getItem("role") === "admin"){
-        deleteLobby();
-      }
-      if (localStorage.getItem("role") === "player"){
-        leaveLobby();
-      }
+      // if (localStorage.getItem("role") === "admin"){
+      //   deleteLobby();
+      // }
+      // if (localStorage.getItem("role") === "player"){
+      //   leaveLobby();
+      // }
       // unsub
       console.log("unsubscribing and cleaning up when navigating to different view from Players!");
       stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Players");
@@ -107,24 +118,46 @@ const Players = () => {
       setPlayers(updatedPlayers);
       setRenderedPlayers(playersArray); // Set the array of player components in the state
     }
+    if (responseData.type === "deletegame") {
+      navigate("/LandingPage");
+    }
   };
 
   // deleting the lobby if you the creator
-  const deleteLobby = () => {
-    stompApi.send(`/app/games/${lobbyId}/leavegame`, "");
+  const deleteLobby = async () => {
+    stompApi.send(`/app/games/${lobbyId}/deletegame`, JSON.stringify(lobbyId));
   }
 
   // leaving from the lobby if you are a player
-  const leaveLobby = () => {
-    stompApi.send(`/app/games/${lobbyId}/leavegame`, JSON.stringify({gameId: lobbyId, indoundPlayer: "indoundPlayer"}));
+  const leaveLobby = async () => {
+    stompApi.send(`/app/games/${lobbyId}/leavegame/${localStorage.getItem("userId")}`, "");
+    navigate("/LandingPage");
   }
 
   return (
     <div className="Players container">
-      <div className="Players header">
-        {lobbyName}
+      <div className="Players players">
+        <div className="Players header">
+          {lobbyName}
+        </div>
+        {renderedPlayers}
       </div>
-      {renderedPlayers}
+      {!isAdmin && (
+        <Button
+          width="100%"
+          onClick={leaveLobby}
+        >
+          Leave game
+        </Button>
+      )}
+      {isAdmin && (
+        <Button
+          width="100%"
+          onClick={deleteLobby}
+        >
+          Delete game
+        </Button>
+      )}
     </div>
   );
 };

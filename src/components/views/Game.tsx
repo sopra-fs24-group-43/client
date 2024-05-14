@@ -35,6 +35,7 @@ const Game = () => {
     }
 
     stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse);
+    stompApi.subscribe(`/topic/games/${gameId}/sendguess`, onHandleMessage)
   }, [navigate]);
 
   const onHandleResponse = (payload) => {
@@ -217,12 +218,37 @@ const Game = () => {
   };
 
   const handleSendMessage = () => {
+    console.log(chatMessages);
+
     if (currentMessage.trim() !== "") {
       const newMessage = localStorage.username +": "+ `${currentMessage}`;
+      const username = localStorage.username;
+      const answerString = currentMessage;
       setChatMessages([...chatMessages, newMessage]);
       setCurrentMessage("");
+      console.log(chatMessages);
+      stompApi.send(`/topic/games/${gameId}/sendguess`, JSON.stringify({username, answerString}));
     }
   };
+
+  const onHandleMessage = (payload) =>{
+    console.log(chatMessages);
+
+    const payloadData = JSON.parse(payload.body);
+    const {username, answerString, IsCorrect} = payloadData;
+
+    console.log("Message From " + username + " to " + localStorage.username);
+    if(username === localStorage.username) {
+      console.log("Message to Self");
+    } else {
+      console.log("Message from Other");
+      const newMessage = `${username}: ${answerString}`;
+      console.log(newMessage);
+      setChatMessages([...chatMessages, newMessage]);
+      console.log(chatMessages);
+    }
+
+  }
 
   useEffect(() => {
     if (chatMessagesRef.current) {
@@ -236,7 +262,8 @@ const Game = () => {
       handleSendMessage();
     }
   };
-  
+
+
   return (
     <BaseContainer className="game container">
       <div className="game-container">

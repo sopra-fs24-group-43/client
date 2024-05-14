@@ -23,39 +23,36 @@ const Chat = () => {
     }
 
     stompApi.subscribe(`/topic/games/${gameId}/sendguess`, onHandleMessage)
-  }, [navigate]);
+    return () => {
+      stompApi.unsubscribe(); 
+    };
+  }, [navigate, context]);
 
   const handleSendMessage = () => {
-    console.log(chatMessages);
-
     if (currentMessage.trim() !== "") {
       const newMessage = localStorage.username +": "+ `${currentMessage}`;
       const username = localStorage.username;
       const answerString = currentMessage;
       setChatMessages([...chatMessages, newMessage]);
-      setCurrentMessage("");
-      console.log(chatMessages);
+      
+ 
       stompApi.send(`/topic/games/${gameId}/sendguess`, JSON.stringify({username, answerString}));
+      setCurrentMessage("");
     }
   };
 
-  const onHandleMessage = (payload) =>{
-    console.log("CHATMESSAGES ARRAY BEFORE ADD NEW MESSAGE" + chatMessages);
+ const onHandleMessage = (payload) => {
+  const payloadData = JSON.parse(payload.body);
+  const { username, answerString } = payloadData;
 
-    const payloadData = JSON.parse(payload.body);
-    const {username, answerString} = payloadData;
-    console.log("PAYLOAD::::::::" + username + answerString);
-    console.log("Message From " + username + " to " + localStorage.username);
-    if(username === localStorage.username) {
-      console.log("Message to Self");
-    } else {
-      console.log("Message from Other");
-      const newMessage = `${username}: ${answerString}`;
-      console.log("NEW MESSAGE:  " + newMessage);
-      setChatMessages([...chatMessages, newMessage]);
-      console.log(chatMessages);
-    }
+  
+  if (username !== localStorage.username) {
+    const newMessage = `${username}: ${answerString}`;
+
+    
+    setChatMessages((currentMessage) => [...currentMessage, newMessage]);
   }
+};
 
   useEffect(() => {
     if (chatMessagesRef.current) {

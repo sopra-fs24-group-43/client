@@ -51,8 +51,9 @@ const Table = () => {
       const joingame = (gameId, inboundPlayer) => {
         console.log(inboundPlayer)
         stompApi.send("/app/games/" + gameId + "/joingame", JSON.stringify(inboundPlayer))
-        sessionStorage.setItem("role", inboundPlayer.role)
-        navigate("/lobby",{state: {username: inboundPlayer.username, userId: inboundPlayer.userId, friends: inboundPlayer.friends, gameId: inboundPlayer.gameId, role: inboundPlayer.role}})
+        localStorage.setItem("role", inboundPlayer.role)
+        navigate(`/lobby/${gameId}`,{state: {username: inboundPlayer.username, userId: inboundPlayer.userId, friends: inboundPlayer.friends, gameId: inboundPlayer.gameId, role: inboundPlayer.role}})
+
       }
       games.forEach((game, index) => {
         const inboundPlayer = {

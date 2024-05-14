@@ -1,65 +1,135 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation, useParams} from "react-router-dom";
-import PropTypes from "prop-types";
+import React, { useEffect, useState, useContext } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "../../../styles/views/lobby/Settings.scss"
 
-import { stompApi } from "../../views/LandingPage";
+import { Context } from "../../../context/Context";
 
-
-const Settings = () => { //{userData}
-  // useEffect(() => {
-  //   stompApi.subscribe("/topic/coordinates", onMessageReceived);
-
-
-  //   return () => {
-  //   };
-  // }, []);
-
-  // const onMessageReceived = (payload) => {
-  //   var payloadData = JSON.parse(payload.body);
-  //   console.log("PayLoad Lobby:", payloadData);
-  // };
-  const { gameId } = useParams();
-  const lobbyId = parseInt(gameId);
-
-  function timeout(delay: number) {
-    return new Promise( res => setTimeout(res, delay) );
-  }
-
-  // const  connect = async ()=>{
-  //   stompApi.connect();
-  //   await timeout(1000);
-  //   stompApi.subscribe(`/topic/games/${lobbyId}`, handleResponse)
-  // }
-  // useEffect(() => {
-  //   console.log("user is connected: " + registered)
-  //   if (registered && !stompApi.isConnected()){
-  //     console.log("connecting to ws in CreateJoinLobby view")
-  //     connect();
-  //   }
-  // }, );
-
+const Settings = () => {
+  console.log("I'm in the Settings");
+  // setting up the gameSettings
   const [maxPlayers, setMaxPlayers] = useState(5);
   const [maxRounds, setMaxRounds] = useState(5);
   const [turnLength, setTurnLength] = useState(60); // seconds
 
-  const handleMaxPlayersChange = (event) => {
-    setMaxPlayers(parseInt(event.target.value));
+  // getting the gameId from the url
+  const { gameId } = useParams();
+  const lobbyId = parseInt(gameId);
+  
+  // getting contex
+  const context = useContext(Context)
+  const {stompApi} = context  //or const stompApi = context.stompApi
+
+  // websocket connection establishing
+  function timeout(delay: number) {
+    return new Promise( res => setTimeout(res, delay) );
   };
 
-  const handleMaxRoundsChange = (event) => {
-    setMaxRounds(parseInt(event.target.value));
+  // const connect = async ()=>{
+  //   stompApi.connect((() => {
+  //     stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
+  //     stompApi.connected = true;
+  //   }));
+  //   await timeout(1000);
+  // };
+
+  useEffect(() => {
+    // reload hadling
+    // const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
+    //   console.log("disconnecting before reloading page!")
+    //   stompApi.disconnect()
+    // };
+    // window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // subscribing
+    if (stompApi.isConnected()){
+      stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
+      console.log("subscribed when was connected to the websocket in Settings");
+    };
+
+    // if not connected
+    // if (!stompApi.isConnected()){
+    //   console.log("connecting to ws in Settings view");
+    //   connect();
+    //   console.log("connected");
+    // };
+
+    // unsub
+    return () => {  //this gets executed when navigating another page
+      console.log("unsubscribing and cleaning up when navigating to different view from Settings!");
+      // window.removeEventListener('beforeunload', handleBeforeUnload)
+      stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Settings");
+    };
+  }, []);
+
+  useEffect(() => {
+    // sending the data to the server only if user is a creator of a lobby
+    if (localStorage.getItem("role") === "admin"){
+      const settings = {
+      type: "gameSettings",
+      maxPlayers: maxPlayers,
+      maxRounds: maxRounds,
+      turnLength: turnLength
+    };
+    if (stompApi.isConnected()){
+      sendData(settings);
+    };
   };
 
-  const handleTurnLengthChange = (event) => {
-    setTurnLength(parseInt(event.target.value));
+  }, ) 
+
+  const sendData = async (settings) => { // needed for delaying the send function, so the connection is established
+    await timeout(1000);
+    console.log("sending the message from the settings");
+    stompApi.send(`/app/games/${lobbyId}/updategamesettings`, JSON.stringify(settings));
   };
+
+  // handling the response
+  const handleResponse = (payload) => {
+    const responseData = JSON.parse(payload.body); // response data from the server
+    console.log("Settings' payload: ", responseData);
+    if (responseData.type === "gameSettings"){
+      setMaxPlayers(responseData.maxPlayers);
+      setMaxRounds(responseData.maxRounds);
+      setTurnLength(responseData.turnLength);
+    }
+  };
+
+  // handling the changes of the settings on the page
+  const handleSettingsChange = (event) => {
+    const { name, value } = event.target;
+    console.log("event: ", event, "name: ", name, "value: ", value);
+
+    switch (name) {
+      case "maxPlayers":
+        setMaxPlayers(parseInt(value));
+        break;
+      case "maxRounds":
+        setMaxRounds(parseInt(value));
+        break;
+      case "turnLength":
+        setTurnLength(parseInt(value));
+        break;
+      default:
+        break;
+    };
+  };
+
+  // disabling the select element if user is not the creator of a lobby ("admin")
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+    if (role !== "admin") {
+      const selects = document.querySelectorAll(".Settings.slide-down-menu");
+      selects.forEach((select) => {
+        (select as HTMLSelectElement).disabled = true;
+      });
+    }
+  }, []);
 
   return (
     <div className="Settings container">
       <div className="Settings menu-form">
         <div className="Settings menu-label">Players</div>
-        <select className="Settings slide-down-menu" value={maxPlayers} onChange={handleMaxPlayersChange}>
+        <select className="Settings slide-down-menu" name="maxPlayers" value={maxPlayers} onChange={handleSettingsChange}>
           <option value={3}>3</option>
           <option value={4}>4</option>
           <option value={5}>5</option>
@@ -70,7 +140,7 @@ const Settings = () => { //{userData}
       </div>
       <div className="Settings menu-form">
         <div className="Settings menu-label">Rounds</div>
-        <select className="Settings slide-down-menu" value={maxRounds} onChange={handleMaxRoundsChange}>
+        <select className="Settings slide-down-menu" name="maxRounds" value={maxRounds} onChange={handleSettingsChange}>
           <option value={4}>4</option>
           <option value={5}>5</option>
           <option value={6}>6</option>
@@ -78,7 +148,7 @@ const Settings = () => { //{userData}
       </div>
       <div className="Settings menu-form">
         <div className="Settings menu-label">Drawtime</div>
-        <select className="Settings slide-down-menu" value={turnLength} onChange={handleTurnLengthChange}>
+        <select className="Settings slide-down-menu" name="turnLength" value={turnLength} onChange={handleSettingsChange}>
           <option value={30}>30</option>
           <option value={45}>45</option>
           <option value={60}>60</option>
@@ -90,14 +160,4 @@ const Settings = () => { //{userData}
   );
 };
 
-// Settings.propTypes = {
-//   data: PropTypes.shape({
-//     username: PropTypes.string.isRequired,
-//     userId: PropTypes.number.isRequired,
-//     friends: PropTypes.list.isRequired,
-//     gameId: PropTypes.number.isRequired,
-//     role: PropTypes.string.isRequired,
-//   }).isRequired,
-// };
-  
 export default Settings;

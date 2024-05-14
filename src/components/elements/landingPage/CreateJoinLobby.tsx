@@ -40,8 +40,8 @@ const CreateJoinLobby = () => {
       if (body.userId === userId) {
         gameId = (body.gameId)
         console.log("username, userId, gameId, role: ", username, userId, gameId, role)
-        sessionStorage.setItem("role", role)
-        navigate("/lobby", {state: {username: username, userId: userId, friends: friends, gameId: gameId, role: role}}) // is sent to the lobby
+        localStorage.setItem("role", role)
+        navigate(`/lobby/${gameId}`, {state: {username: username, userId: userId, friends: friends, gameId: gameId, role: role}}) // is sent to the lobby
       }
       else {
         console.log("creategame from other user")
@@ -89,15 +89,6 @@ const CreateJoinLobby = () => {
           onClick={creategame}
         >
           Create lobby
-        </Button>
-      </div>
-
-      <div className="CreateJoinLobby button-container">
-        <Button
-          width="100%"
-          onClick={() => {}}
-        >
-          does nothing, was join before
         </Button>
       </div>
     </div>

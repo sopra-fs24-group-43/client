@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "../../styles/views/lobby/Lobby.scss"
+import Chat from "./Chat";
+
 
 import Players from "components/elements/lobby/Players";
 import Settings from "components/elements/lobby/Settings";
@@ -90,6 +92,7 @@ const Lobby = () => {
         <Settings/>
         <StartGame/>
       </div>
+      <Chat/>
     </div>
   );
 };

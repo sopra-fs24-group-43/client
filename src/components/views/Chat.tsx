@@ -49,7 +49,6 @@ const Chat = () => {
       setChatMessages([...chatMessages, newMessage]);
       console.log(chatMessages);
     }
-
   }
 
   useEffect(() => {
@@ -66,30 +65,24 @@ const Chat = () => {
   };
   
   return (
-    <BaseContainer className="game container">
-      <div className="game-container">
-        <div className="chat-container">
-          <div className="chat-title">Guessing Chat</div> 
-
-          <div className="chat-messages" ref={chatMessagesRef}>
-
-            {chatMessages.map((message, index) => (
-              <div key={index}>{message}</div>
-            ))}
-          </div>
-          <div className="chat-input">
-            <input
-              type="text"
-              value={currentMessage}
-              onChange={(e) => setCurrentMessage(e.target.value)}
-              onKeyDown={handleKeyPress} 
-              placeholder="Your Guess"
-            />
-            <button onClick={handleSendMessage}>Send</button>
-          </div>
+      <div className="chat-container">
+        <div className="chat-title">Chat</div>
+        <div className="chat-messages" ref={chatMessagesRef}>
+          {chatMessages.map((message, index) => (
+            <div key={index}>{message}</div>
+          ))}
+        </div>
+        <div className="chat-input">
+          <input
+            type="text"
+            value={currentMessage}
+            onChange={(e) => setCurrentMessage(e.target.value)}
+            onKeyDown={handleKeyPress} 
+            placeholder="Your Guess"
+          />
+          <button onClick={handleSendMessage}>Send</button>
         </div>
       </div>
-    </BaseContainer>
   );
 };
 

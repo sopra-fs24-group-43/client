@@ -544,8 +544,8 @@ const Game = () => {
             Erase All
           </Button>
         </div>
-        <Chat/>
       </div>
+      <Chat/>
     </BaseContainer>
   );
 };

@@ -6,36 +6,23 @@ interface ContextProviderProps {
   children?: React.ReactNode;
 }
 interface IContext {
-  userId: number,
-  username: string,
-  gameId: number,
-  role: string,
+  reload: boolean;
   stompApi: StompApi;
-  setUserId: (userId: number) => void;
-  setUsername: (username: string) => void;
-  setGameId: (gameId: number) => void;
-  setRole: (role: string) => void;
+  setReload: (reload: number) => void;
 }
 export const Context = createContext<IContext>(null)
 
 
 export const ContextProvider: React.FC<ContextProviderProps> = ({ children }) => {
-  const [userId, setUserId] = useState<number>();
-  const [username, setUsername] = useState<string>();
-  const [gameId, setGameId] = useState<number>();
-  const [role, setRole] = useState<string>();
+
 
   const stompApi = useStomp()
+  const [reload, setReload] = useState()
+
   const content: IContext = {
-    userId,
-    username,
-    gameId,
-    role,
+    reload,
     stompApi,
-    setUserId,
-    setUsername,
-    setGameId,
-    setRole
+    setReload
   }
 
   return (

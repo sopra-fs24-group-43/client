@@ -32,27 +32,26 @@ const Login = () => {
   const [loginUsername, setLoginUsername] = useState<string>(null);
   const [loginPassword, setLoginPassword] = useState<string>(null);
   const [name, setName] = useState<string>(null);
-  const [username, setUsername] = useState<string>(null);
+  const [username2, setUsername2] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
-  const context = useContext(Context) //added
-  const username1 = context.username;
-  const setUsername1 = context.setUsername;
+
+
   const doRegister = async () => {
     try {
-      const requestBody = JSON.stringify({ username, name, password });
+      const requestBody = JSON.stringify({ username: username2, name, password });
       const response = await api.post("/users", requestBody);
       // Get the returned user and update a new object.
 
       const user = new User(response.data);
 
       // Store the token into the local storage.
-      setUsername1(user.username)//added
-      localStorage.setItem("token", user.token);
-      localStorage.setItem("username", user.username);
-      localStorage.setItem("userId", user.id);
-      localStorage.setItem("friends", user.friends);
+      sessionStorage.setItem("token", user.token);
+      sessionStorage.setItem("username", user.username);
+      sessionStorage.setItem("userId", user.id);
+      sessionStorage.setItem("friends", user.friends);
+      sessionStorage.setItem("isGuest", "false");
       // Login successfully worked --> navigate to the route /game in the GameRouter
-      navigate("/LandingPage", {state:{username:response.data.username, userId: response.data.id, friends: response.data.friends}});
+      navigate("/LandingPage");
     } catch (error) {
       alert(
         `Something went wrong during the login: \n${handleError(error)}`
@@ -68,13 +67,13 @@ const Login = () => {
       const user = new User(response.data);
 
       // Store the token into the local storage.
-      localStorage.setItem("token", user.token);
-      localStorage.setItem("username", user.username);
-      localStorage.setItem("userId", user.id);
-      localStorage.setItem("friends", user.friends);
-      console.log("this is friends!: "+user.friends)
+      sessionStorage.setItem("token", user.token);
+      sessionStorage.setItem("username", user.username);
+      sessionStorage.setItem("userId", user.id);
+      sessionStorage.setItem("friends", user.friends);
+      sessionStorage.setItem("isGuest", "false");
       // Login successfully worked --> navigate to the route /game in the GameRouter
-      navigate("/LandingPage", {state:{username: response.data.username, userId: response.data.id, friends: response.data.friends}});
+      navigate("/LandingPage");
     } catch (error) {
       alert(
         `Something went wrong during the login: \n${handleError(error)}`
@@ -111,8 +110,8 @@ const Login = () => {
             <h2>Register</h2>
             <FormField
               label="Username"
-              value={username}
-              onChange={(un: string) => setUsername(un)}
+              value={username2}
+              onChange={(un: string) => setUsername2(un)}
             />
             <FormField
               label="Name"

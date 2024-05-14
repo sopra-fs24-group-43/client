@@ -18,6 +18,7 @@ const StartGame = () => {
   // checking if a user is a creator of a lobby
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // checking if a user is a creator of a lobby 
   useEffect(() => {
     const role = localStorage.getItem("role");
     setIsAdmin(role === "admin");

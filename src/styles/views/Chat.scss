@@ -1,57 +1,54 @@
 @import "../theme";
 
-/* The '&' is a shorthand for the containing element,
-  so for example a '&.user-list' inside .game will compile to
-  .game.user-list
+.Chat{
+  &.container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
 
-  for more information visit https://sass-lang.com/guide
- */
+    height: 670px;
+    min-width: 30%;
+    margin-left: 3px;
 
-.chat-container {
-  position: fixed;
-  top: 50%; 
-  right: 10px;
-  margin-right: 50px;
-  transform: translateY(-50%); 
-  width: 280px; 
-  padding: 20px;
-  background-color: #dd9441bc;
-  border: 3px solid #2a2c2e;
-  border-radius: 8px;
-}
+    background-color: $background;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: $dropShadow;
+    border: 3px solid #2a2c2e;
+    border-bottom-right-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+  &.title{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-.chat-messages {
-  height: 350px; 
-  overflow-y: auto;
-}
+    height: 30px;
+    width: 100%;
 
-.chat-input {
-  margin-top: 15px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-
-.chat-input input {
-  width: 100%;
-  flex: 1; 
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box; 
-  background-color: white; 
-  overflow: hidden; 
-}
-
-.chat-input button {
-  margin-left: 10px; 
-}
-
-.chat-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: white;
-  margin-top: -12px;
-  margin-bottom: 12px; 
-  text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+  }
+  &.messages{
+    height: 100%; 
+    width: 100%;
+    padding-left: 4px;
+    overflow-y: auto;
+    overflow-x: auto;
+  }
+  &.message{
+    height: auto; /* Change height to auto to allow the message to expand vertically */
+    width: 100%;
+    max-width: calc(100% - 10px); /* Adjust the max-width as needed to ensure it doesn't overflow */
+    word-wrap: break-word;
+  }
+  &.input-form{
+    height: 30px; 
+    width: 100%;
+  }
+  &.input{
+    height: 100%; 
+    width: 100%;
+  }
 }

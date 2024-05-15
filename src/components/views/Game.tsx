@@ -19,22 +19,25 @@ const Game = () => {
   const [strokeSize, setStrokeSize] = useState(3);
   const context = useContext(Context);
   const {stompApi, reload, setReload} = context;  //or const stompApi = context.stompApi
-  let role
+  let role //"admin", "player"
   let gameId
+  let userId
   let subscribed
-  let gamephase //if drawing{ drawing} else { if choosing {choosing } else {leaderboard}
+  let gamePhase //if drawing{ drawing} else { if choosing {choosing } else {leaderboard}
   let endGame
   let connectedPlayers
   let currentRound
   let currentTurn
   let threeWords
-  let drawer
+  let isDrawer //true, false
+  let Drawer //index in drawingOrder
   let chosenWord
   let wordIndex //0,1 or 2
+  let drawingOrder //List of userIds is correct order
   const [time, setTime] = useState()
   role = sessionStorage.getItem("role")
   gameId = sessionStorage.getItem("gameId")
-
+  userId = parseInt(sessionStorage.getItem("userId"))
   const logout = (): void => { //remove this?
     sessionStorage.removeItem("token");
     navigate("/loginOrRegister");
@@ -108,7 +111,9 @@ const Game = () => {
       stompApi.connected = true //important!!! needs to be set during the onConnectedCallback, otherwise it might happen that it connected gets set true before the ws
                                 //is fully setup
       setReload(!reload) //makes so it subscribes in Chat
-      stompApi.send(`/app/games/${gameId}/nextturn`, "")
+      if (role === "admin") {
+        stompApi.send(`/app/games/${gameId}/nextturn`, "")
+      }
     });
   }
   useEffect(() => {
@@ -151,26 +156,46 @@ const Game = () => {
   }
   const onHandleGeneralResponse = (payload) => {
     const body = JSON.parse(payload.body);
+    if (body.type === "leaderboard"  && role === "admin") { //just for testing
+      stompApi.send(`/app/games/${gameId}/nextturn`, "")
+    }
     if (body.type === "GameStateDTO") {
+      gamePhase = "choosing"
       endGame = body.endGame
       connectedPlayers = body.connectedPlayers
       currentRound = body.currentRound
       currentTurn = body.currentTurn
       threeWords = body.threeWords
+      drawingOrder = body.drawingOrder
+      Drawer = body.drawer
+      isDrawer = userId === drawingOrder[Drawer]
+      console.log("userIdofDrawer, userId, isDrawer: ", drawingOrder[Drawer], userId, isDrawer)
+      console.log("isDrawer: ", isDrawer)
+      //renderPopupChooseWord() //
+    }
+    if (body.type === "startdrawing") {
+      gamePhase = "drawing"
     }
     if (body.type === "TimerOut" && body.gamePhase === "drawing") {
-      gamephase = "drawing"
+      gamePhase = "drawing"
       setTime(body.time)
     }
     if (body.type === "TimerOut" && body.gamePhase === "choosing") {
-      gamephase = "drawing"
+      gamePhase = "choosing"
       setTime(body.time)
-      if (body.time === 0) {
-        getRandomInt(3)
+      if (body.time === 0 && isDrawer) {
+        wordIndex = getRandomInt(3)
+        chosenWord = threeWords[wordIndex]
+        const ChooseWordDTO =  {
+          type: "chooseword",
+          wordIndex: wordIndex,
+          word: chosenWord
+        }
+        stompApi.send(`/app/games/${gameId}/sendchosenword`, JSON.stringify(ChooseWordDTO))
       }
     }
     if (body.type === "leaderboard") {
-      gamephase = "leaderboard"
+      gamePhase = "leaderboard"
     }
   }
   const showtimer = (time) => {

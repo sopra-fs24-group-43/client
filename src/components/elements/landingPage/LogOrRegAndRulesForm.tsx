@@ -17,6 +17,7 @@ const LogOrRegAndRulesForm = () => {
   const handleResponse = (payload) => {
     var body = JSON.parse(payload.body)
     if (body.type === "createPlayerFromGuest") {
+      sessionStorage.setItem("token", body.userId); //just to make it work for now
       sessionStorage.setItem("username", body.username);
       sessionStorage.setItem("userId", body.userId);
       sessionStorage.setItem("friends", "null");

@@ -63,7 +63,7 @@ const Settings = () => {
 
   useEffect(() => {
     // sending the data to the server only if user is a creator of a lobby
-    if (localStorage.getItem("role") === "admin"){
+    if (sessionStorage.getItem("role") === "admin"){
       const settings = {
       type: "gameSettings",
       maxPlayers: maxPlayers,
@@ -116,7 +116,7 @@ const Settings = () => {
 
   // disabling the select element if user is not the creator of a lobby ("admin")
   useEffect(() => {
-    const role = localStorage.getItem("role");
+    const role = sessionStorage.getItem("role");
     if (role !== "admin") {
       const selects = document.querySelectorAll(".Settings.slide-down-menu");
       selects.forEach((select) => {

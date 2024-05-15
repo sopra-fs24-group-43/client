@@ -18,14 +18,29 @@ const Game = () => {
   const [isEraserToolSelected, setIsEraserToolSelected] = useState(false);
   const [strokeSize, setStrokeSize] = useState(3);
   const context = useContext(Context);
-  const {stompApi} = context;  //or const stompApi = context.stompApi
+  const {stompApi, reload, setReload} = context;  //or const stompApi = context.stompApi
+  let role
+  let gameId
+  let subscribed
+  let gamephase //if drawing{ drawing} else { if choosing {choosing } else {leaderboard}
+  let endGame
+  let connectedPlayers
+  let currentRound
+  let currentTurn
+  let threeWords
+  let drawer
+  let chosenWord
+  let wordIndex //0,1 or 2
+  const [time, setTime] = useState()
+  role = sessionStorage.getItem("role")
+  gameId = sessionStorage.getItem("gameId")
 
-  const logout = (): void => {
-    localStorage.removeItem("token");
+  const logout = (): void => { //remove this?
+    sessionStorage.removeItem("token");
     navigate("/loginOrRegister");
   };
 
-  const gameId = 1;
+
 
    useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -80,21 +95,92 @@ const Game = () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, []);
-  
+  const connect = async ()  => {
+    await stompApi.connect(() => {
+      stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/general`, onHandleGeneralResponse, "Game")
+      subscribed = true
+      stompApi.connected = true //important!!! needs to be set during the onConnectedCallback, otherwise it might happen that it connected gets set true before the ws
+                                //is fully setup
+      setReload(!reload) //makes so it subscribes in Chat
+      stompApi.send(`/app/games/${gameId}/nextturn`, "")
+    });
+  }
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
+      console.log("disconnecting before reloading page!")
+      stompApi.disconnect()
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    if (!stompApi.isConnected()) {    //need to be registerd and not connected already to connect
+      console.log("connecting to ws!")
+      connect();
+    }
+    const token = sessionStorage.getItem("token");
+    if (!token) { //remove this?
       navigate("/loginOrRegister");
     }
+    if (stompApi.isConnected()) { // && !subscribed
+      stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse, "Game");
 
-    stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse, "Game");
-    stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse, "Game");
-    stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse, "Game");
-    stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse, "Game");
-    stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse, "Game");
-    stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/general`, onHandleGeneralResponse, "Game")
+      subscribed = true
+      if (stompApi.isConnected() && role === "admin") {
+        stompApi.send(`/app/games/${gameId}/nextturn`, "")
+      }
+    }
+    return () => {
+      console.log("unsubscribing and cleaning up when navigating to different view from Game!")
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+
+    }
   }, [navigate]);
-
+  const getRandomInt = (max) => {
+    return Math.floor(Math.random()*3)
+  }
+  const onHandleGeneralResponse = (payload) => {
+    const body = JSON.parse(payload.body);
+    if (body.type === "GameStateDTO") {
+      endGame = body.endGame
+      connectedPlayers = body.connectedPlayers
+      currentRound = body.currentRound
+      currentTurn = body.currentTurn
+      threeWords = body.threeWords
+    }
+    if (body.type === "TimerOut" && body.gamePhase === "drawing") {
+      gamephase = "drawing"
+      setTime(body.time)
+    }
+    if (body.type === "TimerOut" && body.gamePhase === "choosing") {
+      gamephase = "drawing"
+      setTime(body.time)
+      if (body.time === 0) {
+        getRandomInt(3)
+      }
+    }
+    if (body.type === "leaderboard") {
+      gamephase = "leaderboard"
+    }
+  }
+  const showtimer = (time) => {
+    if (time === undefined) {
+      return ""
+    }
+    else {
+      return ( <div> Timer: { time } </div>)
+    }
+  }
   const onHandleResponse = (payload) => {
     const renderCanvas = canvasRef.current;
     if (!renderCanvas) return;
@@ -392,6 +478,9 @@ const Game = () => {
   
   return (
     <BaseContainer className="game container">
+      <div>
+        {showtimer(time)}
+      </div>
       <div className="game-container">
         <div className="canvas-container">
           <canvas

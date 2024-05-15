@@ -40,7 +40,8 @@ const CreateJoinLobby = () => {
       if (body.userId === userId) {
         gameId = (body.gameId)
         console.log("username, userId, gameId, role: ", username, userId, gameId, role)
-        localStorage.setItem("role", role)
+        sessionStorage.setItem("role", role)
+        sessionStorage.setItem("gameId", gameId)
         navigate(`/lobby/${gameId}`, {state: {username: username, userId: userId, friends: friends, gameId: gameId, role: role}}) // is sent to the lobby
       }
       else {

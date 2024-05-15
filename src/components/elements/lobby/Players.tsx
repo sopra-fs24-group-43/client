@@ -18,7 +18,7 @@ const Players = () => {
 
   // checking if a user is a creator of a lobby 
   useEffect(() => {
-    const role = localStorage.getItem("role");
+    const role = sessionStorage.getItem("role");
     setIsAdmin(role === "admin");
   }, []);
 
@@ -64,10 +64,10 @@ const Players = () => {
  
     // cleaning up
     return () => {  //this gets executed when navigating another page
-      // if (localStorage.getItem("role") === "admin"){
+      // if (sessionStorage.getItem("role") === "admin"){
       //   deleteLobby();
       // }
-      // if (localStorage.getItem("role") === "player"){
+      // if (sessionStorage.getItem("role") === "player"){
       //   leaveLobby();
       // }
       // unsub
@@ -130,7 +130,7 @@ const Players = () => {
 
   // leaving from the lobby if you are a player
   const leaveLobby = async () => {
-    stompApi.send(`/app/games/${lobbyId}/leavegame/${localStorage.getItem("userId")}`, "");
+    stompApi.send(`/app/games/${lobbyId}/leavegame/${sessionStorage.getItem("userId")}`, "");
     navigate("/LandingPage");
   }
 

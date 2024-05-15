@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef, useContext} from "react";
 import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
-import BaseContainer from "components/ui/BaseContainer";
-import "styles/views/Game.scss";
-import ButtonComponent from "components/elements/game/ButtonComponent";
+import "styles/views/game/Game.scss";
+import "styles/views/game/Tracker.scss";
+import "styles/views/game/Canvas.scss";
 import { Context } from "../../context/Context";
 import Chat from "./Chat";
+import LeaderboardInGame from "./LeaderboardInGame";
 
 const Game = () => {
   const navigate = useNavigate();
@@ -474,199 +475,207 @@ const Game = () => {
     );
   };
   
-
+ // <Button onClick={logout}>Logout</Button>
   
   return (
-    <BaseContainer className="game container">
-      <div>
-        {showtimer(time)}
-      </div>
-      <div className="game-container">
-        <div className="canvas-container">
-          <canvas
-            ref={canvasRef}
-            width={800}
-            height={600}
-            style={{ border: "1px solid black", background: "white" }}
-          />
-          <Button onClick={logout}>Logout</Button>
+    <div className="Game container">
+      <div className="Tracker container">
+        <div className="Tracker timer">
+          {showtimer(time)}
         </div>
-        <div className="color-buttons-container">
-          <div className="color-buttons">
-            <div className="color-button" style={{ width: "50px", height: "50px" }}>
-              <button
-                style={{ backgroundColor: selectedColor, width: "50px", height: "50px" }}
-                onClick={() => handleColorButtonClick(selectedColor)}
-              />
+        <div className="Tracker rounds">
+          Round 1/2
+        </div>
+        <div className="Tracker word">
+          Word to guess
+        </div>
+      </div>
+      <div className="Game form">
+        <LeaderboardInGame/>
+        <div className="Canvas container">
+          <div className="Canvas canvas">
+            <canvas
+              ref={canvasRef}
+              width={800}
+              height={600}
+              style={{ border: "1px solid black", background: "white" }}
+            />
+          </div>
+          <div className="Canvas toolbar">
+            <div className="Canvas color-buttons">
+              <div className="Canvas main-color-button">
+                <button
+                  style={{ backgroundColor: selectedColor, width: "50px", height: "50px" }}
+                  onClick={() => handleColorButtonClick(selectedColor)}
+                />
+              </div>
+              <div className="Canvas color-buttons-group">
+                <div className="Canvas color-button-row">
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#FFFFFF", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#FFFFFF")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#d3d3d3", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#d3d3d3")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#6E95FB", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#6E95FB")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#FF0000", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#FF0000")}
+                  /> 
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#66DA3D", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#66DA3D")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#E9ED20", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#E9ED20")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#FA8633", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#FA8633")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#B149F1", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#B149F1")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#EE49F1", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#EE49F1")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#A44E1E", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#A44E1E")}
+                  />
+                </div>
+                <div className="Canvas color-button-row">
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#000000", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#000000")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#A9A9A9", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#A9A9A9")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#0A53E1", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#0A53E1")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#CF0808", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#CF0808")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#0CAA09", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#0CAA09")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#C9CD03", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#C9CD03")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#EF6A0A", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#EF6A0A")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#82109E", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#82109E")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#9E106E", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#9E106E")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#703717", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#703717")}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="color-button-row">
+            <div className="Canvas stroke-size-buttons">
               <button
-                className="color-button"
-                style={{ backgroundColor: "#FFFFFF", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#FFFFFF")}
-              />
+                className={`Canvas stroke-size-button ${strokeSize === 3 ? "active" : ""}`}
+                onClick={() => setStrokeSize(3)}
+                style={{ width: "50px", height: "50px", marginRight: "3px", outline: strokeSize === 3 ? "3px solid black" : "none", position: "relative" }}
+              >
+                <div className="Canvas stroke-circle" style={{ width: "10px", height: "10px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+              </button>
               <button
-                className="color-button"
-                style={{ backgroundColor: "#d3d3d3", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#d3d3d3")}
-              />
+                className={`Canvas stroke-size-button ${strokeSize === 5 ? "active" : ""}`}
+                onClick={() => setStrokeSize(5)}
+                style={{ width: "50px", height: "50px", outline: strokeSize === 5 ? "3px solid black" : "none", position: "relative" }}
+              >
+                <div className="Canvas stroke-circle" style={{ width: "15px", height: "15px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+              </button>
               <button
-                className="color-button"
-                style={{ backgroundColor: "#6E95FB", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#6E95FB")}
-              />
+                className={`Canvas stroke-size-button ${strokeSize === 8 ? "active" : ""}`}
+                onClick={() => setStrokeSize(8)}
+                style={{ width: "50px", height: "50px", outline: strokeSize === 8 ? "3px solid black" : "none", position: "relative" }}
+              >
+                <div className="Canvas stroke-circle" style={{ width: "20px", height: "20px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+              </button>
               <button
-                className="color-button"
-                style={{ backgroundColor: "#FF0000", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#FF0000")}
-              /> 
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#66DA3D", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#66DA3D")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#E9ED20", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#E9ED20")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#FA8633", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#FA8633")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#B149F1", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#B149F1")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#EE49F1", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#EE49F1")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#A44E1E", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#A44E1E")}
-              />
+                className={`Canvas stroke-size-button ${strokeSize === 12 ? "active" : ""}`}
+                onClick={() => setStrokeSize(12)}
+                style={{ width: "50px", height: "50px", outline: strokeSize === 12 ? "3px solid black" : "none", position: "relative" }}
+              >
+                <div className="Canvas stroke-circle" style={{ width: "28px", height: "28px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+              </button>
             </div>
-            <div className="color-button-row">
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#000000", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#000000")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#A9A9A9", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#A9A9A9")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#0A53E1", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#0A53E1")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#CF0808", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#CF0808")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#0CAA09", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#0CAA09")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#C9CD03", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#C9CD03")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#EF6A0A", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#EF6A0A")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#82109E", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#82109E")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#9E106E", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#9E106E")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#703717", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#703717")}
-              />
+            <div className="Canvas actions">
+              <Button
+                onClick={handleDrawToolClick}
+                className={`Canvas action ${isDrawToolSelected ? "game selected" : ""}`}
+              >
+                Draw
+              </Button>
+              <Button
+                onClick={handleFillToolClick}
+                className={`Canvas action ${isFillToolSelected ? "game selected" : ""}`}
+              >
+                Fill
+              </Button>
+              <Button
+                onClick={handleEraserClick}
+                className={`Canvas action ${isEraserToolSelected ? "game selected" : ""}`}
+              >
+                Eraser
+              </Button>
+              <Button 
+                onClick={handleEraseAllClick}
+              >
+                Erase All
+              </Button>
             </div>
           </div>
         </div>
-        <div className="stroke-size-buttons">
-          <button
-            className={`stroke-size-button ${strokeSize === 3 ? "active" : ""}`}
-            onClick={() => setStrokeSize(3)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 3 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "10px", height: "10px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-          <button
-            className={`stroke-size-button ${strokeSize === 5 ? "active" : ""}`}
-            onClick={() => setStrokeSize(5)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 5 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "15px", height: "15px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-          <button
-            className={`stroke-size-button ${strokeSize === 8 ? "active" : ""}`}
-            onClick={() => setStrokeSize(8)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 8 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "20px", height: "20px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-          <button
-            className={`stroke-size-button ${strokeSize === 12 ? "active" : ""}`}
-            onClick={() => setStrokeSize(12)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", outline: strokeSize === 12 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "28px", height: "28px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-        </div>
-        <div className="tools-container">
-          <Button
-            onClick={handleDrawToolClick}
-            className={`tool-button ${isDrawToolSelected ? "game selected" : ""}`}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Draw
-          </Button>
-          <Button
-            onClick={handleFillToolClick}
-            className={`tool-button ${isFillToolSelected ? "game selected" : ""}`}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Fill
-          </Button>
-          <Button
-            onClick={handleEraserClick}
-            className={`tool-button ${isEraserToolSelected ? "game selected" : ""}`}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Eraser
-          </Button>
-          <Button 
-            onClick={handleEraseAllClick}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Erase All
-          </Button>
-        </div>
+        <Chat/>
       </div>
-      <Chat/>
-    </BaseContainer>
+    </div>
   );
 };
 

@@ -6,6 +6,7 @@ import "styles/views/Game.scss";
 import ButtonComponent from "components/elements/game/ButtonComponent";
 import { Context } from "../../context/Context";
 import Chat from "./Chat";
+import WordSelection from "./WordSelection";
 
 const Game = () => {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ const Game = () => {
   const [isDrawToolSelected, setIsDrawToolSelected] = useState(true);
   const [isEraserToolSelected, setIsEraserToolSelected] = useState(false);
   const [strokeSize, setStrokeSize] = useState(3);
+  const [isSelectionOpen, setIsSelectionOpen] = useState(false);
+
   const context = useContext(Context);
   const {stompApi, reload, setReload} = context;  //or const stompApi = context.stompApi
   let role
@@ -38,6 +41,14 @@ const Game = () => {
   const logout = (): void => { //remove this?
     sessionStorage.removeItem("token");
     navigate("/loginOrRegister");
+  };
+
+  const handleWordSelectionClick = () => {
+    setIsSelectionOpen(true);
+  };
+
+  const handleCloseSelection = () => {
+    setIsSelectionOpen(false);
   };
 
 
@@ -491,6 +502,13 @@ const Game = () => {
           />
           <Button onClick={logout}>Logout</Button>
         </div>
+        <Button
+        onClick={handleWordSelectionClick}
+        className={`tool-button ${isEraserToolSelected ? "game selected" : ""}`}
+        style={{ marginRight: "4px", marginTop: "7px"}}
+        >
+          Open Word Selection
+      </Button>
         <div className="color-buttons-container">
           <div className="color-buttons">
             <div className="color-button" style={{ width: "50px", height: "50px" }}>
@@ -498,6 +516,7 @@ const Game = () => {
                 style={{ backgroundColor: selectedColor, width: "50px", height: "50px" }}
                 onClick={() => handleColorButtonClick(selectedColor)}
               />
+              
             </div>
             <div className="color-button-row">
               <button
@@ -666,6 +685,8 @@ const Game = () => {
         </div>
       </div>
       <Chat/>
+
+        <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} />
     </BaseContainer>
   );
 };

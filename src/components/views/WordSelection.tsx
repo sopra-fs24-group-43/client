@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import '../../styles/views/WordSelection.scss';
+import '../../styles/views/game/WordSelection.scss';
 
 
 const WordSelection = ({ isOpen, onClose }) => {

@@ -707,15 +707,15 @@ const Game = () => {
                 Erase All
               </Button>
             </div>
-            <Button
-              onClick={handleWordSelectionClick}
-              className={`tool-button ${isEraserToolSelected ? "game selected" : ""}`}
-              style={{ marginRight: "4px", marginTop: "7px"}}
-              >
-                Open Word Selection
-            </Button>
-            <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} />
           </div>
+          <Button
+            onClick={handleWordSelectionClick}
+            className={`tool-button ${isEraserToolSelected ? "game selected" : ""}`}
+            style={{ marginRight: "4px", marginTop: "7px"}}
+            >
+              Open Word Selection
+          </Button>
+          <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} />
         </div>
         <Chat/>
       </div>

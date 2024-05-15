@@ -515,7 +515,11 @@ const Game = () => {
                 style={{ backgroundColor: "#6E95FB", width: "25px", height: "25px" }}
                 onClick={() => handleColorButtonClick("#6E95FB")}
               />
-              <ButtonComponent color={"red"} changeColor={handleColorButtonClick}/> 
+              <button
+                className="color-button"
+                style={{ backgroundColor: "#FF0000", width: "25px", height: "25px" }}
+                onClick={() => handleColorButtonClick("#FF0000")}
+              /> 
               <button
                 className="color-button"
                 style={{ backgroundColor: "#66DA3D", width: "25px", height: "25px" }}

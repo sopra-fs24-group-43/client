@@ -12,26 +12,32 @@ const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const chatMessagesRef = useRef(null);
   const context = useContext(Context);
-  const {stompApi} = context;  //or const stompApi = context.stompApi
+  const {stompApi, reload, setReload} = context;  //or const stompApi = context.stompApi
 
-  const gameId = 1;
+  let gameId;
+  gameId = sessionStorage.getItem("gameId")
 
+  let subscribed
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       navigate("/loginOrRegister");
     }
-
-    stompApi.subscribe(`/topic/games/${gameId}/sendguess`, onHandleMessage)
+    if (stompApi.isConnected() && !subscribed) {
+      console.log("subscribed in Chat")
+      stompApi.subscribe(`/topic/games/${gameId}/sendguess`, onHandleMessage)
+      subscribed = true;
+    }
     return () => {
-      stompApi.unsubscribe(); 
+      stompApi.unsubscribe();
+      subscribed = false;
     };
-  }, [navigate, context]);
+  }, [navigate, context, reload]); //add reload so that Chat subscribes
 
   const handleSendMessage = () => {
     if (currentMessage.trim() !== "") {
-      const newMessage = localStorage.username +": "+ `${currentMessage}`;
-      const username = localStorage.username;
+      const newMessage = sessionStorage.username +": "+ `${currentMessage}`;
+      const username = sessionStorage.username;
       const answerString = currentMessage;
       setChatMessages([...chatMessages, newMessage]);
       
@@ -46,7 +52,7 @@ const Chat = () => {
   const { username, answerString } = payloadData;
 
   
-  if (username !== localStorage.username) {
+  if (username !== sessionStorage.username) {
     const newMessage = `${username}: ${answerString}`;
 
     

@@ -31,7 +31,14 @@ const Game = () => {
   const [gamePhase2, setGamePhase2] = useState()
   let endGame
   let connectedPlayers
+  const [connectedPlayers2, setConnectedPlayers2] = useState()
+  let playersOriginally
+  const [playersOriginally2, setPlayersOriginally] = useState()
+  let maxRounds
+  const [maxRounds2, setMaxRounds2] = useState()
   let currentRound
+  const [currentRound2, setCurrentRound2] = useState()
+  const [currentTurn2, setCurrentTurn2] = useState()
   let currentTurn
   let threeWords //the three words to choose from
   const [threeWords2, setThreeWords2] = useState()
@@ -192,10 +199,17 @@ const Game = () => {
     if (body.type === "GameStateDTO") {
       gamePhase = "choosing"
       setGamePhase2("choosing")
+      maxRounds = body.maxRounds
+      setMaxRounds2(body.maxRounds)
+      playersOriginally = body.playersOriginally
+      setPlayersOriginally(body.playersOriginally)
       endGame = body.endGame
       connectedPlayers = body.connectedPlayers
+      setConnectedPlayers2(body.connectedPlayers)
       currentRound = body.currentRound
+      setCurrentRound2(body.currentRound)
       currentTurn = body.currentTurn
+      setCurrentTurn2(body.currentTurn)
       threeWords = body.threeWords
       setThreeWords2(body.threeWords)
       drawingOrder = body.drawingOrder
@@ -552,10 +566,10 @@ const Game = () => {
           {showtimer(time, gamePhase2, "drawing")}
         </div>
         <div className="Tracker rounds">
-          Round 1/2
+          Round {currentRound2}/{maxRounds2}
         </div>
         <div className="Tracker word">
-          Word to guess
+          {chosenWord}
         </div>
       </div>
       <div className="Game form">
@@ -751,8 +765,7 @@ const Game = () => {
       </div>
       <Chat/>
       <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
-    </BaseContainer>
-
+    </div>
   );
 };
 

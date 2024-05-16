@@ -148,7 +148,10 @@ const Settings = () => {
       </div>
       <div className="Settings menu-form">
         <div className="Settings menu-label">Drawtime</div>
-        <select className="Settings slide-down-menu" name="turnLength" value={turnLength} onChange={handleSettingsChange}>
+        <select className="Settings slide-down-menu" name="turnLength" value={turnLength}
+                onChange={handleSettingsChange}>
+          <option value={5}>5</option>
+          <option value={10}>10</option>
           <option value={30}>30</option>
           <option value={45}>45</option>
           <option value={60}>60</option>

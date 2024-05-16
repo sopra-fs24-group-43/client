@@ -47,7 +47,7 @@ const Login = () => {
       const user = new User(response.data);
 
       // Store the token into the local storage.
-      localStorage.setItem("token", user.token);
+      sessionStorage.setItem("token", user.token);
 
       // Login successfully worked --> navigate to the route /game in the GameRouter
       navigate("/game");
@@ -60,8 +60,8 @@ const Login = () => {
 
   return (
     <BaseContainer>
-      <div className="login container">
-        <div className="login form">
+      <div className={`login container`}>
+        <div className={`login form`}>
           <FormField
             label="Username"
             value={username}

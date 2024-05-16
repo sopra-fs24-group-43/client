@@ -20,7 +20,7 @@ const Settings = ({ isOpen, onClose }) => {
 
   return (
     <div className={`settings ${isOpen ? "open" : ""}`}>
-      <div className={`modal-content${localStorage.getItem("isDarkMode") ? '_dark' : ''}`}>
+      <div className={`modal-content`}>
         <span className="close" onClick={onClose}>&times;</span>
         <h2>Settings</h2>
         <div className={"setting-option"}>

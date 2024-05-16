@@ -1,0 +1,123 @@
+@import "../theme";
+
+.Chat{
+  &.container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    height: 670px;
+    min-width: 30%;
+    margin-left: 3px;
+
+    background-color: $background;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: $dropShadow;
+    border: 3px solid #2a2c2e;
+    border-bottom-right-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+  &.title{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 30px;
+    width: 100%;
+
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+  }
+  &.messages{
+    height: 100%; 
+    width: 100%;
+    padding-left: 4px;
+    overflow-y: auto;
+    overflow-x: auto;
+  }
+  &.message{
+    height: auto; /* Change height to auto to allow the message to expand vertically */
+    width: 100%;
+    max-width: calc(100% - 10px); /* Adjust the max-width as needed to ensure it doesn't overflow */
+    word-wrap: break-word;
+  }
+  &.messages_dark{
+    height: 100%;
+    width: 100%;
+    padding-left: 4px;
+    overflow-y: auto;
+    overflow-x: auto;
+    color: white;
+  }
+  &.message_dark{
+    height: auto; /* Change height to auto to allow the message to expand vertically */
+    width: 100%;
+    max-width: calc(100% - 10px); /* Adjust the max-width as needed to ensure it doesn't overflow */
+    word-wrap: break-word;
+    color: white;
+  }
+  &.input-form{
+    height: 30px; 
+    width: 100%;
+  }
+  &.input{
+    height: 100%; 
+    width: 100%;
+  }
+}
+.Chat_dark{
+  &.container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    height: 670px;
+    min-width: 30%;
+    margin-left: 3px;
+
+    background-color: $darkMode;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: $dropShadow;
+    border: 3px solid #2a2c2e;
+    border-bottom-right-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+  &.title{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 30px;
+    width: 100%;
+
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+  }
+  &.messages{
+    height: 100%;
+    width: 100%;
+    padding-left: 4px;
+    overflow-y: auto;
+    overflow-x: auto;
+    color: white;
+  }
+  &.message{
+    height: auto; /* Change height to auto to allow the message to expand vertically */
+    width: 100%;
+    max-width: calc(100% - 10px); /* Adjust the max-width as needed to ensure it doesn't overflow */
+    word-wrap: break-word;
+    color: white;
+  }
+  &.input-form{
+    height: 30px;
+    width: 100%;
+  }
+  &.input{
+    height: 100%;
+    width: 100%;
+  }
+}

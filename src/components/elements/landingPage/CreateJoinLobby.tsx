@@ -1,62 +1,47 @@
 import React, {useEffect, useContext} from "react";
-import {useNavigate, useLocation} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import "styles/views/CreateJoinLobby.scss";
-import StompApi from "../../../helpers/StompApi";
+
 import { Button } from "components/ui/Button";
 import {Context} from "../../../context/Context";
 
-const stompApi = new StompApi()
 export const changeview = false;
 const CreateJoinLobby = () => {
   const navigate = useNavigate();
-  var registered = false;
-  var username;
-  var userId;
-  var friends = null;
-  var role;
-  var gameId;
+  let username
+  let userId
+  let gameId
+  let isGuest
+  let friends
+  let role
+  let registered
+
+
+
+
   const context = useContext(Context)
   const {stompApi} = context
+  registered = (!(sessionStorage.getItem("username")=== null || sessionStorage.getItem("userId")=== null || sessionStorage.getItem("friends")=== null || sessionStorage.getItem("isGuest") === null))
 
-  console.log("1registered: "+registered)
-  console.log("1username, userId: " + username + ", " + userId)
 
-  if (useLocation()["state"] === null){
-    if (localStorage.getItem("username")=== null && localStorage.getItem("userId")=== null && localStorage.getItem("friends")=== "null"){
-      registered = false
-    }
-    else {
-      console.log("gettings credentials from localStorage")
-      username = localStorage.getItem("username")
-      userId = parseInt(localStorage.getItem("userId"))
-      friends = localStorage.getItem("friends")
-      if (friends === "null") {friends = []}
-      registered = true;
-    }
+
+  if (registered) {
+    console.log("gettings credentials from sessionStorage in CreateJoinLobby")
+    username = (sessionStorage.getItem("username"))
+    userId = (parseInt(sessionStorage.getItem("userId")))
+    friends = (sessionStorage.getItem("friends")) //is the String "null" if user has no friends
+    isGuest = (sessionStorage.getItem("isGuest"))
+    console.log("got credentials in CreateJoinLobby: username, userid, friends, isGuest: ", username, userId, friends, isGuest)
   }
-  else{
-    console.log("gettings credentials from useLocation")
-    username = useLocation()["state"]["username"];
-    userId = useLocation()["state"]["userId"];
-    friends = useLocation()["state"]["friends"];
-    if (friends === null) {friends = []}
-    registered = true;
-  }
-
-  console.log("1registered after: "+registered)
-  console.log("1username, userId after: " + username + ", " + userId)
 
   const handleResponse = (payload) => {
     var body = JSON.parse(payload.body)
     if (body.type === "creategame"){
-      console.log("handle: "+typeof body.userId)
-      console.log("handle: "+body.userId)
-      console.log("handle: "+typeof userId)
-      console.log("handle: " + userId)
       if (body.userId === userId) {
-        gameId = body.gameId
+        gameId = (body.gameId)
         console.log("username, userId, gameId, role: ", username, userId, gameId, role)
-        localStorage.setItem("role", role)
+        sessionStorage.setItem("role", role)
+        sessionStorage.setItem("gameId", gameId)
         navigate(`/lobby/${gameId}`, {state: {username: username, userId: userId, friends: friends, gameId: gameId, role: role}}) // is sent to the lobby
       }
       else {
@@ -69,23 +54,25 @@ const CreateJoinLobby = () => {
   }
 
   useEffect(() => {
+
     return () => {  //this gets executed when navigating another page
       console.log("unsubscribing when navigating to different view from CreateJoinLobby!")
       stompApi.unsubscribe("/topic/landing", "CreateJoinLobby")
     }
-  }, []);
+  }, [registered]);
 
   const creategame = () => {
     const inboundPlayer = {
       type: "inboundPlayer",
       username: username,
       userId: userId,
+      isGuest: isGuest,
       gameId: 101,
-      friends: friends,
+      friends: [],
       role: "admin"
     }
     console.log("trying to sub: " + stompApi.isConnected())
-    role = "admin"
+    role = ("admin")
     if (stompApi.isConnected()){
       console.log("trying to sub: ")
       stompApi.subscribe("/topic/landing", handleResponse, "CreateJoinLobby")

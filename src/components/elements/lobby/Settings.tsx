@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../../../styles/views/lobby/Settings.scss"
 
-import { stompApi } from "../../views/LandingPage";
-
+import { Context } from "../../../context/Context";
 
 const Settings = () => {
+  console.log("I'm in the Settings");
   // setting up the gameSettings
   const [maxPlayers, setMaxPlayers] = useState(5);
   const [maxRounds, setMaxRounds] = useState(5);
@@ -14,48 +14,43 @@ const Settings = () => {
   // getting the gameId from the url
   const { gameId } = useParams();
   const lobbyId = parseInt(gameId);
+  
+  // getting contex
+  const context = useContext(Context)
+  const {stompApi} = context  //or const stompApi = context.stompApi
 
   // websocket connection establishing
   function timeout(delay: number) {
     return new Promise( res => setTimeout(res, delay) );
   };
 
-  const connect = async ()=>{
-    stompApi.connect();
-    await timeout(1000);
-    stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse);
+  // subscribe if !stompApi.isConnected()
+  const subscribe = async () => { // needed for delaying the send function, so the connection is established
+    await timeout(600);
+    console.log("Subscribing from the settings");
+    stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
   };
-
+  
   useEffect(() => {
-    // connecting
-    if (!stompApi.isConnected()){
-      console.log("connecting to ws in Lobby view");
-      connect();
-      console.log("connected");
+    // subscribing
+    if (stompApi.isConnected()){
+      stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
+      console.log("subscribed when was connected to the websocket in Settings");
+    } else if (!stompApi.isConnected()){
+      subscribe()
     }
-
-    // sending the data to the server only if user is a creator of a lobby
-    if (localStorage.getItem("role") === "admin"){
-        const settings = {
-        type: "gameSettings",
-        maxPlayers: maxPlayers,
-        maxRounds: maxRounds,
-        turnLength: turnLength
-      };
-      if (stompApi.isConnected()){
-        sendData(settings);
-      };
+    
+    // unsub
+    return () => {  //this gets executed when navigating another page
+      console.log("unsubscribing and cleaning up when navigating to different view from Settings!");
+      // window.removeEventListener('beforeunload', handleBeforeUnload)
+      stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Settings");
     };
-  }, );
+  }, []);
 
-  const sendData = async (settings) => { // needed for delaying the send function, so the connection is established
-    await timeout(1000);
-    stompApi.send(`/app/games/${lobbyId}/updategamesettings`, JSON.stringify(settings));
-  };
-
-  // sending the data to the server
   useEffect(() => {
-    if (localStorage.getItem("role") === "admin"){
+    // sending the data to the server only if user is a creator of a lobby
+    if (sessionStorage.getItem("role") === "admin"){
       const settings = {
         type: "gameSettings",
         maxPlayers: maxPlayers,
@@ -66,32 +61,27 @@ const Settings = () => {
         sendData(settings);
       };
     };
-  }, [maxPlayers, maxRounds, turnLength]);
 
-  // fetching the data
-  // useEffect(() => {
-  //   const fetchInitialSettings = async () => {
-  //     // Fetch initial settings from the server
-  //     const response = await fetch(`/topic/games/${lobbyId}/general`);
-  //     const initialSettings = await JSON.parse;
-      
-  //     // Update state with initial settings
-  //     setMaxPlayers(initialSettings.maxPlayers);
-  //     setMaxRounds(initialSettings.maxRounds);
-  //     setTurnLength(initialSettings.turnLength);
-  //   };
-  
-  //   fetchInitialSettings();
-  // }, []);
+  }, [maxPlayers, maxRounds, turnLength]) 
+
+  const sendData = async (settings) => { // needed for delaying the send function, so the connection is established
+    await timeout(400);
+    console.log("sending the message from the settings");
+    stompApi.send(`/app/games/${lobbyId}/updategamesettings`, JSON.stringify(settings));
+  };
 
   // handling the response
   const handleResponse = (payload) => {
     const responseData = JSON.parse(payload.body); // response data from the server
-    console.log("payload: ", responseData);
+    console.log("Settings' payload: ", responseData);
     if (responseData.type === "gameSettings"){
       setMaxPlayers(responseData.maxPlayers);
       setMaxRounds(responseData.maxRounds);
       setTurnLength(responseData.turnLength);
+    } else if (responseData.type === "getlobbyinfo") {
+      setMaxPlayers(responseData.gameSettingsDTO.maxPlayers);
+      setMaxRounds(responseData.gameSettingsDTO.maxRounds);
+      setTurnLength(responseData.gameSettingsDTO.turnLength);
     }
   };
 
@@ -115,10 +105,21 @@ const Settings = () => {
     };
   };
 
+  // disabling the select element if user is not the creator of a lobby ("admin")
+  useEffect(() => {
+    const role = sessionStorage.getItem("role");
+    if (role !== "admin") {
+      const selects = document.querySelectorAll(".Settings.slide-down-menu");
+      selects.forEach((select) => {
+        (select as HTMLSelectElement).disabled = true;
+      });
+    }
+  }, []);
+
   return (
-    <div className="Settings container">
+    <div className={`Settings${localStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
       <div className="Settings menu-form">
-        <div className="Settings menu-label">Players</div>
+        <div className={`Settings${localStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Players</div>
         <select className="Settings slide-down-menu" name="maxPlayers" value={maxPlayers} onChange={handleSettingsChange}>
           <option value={3}>3</option>
           <option value={4}>4</option>
@@ -129,7 +130,7 @@ const Settings = () => {
         </select>
       </div>
       <div className="Settings menu-form">
-        <div className="Settings menu-label">Rounds</div>
+        <div className={`Settings${localStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Rounds</div>
         <select className="Settings slide-down-menu" name="maxRounds" value={maxRounds} onChange={handleSettingsChange}>
           <option value={4}>4</option>
           <option value={5}>5</option>
@@ -137,8 +138,11 @@ const Settings = () => {
         </select>
       </div>
       <div className="Settings menu-form">
-        <div className="Settings menu-label">Drawtime</div>
-        <select className="Settings slide-down-menu" name="turnLength" value={turnLength} onChange={handleSettingsChange}>
+        <div className={`Settings${localStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Drawtime</div>
+        <select className="Settings slide-down-menu" name="turnLength" value={turnLength}
+                onChange={handleSettingsChange}>
+          <option value={5}>5</option>
+          <option value={10}>10</option>
           <option value={30}>30</option>
           <option value={45}>45</option>
           <option value={60}>60</option>

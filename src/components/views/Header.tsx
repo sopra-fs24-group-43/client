@@ -27,16 +27,16 @@ const Header = (props) => {
       </div>
       <div className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
         <a href="/leaderboard" className="navigation-link">
-          <img src="/leaderboard.png" alt="Leaderboard Icon" className="header img" />
+          <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
         </a>
         <a href="/friends" className="navigation-link">
-          <img src="/friends.png" alt="Friends Icon" className="header img" />
+          <img src="/friends.png" alt="Friends Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
         </a>
         <button onClick={handleSettingsClick} className="navigation-link settings-button">
-          <img src="/settings.png" alt="Settings Icon" className="header img" />
+          <img src="/settings.png" alt="Settings Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
         </button>
         <a href="/profile" className="navigation-link">
-          <img src="/profile.png" alt="Profile Icon" className="header img" />
+          <img src="/profile.png" alt="Profile Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
         </a>
       </div>
 

@@ -1,11 +1,13 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext} from "react";
 import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
-import BaseContainer from "components/ui/BaseContainer";
-import "styles/views/Game.scss";
-import ButtonComponent from "components/elements/game/ButtonComponent";
-
-import { stompApi } from "./LandingPage";
+import "styles/views/game/Game.scss";
+import "styles/views/game/Tracker.scss";
+import "styles/views/game/Canvas.scss";
+import { Context } from "../../context/Context";
+import Chat from "./Chat";
+import LeaderboardInGame from "./LeaderboardInGame";
+import WordSelection from "./WordSelection";
 
 const Game = () => {
   const navigate = useNavigate();
@@ -17,16 +19,53 @@ const Game = () => {
   const [isDrawToolSelected, setIsDrawToolSelected] = useState(true);
   const [isEraserToolSelected, setIsEraserToolSelected] = useState(false);
   const [strokeSize, setStrokeSize] = useState(3);
-  const [chatMessages, setChatMessages] = useState<string[]>([]);
-  const [currentMessage, setCurrentMessage] = useState<string>("");
-  const chatMessagesRef = useRef(null);
+  const [isSelectionOpen, setIsSelectionOpen] = useState(false);
 
-  const logout = (): void => {
-    localStorage.removeItem("token");
+  const context = useContext(Context);
+  const {stompApi, reload, setReload} = context;  //or const stompApi = context.stompApi
+  let role //"admin", "player"
+  let gameId
+  let userId
+  let subscribed
+  let gamePhase //if drawing{ drawing} else { if choosing {choosing } else {leaderboard}
+  const [gamePhase2, setGamePhase2] = useState()
+  let endGame
+  let connectedPlayers
+  const [connectedPlayers2, setConnectedPlayers2] = useState()
+  let playersOriginally
+  const [playersOriginally2, setPlayersOriginally] = useState()
+  let maxRounds
+  const [maxRounds2, setMaxRounds2] = useState()
+  let currentRound
+  const [currentRound2, setCurrentRound2] = useState()
+  const [currentTurn2, setCurrentTurn2] = useState()
+  let currentTurn
+  let threeWords //the three words to choose from
+  const [threeWords2, setThreeWords2] = useState()
+  let isDrawer //true, false
+  let Drawer //index in drawingOrder
+  let chosenWord
+  let wordIndex //0,1 or 2
+  let drawingOrder //List of userIds is correct order
+  const [isDrawer2, setIsDrawer2] = useState()
+  const [time, setTime] = useState()
+  role = sessionStorage.getItem("role")
+  gameId = sessionStorage.getItem("gameId")
+  userId = parseInt(sessionStorage.getItem("userId"))
+  const logout = (): void => { //remove this?
+    sessionStorage.removeItem("token");
     navigate("/loginOrRegister");
   };
 
-  const gameId = 1;
+  const handleWordSelectionClick = () => {
+    setIsSelectionOpen(true);
+  };
+
+  const handleCloseSelection = () => {
+    setIsSelectionOpen(false);
+  };
+
+
 
    useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -56,19 +95,174 @@ const Game = () => {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "e":
+          handleEraserClick();
+          break;
+        case "c":
+          handleEraseAllClick();
+          break;
+        case "f":
+          handleFillToolClick();
+          break;
+        case "d": 
+          handleDrawToolClick();
+          break;
+        default:
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
+  function timeout(delay: number) {
+    return new Promise( res => setTimeout(res, delay) );
+  };
+  const connect = async ()  => {
+    await stompApi.connect(() => {
+      stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/general`, onHandleGeneralResponse, "Game")
+      subscribed = true
+      stompApi.connected = true //important!!! needs to be set during the onConnectedCallback, otherwise it might happen that it connected gets set true before the ws
+                                //is fully setup
+      setReload(!reload) //makes so it subscribes in Chat
+      if (role === "admin") {
+        timeout(1000);
+        stompApi.send(`/app/games/${gameId}/nextturn`, "")
+      }
+    });
+  }
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
+      console.log("disconnecting before reloading page!")
+      stompApi.disconnect()
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    if (!stompApi.isConnected()) {    //need to be registerd and not connected already to connect
+      console.log("connecting to ws!")
+      connect();
+    }
+    const token = sessionStorage.getItem("token");
+    if (!token) { //remove this?
       navigate("/loginOrRegister");
     }
+    if (stompApi.isConnected()) { // && !subscribed
+      stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse, "Game");
 
-    stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse);
-    stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse);
-    stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse);
-    stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse);
-    stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse);
-    stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse);
+      stompApi.subscribe(`/topic/games/${gameId}/general`, onHandleGeneralResponse, "Game")
+      subscribed = true
+      if (stompApi.isConnected() && role === "admin") {
+        stompApi.send(`/app/games/${gameId}/nextturn`, "")
+      }
+    }
+    return () => {
+      console.log("unsubscribing and cleaning up when navigating to different view from Game!")
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+
+    }
   }, [navigate]);
 
+  const sendWordChoice = (wordIndex, threeWords) => {
+
+    let chosenWord = threeWords[wordIndex]
+    const ChooseWordDTO =  {
+      type: "chooseword",
+      wordIndex: wordIndex,
+      word: chosenWord
+    }
+    stompApi.send(`/app/games/${gameId}/sendchosenword`, JSON.stringify(ChooseWordDTO))
+  }
+  const getRandomInt = (max) => {
+    return Math.floor(Math.random()*3)
+  }
+  const onHandleGeneralResponse = (payload) => {
+    const body = JSON.parse(payload.body);
+    if (body.type === "leaderboard"  && role === "admin") { //just for testing
+      stompApi.send(`/app/games/${gameId}/nextturn`, "")
+    }
+    if (body.type === "GameStateDTO") {
+      gamePhase = "choosing"
+      setGamePhase2("choosing")
+      maxRounds = body.maxRounds
+      setMaxRounds2(body.maxRounds)
+      playersOriginally = body.playersOriginally
+      setPlayersOriginally(body.playersOriginally)
+      endGame = body.endGame
+      connectedPlayers = body.connectedPlayers
+      setConnectedPlayers2(body.connectedPlayers)
+      currentRound = body.currentRound
+      setCurrentRound2(body.currentRound)
+      currentTurn = body.currentTurn
+      setCurrentTurn2(body.currentTurn)
+      threeWords = body.threeWords
+      setThreeWords2(body.threeWords)
+      drawingOrder = body.drawingOrder
+      Drawer = body.drawer
+      setIsDrawer2(userId === drawingOrder[Drawer])
+      isDrawer = userId === drawingOrder[Drawer]
+      console.log("userIdofDrawer, userId, isDrawer: ", drawingOrder[Drawer], userId, isDrawer)
+      console.log("isDrawer: ", isDrawer)
+      setIsSelectionOpen(true);
+    }
+    if (body.type === "startdrawing") {
+      gamePhase = "drawing"
+      setGamePhase2("drawing")
+      wordIndex = body.wordIndex
+      chosenWord = body.word
+      setIsSelectionOpen(false);
+    }
+    if (body.type === "TimerOut" && body.gamePhase === "drawing") {
+      gamePhase = "drawing"
+      setGamePhase2("drawing")
+
+      setTime(body.time)
+    }
+    if (body.type === "TimerOut" && body.gamePhase === "choosing") {
+      gamePhase = "choosing"
+      setGamePhase2("choosing")
+
+      setTime(body.time)
+      if (body.time === 0 && isDrawer && gamePhase === "choosing") {
+        wordIndex = getRandomInt(3)
+        chosenWord = threeWords[wordIndex]
+        const ChooseWordDTO =  {
+          type: "chooseword",
+          wordIndex: wordIndex,
+          word: chosenWord
+        }
+        stompApi.send(`/app/games/${gameId}/sendchosenword`, JSON.stringify(ChooseWordDTO))
+      }
+    }
+    if (body.type === "leaderboard") {
+      gamePhase = "leaderboard"
+      setGamePhase2("leaderboard")
+
+    }
+  }
+  const showtimer = (time, gamePhase2, wantedgamePhase) => {
+    if (time === undefined) {
+      return ""
+    }
+    if (time !== undefined && gamePhase2 === wantedgamePhase) {
+      return ( <div> Timer: { time } </div>)
+    }
+  }
   const onHandleResponse = (payload) => {
     const renderCanvas = canvasRef.current;
     if (!renderCanvas) return;
@@ -362,230 +556,225 @@ const Game = () => {
     );
   };
   
-  const handleSendMessage = () => {
-    if (currentMessage.trim() !== "") {
-      const newMessage = localStorage.username +": "+ `${currentMessage}`;
-      setChatMessages([...chatMessages, newMessage]);
-      setCurrentMessage("");
-    }
-  };
-
-  useEffect(() => {
-    if (chatMessagesRef.current) {
-      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
-    }
-  }, [chatMessages]);
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+ // <Button onClick={logout}>Logout</Button>
   
   return (
-    <BaseContainer className="game container">
-      <div className="game-container">
-        <div className="canvas-container">
-          <canvas
-            ref={canvasRef}
-            width={800}
-            height={600}
-            style={{ border: "1px solid black", background: "white" }}
-          />
-          <Button onClick={logout}>Logout</Button>
-        </div>
-        <div className="color-buttons-container">
-          <div className="color-buttons">
-            <div className="color-button" style={{ width: "50px", height: "50px" }}>
-              <button
-                style={{ backgroundColor: selectedColor, width: "50px", height: "50px" }}
-                onClick={() => handleColorButtonClick(selectedColor)}
-              />
-            </div>
-            <div className="color-button-row">
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#FFFFFF", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#FFFFFF")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#d3d3d3", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#d3d3d3")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#6E95FB", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#6E95FB")}
-              />
-              <ButtonComponent color={"red"} changeColor={handleColorButtonClick}/> 
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#66DA3D", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#66DA3D")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#E9ED20", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#E9ED20")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#FA8633", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#FA8633")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#B149F1", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#B149F1")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#EE49F1", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#EE49F1")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#A44E1E", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#A44E1E")}
-              />
-            </div>
-            <div className="color-button-row">
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#000000", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#000000")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#A9A9A9", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#A9A9A9")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#0A53E1", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#0A53E1")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#CF0808", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#CF0808")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#0CAA09", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#0CAA09")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#C9CD03", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#C9CD03")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#EF6A0A", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#EF6A0A")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#82109E", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#82109E")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#9E106E", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#9E106E")}
-              />
-              <button
-                className="color-button"
-                style={{ backgroundColor: "#703717", width: "25px", height: "25px" }}
-                onClick={() => handleColorButtonClick("#703717")}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="stroke-size-buttons">
-          <button
-            className={`stroke-size-button ${strokeSize === 3 ? "active" : ""}`}
-            onClick={() => setStrokeSize(3)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 3 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "10px", height: "10px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-          <button
-            className={`stroke-size-button ${strokeSize === 5 ? "active" : ""}`}
-            onClick={() => setStrokeSize(5)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 5 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "15px", height: "15px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-          <button
-            className={`stroke-size-button ${strokeSize === 8 ? "active" : ""}`}
-            onClick={() => setStrokeSize(8)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", marginRight: "3px", outline: strokeSize === 8 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "20px", height: "20px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-          <button
-            className={`stroke-size-button ${strokeSize === 12 ? "active" : ""}`}
-            onClick={() => setStrokeSize(12)}
-            style={{ width: "50px", height: "50px", marginTop: "7px", outline: strokeSize === 12 ? "3px solid black" : "none", position: "relative" }}
-          >
-            <div className="stroke-circle" style={{ width: "28px", height: "28px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          </button>
-        </div>
-        <div className="tools-container">
-          <Button
-            onClick={handleDrawToolClick}
-            className={`tool-button ${isDrawToolSelected ? "game selected" : ""}`}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Draw
-          </Button>
-          <Button
-            onClick={handleFillToolClick}
-            className={`tool-button ${isFillToolSelected ? "game selected" : ""}`}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Fill
-          </Button>
-          <Button
-            onClick={handleEraserClick}
-            className={`tool-button ${isEraserToolSelected ? "game selected" : ""}`}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Eraser
-          </Button>
-          <Button 
-            onClick={handleEraseAllClick}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-          >
-            Erase All
-          </Button>
-        </div>
-        <div className="chat-container">
-          <div className="chat-title">Guessing Chat</div> 
 
-          <div className="chat-messages" ref={chatMessagesRef}>
-
-            {chatMessages.map((message, index) => (
-              <div key={index}>{message}</div>
-            ))}
-          </div>
-          <div className="chat-input">
-            <input
-              type="text"
-              value={currentMessage}
-              onChange={(e) => setCurrentMessage(e.target.value)}
-              onKeyDown={handleKeyPress} 
-              placeholder="Your Guess"
-            />
-            <button onClick={handleSendMessage}>Send</button>
-          </div>
+    <div className="Game container">
+      <div className="Tracker container">
+        <div className="Tracker timer">
+          {showtimer(time, gamePhase2, "drawing")}
+        </div>
+        <div className="Tracker rounds">
+          Round {currentRound2}/{maxRounds2}
+        </div>
+        <div className="Tracker word">
+          {chosenWord}
         </div>
       </div>
-    </BaseContainer>
+      <div className="Game form">
+        <LeaderboardInGame/>
+        <div className="Canvas container">
+          <div className="Canvas canvas">
+            <canvas
+              ref={canvasRef}
+              width={800}
+              height={600}
+              style={{ border: "1px solid black", background: "white" }}
+            />
+          </div>
+          <div className="Canvas toolbar">
+            <div className="Canvas color-buttons">
+              <div className="Canvas main-color-button">
+                <button
+                  style={{ backgroundColor: selectedColor, width: "50px", height: "50px" }}
+                  onClick={() => handleColorButtonClick(selectedColor)}
+                />
+              </div>
+              <div className="Canvas color-buttons-group">
+                <div className="Canvas color-button-row">
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#FFFFFF", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#FFFFFF")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#d3d3d3", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#d3d3d3")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#6E95FB", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#6E95FB")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#FF0000", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#FF0000")}
+                  /> 
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#66DA3D", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#66DA3D")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#E9ED20", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#E9ED20")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#FA8633", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#FA8633")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#B149F1", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#B149F1")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#EE49F1", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#EE49F1")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#A44E1E", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#A44E1E")}
+                  />
+                </div>
+                <div className="Canvas color-button-row">
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#000000", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#000000")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#A9A9A9", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#A9A9A9")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#0A53E1", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#0A53E1")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#CF0808", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#CF0808")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#0CAA09", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#0CAA09")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#C9CD03", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#C9CD03")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#EF6A0A", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#EF6A0A")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#82109E", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#82109E")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#9E106E", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#9E106E")}
+                  />
+                  <button
+                    className="Canvas color-button"
+                    style={{ backgroundColor: "#703717", width: "25px", height: "25px" }}
+                    onClick={() => handleColorButtonClick("#703717")}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="Canvas stroke-size-buttons">
+              <button
+                className={`Canvas stroke-size-button ${strokeSize === 3 ? "active" : ""}`}
+                onClick={() => setStrokeSize(3)}
+                style={{ width: "50px", height: "50px", marginRight: "3px", outline: strokeSize === 3 ? "3px solid black" : "none", position: "relative" }}
+              >
+                <div className="Canvas stroke-circle" style={{ width: "10px", height: "10px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+              </button>
+              <button
+                className={`Canvas stroke-size-button ${strokeSize === 5 ? "active" : ""}`}
+                onClick={() => setStrokeSize(5)}
+                style={{ width: "50px", height: "50px", outline: strokeSize === 5 ? "3px solid black" : "none", position: "relative" }}
+              >
+                <div className="Canvas stroke-circle" style={{ width: "15px", height: "15px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+              </button>
+              <button
+                className={`Canvas stroke-size-button ${strokeSize === 8 ? "active" : ""}`}
+                onClick={() => setStrokeSize(8)}
+                style={{ width: "50px", height: "50px", outline: strokeSize === 8 ? "3px solid black" : "none", position: "relative" }}
+              >
+                <div className="Canvas stroke-circle" style={{ width: "20px", height: "20px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+              </button>
+              <button
+                className={`Canvas stroke-size-button ${strokeSize === 12 ? "active" : ""}`}
+                onClick={() => setStrokeSize(12)}
+                style={{ width: "50px", height: "50px", outline: strokeSize === 12 ? "3px solid black" : "none", position: "relative" }}
+              >
+                <div className="Canvas stroke-circle" style={{ width: "28px", height: "28px", backgroundColor: "black", borderRadius: "50%", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
+              </button>
+            </div>
+            <div className="Canvas actions">
+              <Button
+                onClick={handleDrawToolClick}
+                className={`Canvas action ${isDrawToolSelected ? "game selected" : ""}`}
+                style={{
+                  outline: isDrawToolSelected ? "3px solid black" : "none",   
+                }}
+              >
+                Draw
+              </Button>
+              <Button
+                onClick={handleFillToolClick}
+                className={`Canvas action ${isFillToolSelected ? "game selected" : ""}`}
+                style={{
+                  outline: isFillToolSelected ? "3px solid black" : "none",   
+                }}
+              >
+                Fill
+              </Button>
+              <Button
+                onClick={handleEraserClick}
+                className={`Canvas action ${isEraserToolSelected ? "game selected" : ""}`}
+                style={{
+                  outline: isEraserToolSelected ? "3px solid black" : "none",   
+                }}
+              >
+                Eraser
+              </Button>
+              <Button 
+                onClick={handleEraseAllClick}
+              >
+                Erase All
+              </Button>
+            </div>
+          </div>
+          <Button
+            onClick={handleWordSelectionClick}
+            className={`tool-button ${isEraserToolSelected ? "game selected" : ""}`}
+            style={{ marginRight: "4px", marginTop: "7px"}}
+            >
+              Open Word Selection
+          </Button>
+        </div>
+      </div>
+      <Chat/>
+      <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
+    </div>
   );
 };
 

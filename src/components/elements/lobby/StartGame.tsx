@@ -37,20 +37,17 @@ const StartGame = () => {
     };
   },[]);
 
+  // executes when button Start Game is triggered 
   const startGame = () => {
     console.log("sending data from the StartGame");
     console.log("lobbyId: ", lobbyId);
     if (stompApi.isConnected()){
-      sendData();
+      console.log("sending the message from the Startgame");
+      stompApi.send(`/app/games/${lobbyId}/startgame`, "");
     };
   };
 
-  const sendData = async () => { // needed for delaying the send function, so the connection is established
-    // await timeout(4000);
-    console.log("sending the message from the Startgame");
-    stompApi.send(`/app/games/${lobbyId}/startgame`, ""); // JSON.stringify({type: "startgame"})
-  };
-
+  // handling the response by navigating all players to the Game view
   const handleResponse = (payload) => {
     const responseData = JSON.parse(payload.body);
     console.log("handling the response in Startgame");

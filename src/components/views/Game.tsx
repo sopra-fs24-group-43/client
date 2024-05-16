@@ -27,16 +27,19 @@ const Game = () => {
   let userId
   let subscribed
   let gamePhase //if drawing{ drawing} else { if choosing {choosing } else {leaderboard}
+  const [gamePhase2, setGamePhase2] = useState()
   let endGame
   let connectedPlayers
   let currentRound
   let currentTurn
-  let threeWords
+  let threeWords //the three words to choose from
+  const [threeWords2, setThreeWords2] = useState()
   let isDrawer //true, false
   let Drawer //index in drawingOrder
   let chosenWord
   let wordIndex //0,1 or 2
   let drawingOrder //List of userIds is correct order
+  const [isDrawer2, setIsDrawer2] = useState()
   const [time, setTime] = useState()
   role = sessionStorage.getItem("role")
   gameId = sessionStorage.getItem("gameId")
@@ -109,6 +112,9 @@ const Game = () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, []);
+  function timeout(delay: number) {
+    return new Promise( res => setTimeout(res, delay) );
+  };
   const connect = async ()  => {
     await stompApi.connect(() => {
       stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse, "Game");
@@ -123,6 +129,7 @@ const Game = () => {
                                 //is fully setup
       setReload(!reload) //makes so it subscribes in Chat
       if (role === "admin") {
+        timeout(1000);
         stompApi.send(`/app/games/${gameId}/nextturn`, "")
       }
     });
@@ -162,6 +169,17 @@ const Game = () => {
 
     }
   }, [navigate]);
+
+  const sendWordChoice = (wordIndex, threeWords) => {
+
+    let chosenWord = threeWords[wordIndex]
+    const ChooseWordDTO =  {
+      type: "chooseword",
+      wordIndex: wordIndex,
+      word: chosenWord
+    }
+    stompApi.send(`/app/games/${gameId}/sendchosenword`, JSON.stringify(ChooseWordDTO))
+  }
   const getRandomInt = (max) => {
     return Math.floor(Math.random()*3)
   }
@@ -172,29 +190,40 @@ const Game = () => {
     }
     if (body.type === "GameStateDTO") {
       gamePhase = "choosing"
+      setGamePhase2("choosing")
       endGame = body.endGame
       connectedPlayers = body.connectedPlayers
       currentRound = body.currentRound
       currentTurn = body.currentTurn
       threeWords = body.threeWords
+      setThreeWords2(body.threeWords)
       drawingOrder = body.drawingOrder
       Drawer = body.drawer
+      setIsDrawer2(userId === drawingOrder[Drawer])
       isDrawer = userId === drawingOrder[Drawer]
       console.log("userIdofDrawer, userId, isDrawer: ", drawingOrder[Drawer], userId, isDrawer)
       console.log("isDrawer: ", isDrawer)
-      //renderPopupChooseWord() //
+      setIsSelectionOpen(true);
     }
     if (body.type === "startdrawing") {
       gamePhase = "drawing"
+      setGamePhase2("drawing")
+      wordIndex = body.wordIndex
+      chosenWord = body.word
+      setIsSelectionOpen(false);
     }
     if (body.type === "TimerOut" && body.gamePhase === "drawing") {
       gamePhase = "drawing"
+      setGamePhase2("drawing")
+
       setTime(body.time)
     }
     if (body.type === "TimerOut" && body.gamePhase === "choosing") {
       gamePhase = "choosing"
+      setGamePhase2("choosing")
+
       setTime(body.time)
-      if (body.time === 0 && isDrawer) {
+      if (body.time === 0 && isDrawer && gamePhase === "choosing") {
         wordIndex = getRandomInt(3)
         chosenWord = threeWords[wordIndex]
         const ChooseWordDTO =  {
@@ -207,13 +236,15 @@ const Game = () => {
     }
     if (body.type === "leaderboard") {
       gamePhase = "leaderboard"
+      setGamePhase2("leaderboard")
+
     }
   }
-  const showtimer = (time) => {
+  const showtimer = (time, gamePhase2, wantedgamePhase) => {
     if (time === undefined) {
       return ""
     }
-    else {
+    if (time !== undefined && gamePhase2 === wantedgamePhase) {
       return ( <div> Timer: { time } </div>)
     }
   }
@@ -515,7 +546,7 @@ const Game = () => {
   return (
     <BaseContainer className="game container">
       <div>
-        {showtimer(time)}
+        {showtimer(time, gamePhase2, "drawing")}
       </div>
       <div className="game-container">
         <div className="canvas-container">
@@ -710,8 +741,7 @@ const Game = () => {
         </div>
       </div>
       <Chat/>
-
-        <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} />
+      <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
     </BaseContainer>
   );
 };

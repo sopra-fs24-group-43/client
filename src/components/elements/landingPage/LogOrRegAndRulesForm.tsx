@@ -7,7 +7,7 @@ const LogOrRegAndRulesForm = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="LogOrRegAndRulesForm form">
+    <div className={`LogOrRegAndRulesForm${localStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
       <div className="LogOrRegAndRulesForm button-container">
         <Button
           width="100%"

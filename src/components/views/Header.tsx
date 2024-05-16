@@ -10,18 +10,22 @@ const Header = (props) => {
   const handleSettingsClick = () => {
     setIsSettingsOpen(true);
   };
+  function refreshPage() {
+    window.location.reload();
+  }
 
   const handleCloseSettings = () => {
     setIsSettingsOpen(false);
+    refreshPage();
   };
 
   return (
-    <div className="header container">
-      <div className="header title">
-        <h1 className="header logo">Freitagsmaler - Group 43</h1>
+    <div className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
+      <div className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} title`}>
+        <h1 className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} logo`}>Freitagsmaler - Group 43</h1>
         <ReactLogo />
       </div>
-      <div className="header navigation">
+      <div className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
         <a href="/leaderboard" className="navigation-link">
           <img src="/leaderboard.png" alt="Leaderboard Icon" className="header img" />
         </a>

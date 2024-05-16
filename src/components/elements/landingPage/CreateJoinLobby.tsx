@@ -94,7 +94,7 @@ const CreateJoinLobby = () => {
 
   }
   return (
-    <div className="CreateJoinLobby container">
+    <div className={`CreateJoinLobby${localStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
 
       <div className="CreateJoinLobby button-container">
 

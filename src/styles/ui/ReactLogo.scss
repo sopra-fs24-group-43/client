@@ -12,3 +12,15 @@
     transform: rotate(360deg);
   }
 }
+.react-logo_dark {
+  fill: white;
+  animation: spin 20s linear infinite;
+  width: 60px;
+  height: 60px;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -192,7 +192,7 @@ const Table = () => {
 
 
 
-  <div className="Table container">
+  <div className={`Table container${localStorage.getItem("isDarkMode") ? "_dark" : ""}`}>
     <h2>User Table</h2>
     <table>
       <thead>

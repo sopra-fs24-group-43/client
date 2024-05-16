@@ -26,3 +26,29 @@
     margin-bottom: 300px;
   }
 }
+.CreateJoinLobby_dark {
+  &.container {
+    display: flex;
+    flex-direction: column;
+    justify-content:flex-start;
+    align-items: center;
+    width: 20%;
+    height: 40em;
+    margin-left: 20px;
+    font-size: 16px;
+    font-weight: 300;
+    padding-left: 37px;
+    padding-right: 37px;
+    border-radius: 0.75em;
+    background-color: $darkMode;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: $dropShadow;
+  }
+  &.button-container {
+    width: 200px;
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+    margin-bottom: 300px;
+  }
+}

@@ -24,35 +24,22 @@ const Settings = () => {
     return new Promise( res => setTimeout(res, delay) );
   };
 
-  // const connect = async ()=>{
-  //   stompApi.connect((() => {
-  //     stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
-  //     stompApi.connected = true;
-  //   }));
-  //   await timeout(1000);
-  // };
-
+  // subscribe if !stompApi.isConnected()
+  const subscribe = async () => { // needed for delaying the send function, so the connection is established
+    await timeout(600);
+    console.log("Subscribing from the settings");
+    stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
+  };
+  
   useEffect(() => {
-    // reload hadling
-    // const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
-    //   console.log("disconnecting before reloading page!")
-    //   stompApi.disconnect()
-    // };
-    // window.addEventListener('beforeunload', handleBeforeUnload);
-
     // subscribing
     if (stompApi.isConnected()){
       stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
       console.log("subscribed when was connected to the websocket in Settings");
-    };
-
-    // if not connected
-    // if (!stompApi.isConnected()){
-    //   console.log("connecting to ws in Settings view");
-    //   connect();
-    //   console.log("connected");
-    // };
-
+    } else if (!stompApi.isConnected()){
+      subscribe()
+    }
+    
     // unsub
     return () => {  //this gets executed when navigating another page
       console.log("unsubscribing and cleaning up when navigating to different view from Settings!");
@@ -65,20 +52,20 @@ const Settings = () => {
     // sending the data to the server only if user is a creator of a lobby
     if (sessionStorage.getItem("role") === "admin"){
       const settings = {
-      type: "gameSettings",
-      maxPlayers: maxPlayers,
-      maxRounds: maxRounds,
-      turnLength: turnLength
+        type: "gameSettings",
+        maxPlayers: maxPlayers,
+        maxRounds: maxRounds,
+        turnLength: turnLength
+      };
+      if (stompApi.isConnected()){
+        sendData(settings);
+      };
     };
-    if (stompApi.isConnected()){
-      sendData(settings);
-    };
-  };
 
-  }, ) 
+  }, [maxPlayers, maxRounds, turnLength]) 
 
   const sendData = async (settings) => { // needed for delaying the send function, so the connection is established
-    await timeout(1000);
+    await timeout(400);
     console.log("sending the message from the settings");
     stompApi.send(`/app/games/${lobbyId}/updategamesettings`, JSON.stringify(settings));
   };
@@ -91,6 +78,10 @@ const Settings = () => {
       setMaxPlayers(responseData.maxPlayers);
       setMaxRounds(responseData.maxRounds);
       setTurnLength(responseData.turnLength);
+    } else if (responseData.type === "getlobbyinfo") {
+      setMaxPlayers(responseData.gameSettingsDTO.maxPlayers);
+      setMaxRounds(responseData.gameSettingsDTO.maxRounds);
+      setTurnLength(responseData.gameSettingsDTO.turnLength);
     }
   };
 

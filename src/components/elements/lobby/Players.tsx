@@ -37,7 +37,7 @@ const Players = () => {
       console.log("subscribed when was NOT connected to the websocket in Players");
       stompApi.connected = true;
     });
-    await timeout(1000);
+    // await timeout(1000);
   };
 
   useEffect(() => {
@@ -77,7 +77,7 @@ const Players = () => {
   }, [stompApi.isConnected()]); // [stompApi.isConnected()]
 
   const sendData = async () => { // needed for delaying the send function, so the connection is established
-    await timeout(1100); // !!!!! needs a little bit more time!
+    await timeout(500); // !!!!! needs a little bit more time!
     console.log("sending the message from the Players");
     stompApi.send(`/app/games/${lobbyId}/getlobbyinfo`, "");
   };

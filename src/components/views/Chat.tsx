@@ -1,9 +1,6 @@
 import React, { useEffect, useState, useRef, useContext} from "react";
-import { Button } from "components/ui/Button";
 import { useNavigate } from "react-router-dom";
-import BaseContainer from "components/ui/BaseContainer";
 import "styles/views/Chat.scss";
-import ButtonComponent from "components/elements/game/ButtonComponent";
 import { Context } from "../../context/Context";
 
 const Chat = () => {
@@ -74,24 +71,24 @@ const Chat = () => {
   };
   
   return (
-      <div className="chat-container">
-        <div className="chat-title">Chat</div>
-        <div className="chat-messages" ref={chatMessagesRef}>
+    <div className="Chat container">
+      <div className="Chat title">Chat</div>
+        <div className="Chat messages" ref={chatMessagesRef}>
           {chatMessages.map((message, index) => (
-            <div key={index}>{message}</div>
+            <div className="Chat message" key={index}>{message}</div>
           ))}
         </div>
-        <div className="chat-input">
-          <input
-            type="text"
-            value={currentMessage}
-            onChange={(e) => setCurrentMessage(e.target.value)}
-            onKeyDown={handleKeyPress} 
-            placeholder="Your Guess"
-          />
-          <button onClick={handleSendMessage}>Send</button>
-        </div>
+      <div className="Chat input-form">
+        <input
+          className="Chat input"
+          type="text"
+          value={currentMessage}
+          onChange={(e) => setCurrentMessage(e.target.value)}
+          onKeyDown={handleKeyPress} 
+          placeholder="Type your guess here..."
+        />
       </div>
+    </div>
   );
 };
 

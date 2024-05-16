@@ -732,18 +732,27 @@ const Game = () => {
               <Button
                 onClick={handleDrawToolClick}
                 className={`Canvas action ${isDrawToolSelected ? "game selected" : ""}`}
+                style={{
+                  outline: isDrawToolSelected ? "3px solid black" : "none",   
+                }}
               >
                 Draw
               </Button>
               <Button
                 onClick={handleFillToolClick}
                 className={`Canvas action ${isFillToolSelected ? "game selected" : ""}`}
+                style={{
+                  outline: isFillToolSelected ? "3px solid black" : "none",   
+                }}
               >
                 Fill
               </Button>
               <Button
                 onClick={handleEraserClick}
                 className={`Canvas action ${isEraserToolSelected ? "game selected" : ""}`}
+                style={{
+                  outline: isEraserToolSelected ? "3px solid black" : "none",   
+                }}
               >
                 Eraser
               </Button>

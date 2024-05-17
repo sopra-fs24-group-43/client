@@ -561,20 +561,20 @@ const Game = () => {
   return (
 
     <div className="Game container">
-      <div className="Tracker container">
-        <div className="Tracker timer">
+      <div className={`Tracker${localStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
+        <div className={`Tracker${localStorage.getItem("isDarkMode") ? "_dark" : ""} timer`}>
           {showtimer(time, gamePhase2, "drawing")}
         </div>
-        <div className="Tracker rounds">
+        <div className={`Canvas${localStorage.getItem("isDarkMode") ? "_dark" : ""} rounds`}>
           Round {currentRound2}/{maxRounds2}
         </div>
-        <div className="Tracker word">
+        <div className={`Tracker${localStorage.getItem("isDarkMode") ? "_dark" : ""} word`}>
           {chosenWord}
         </div>
       </div>
       <div className="Game form">
         <LeaderboardInGame/>
-        <div className="Canvas container">
+        <div className={`Canvas${localStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
           <div className="Canvas canvas">
             <canvas
               ref={canvasRef}

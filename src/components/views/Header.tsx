@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import { ReactLogo } from '../ui/ReactLogo';
 import PropTypes from 'prop-types';
-import Settings from './Settings';
+import ClientSettings from './ClientSettings';
 import '../../styles/views/Header.scss';
 
 const Header = (props) => {
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isClientSettingsOpen, setIsClientSettingsOpen] = useState(false);
 
-  const handleSettingsClick = () => {
-    setIsSettingsOpen(true);
+  const handleClientSettingsClick = () => {
+    setIsClientSettingsOpen(true);
   };
   function refreshPage() {
     window.location.reload();
   }
 
-  const handleCloseSettings = () => {
-    setIsSettingsOpen(false);
+  const handleCloseClientSettings = () => {
+    setIsClientSettingsOpen(false);
     refreshPage();
   };
 
@@ -32,7 +32,7 @@ const Header = (props) => {
         <a href="/friends" className="navigation-link">
           <img src="/friends.png" alt="Friends Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
         </a>
-        <button onClick={handleSettingsClick} className="navigation-link settings-button">
+        <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
           <img src="/settings.png" alt="Settings Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
         </button>
         <a href="/profile" className="navigation-link">
@@ -40,7 +40,7 @@ const Header = (props) => {
         </a>
       </div>
 
-      <Settings isOpen={isSettingsOpen} onClose={handleCloseSettings} />
+      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings} />
     </div>
   );
 };

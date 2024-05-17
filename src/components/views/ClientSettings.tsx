@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import "../../styles/views/Settings.scss";
-import {useLocation, useNavigate} from "react-router-dom";
+import "../../styles/views/ClientSettings.scss";
 
 
-const Settings = ({ isOpen, onClose }) => {
+
+const ClientSettings = ({ isOpen, onClose }) => {
   const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem("isDarkMode")||false);
 
 
@@ -19,7 +19,7 @@ const Settings = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={`settings ${isOpen ? "open" : ""}`}>
+    <div className={`client-settings ${isOpen ? "open" : ""}`}>
       <div className={`modal-content`}>
         <span className="close" onClick={onClose}>&times;</span>
         <h2>Settings</h2>
@@ -39,9 +39,9 @@ const Settings = ({ isOpen, onClose }) => {
   );
 };
 
-Settings.propTypes = {
+ClientSettings.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
-export default Settings;
+export default ClientSettings;

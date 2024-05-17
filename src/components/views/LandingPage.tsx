@@ -5,7 +5,7 @@ import "styles/views/LandingPage.scss"
 import Table from "../elements/landingPage/Table";
 import LogOrRegAndRulesForm from "../elements/landingPage/LogOrRegAndRulesForm";
 import CreateJoinLobby from "../elements/landingPage/CreateJoinLobby";
-import IsDarkMode from "./Settings";
+import IsDarkMode from "./ClientSettings";
 
 import StompApi from "../../helpers/StompApi";
 

@@ -3,13 +3,14 @@ import { useNavigate } from "react-router-dom";
 import "styles/views/Chat.scss";
 import { Context } from "../../context/Context";
 
-const Chat = () => {
+const Chat = ({isChatting, setIsChatting}) => {
   const navigate = useNavigate();
   const [chatMessages, setChatMessages] = useState<string[]>([]);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const chatMessagesRef = useRef(null);
   const context = useContext(Context);
   const {stompApi, reload, setReload} = context;  //or const stompApi = context.stompApi
+  // const [isChatting, setIsChatting] = useState(false);
 
   let gameId;
   gameId = sessionStorage.getItem("gameId")
@@ -69,6 +70,14 @@ const Chat = () => {
       handleSendMessage();
     }
   };
+
+  const handleFocus = () => {
+    setIsChatting(true);
+  };
+
+  const handleClose = () => {
+    setIsChatting(false); 
+  };
   
   return (
     <div className={`Chat${localStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
@@ -84,6 +93,8 @@ const Chat = () => {
           type="text"
           value={currentMessage}
           onChange={(e) => setCurrentMessage(e.target.value)}
+          onFocus={handleFocus}
+          onBlur={handleClose}
           onKeyDown={handleKeyPress} 
           placeholder="Type your guess here..."
         />

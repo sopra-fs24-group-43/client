@@ -20,6 +20,7 @@ const Game = () => {
   const [isEraserToolSelected, setIsEraserToolSelected] = useState(false);
   const [strokeSize, setStrokeSize] = useState(3);
   const [isSelectionOpen, setIsSelectionOpen] = useState(false);
+  const [isChatting, setIsChatting] = useState(false);
 
   const context = useContext(Context);
   const {stompApi, reload, setReload} = context;  //or const stompApi = context.stompApi
@@ -65,52 +66,25 @@ const Game = () => {
     setIsSelectionOpen(false);
   };
 
-
-
-   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "e":
-          handleEraserClick();
-          break;
-        case "c":
-          handleEraseAllClick();
-          break;
-        case "f":
-          handleFillToolClick();
-          break;
-        case "d": 
-          handleDrawToolClick();
-          break;
-        default:
-          break;
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, []);
-
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "e":
-          handleEraserClick();
-          break;
-        case "c":
-          handleEraseAllClick();
-          break;
-        case "f":
-          handleFillToolClick();
-          break;
-        case "d": 
-          handleDrawToolClick();
-          break;
-        default:
-          break;
+      if (isDrawer2 && !isChatting) {
+        switch (event.key) {
+          case "e":
+            handleEraserClick();
+            break;
+          case "c":
+            handleEraseAllClick();
+            break;
+          case "f":
+            handleFillToolClick();
+            break;
+          case "d":
+            handleDrawToolClick();
+            break;
+          default:
+            break;
+        }
       }
     };
 
@@ -119,7 +93,8 @@ const Game = () => {
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, []);
+  }, [isDrawer2, isChatting]);
+
   function timeout(delay: number) {
     return new Promise( res => setTimeout(res, delay) );
   };
@@ -179,7 +154,7 @@ const Game = () => {
   }, [navigate]);
 
   const sendWordChoice = (wordIndex, threeWords) => {
-
+    
     let chosenWord = threeWords[wordIndex]
     const ChooseWordDTO =  {
       type: "chooseword",
@@ -187,6 +162,8 @@ const Game = () => {
       word: chosenWord
     }
     stompApi.send(`/app/games/${gameId}/sendchosenword`, JSON.stringify(ChooseWordDTO))
+    handleEraseAllClick();
+  
   }
   const getRandomInt = (max) => {
     return Math.floor(Math.random()*3)
@@ -286,7 +263,6 @@ const Game = () => {
     ctx.moveTo(x, y);
     ctx.lineTo(newX, newY);
     ctx.stroke();
-    
   }
 
   useEffect(() => {
@@ -308,7 +284,8 @@ const Game = () => {
     ctx.lineJoin = "round";
 
     const handleMouseDown = (event: MouseEvent) => {
-      if (isFillToolSelected) {
+      
+      if (isFillToolSelected && isDrawer2) {
         fillArea(event.offsetX, event.offsetY, ctx);
         
       } else if (isDrawToolSelected || isEraserToolSelected) {
@@ -318,12 +295,11 @@ const Game = () => {
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      if (!isDrawing || isFillToolSelected || (!isDrawToolSelected && !isEraserToolSelected)) return;
+      if (!isDrawing || !isDrawer2 ||isFillToolSelected || (!isDrawToolSelected && !isEraserToolSelected)) return;
       const { x, y } = prevPosition;
       const newX = event.offsetX;
       const newY = event.offsetY;
       var eraserSelected = false;
-      console.log("isEraserToolSelected::::::", isEraserToolSelected);
       if (isEraserToolSelected) {
         eraserSelected = true;
         ctx.lineWidth = 15;
@@ -332,13 +308,15 @@ const Game = () => {
         eraserSelected = false;
         ctx.lineWidth = strokeSize;
       }
+     
       stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x, y, newX, newY, selectedColor, strokeSize, eraserSelected}));
-
+     
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(newX, newY);
       ctx.stroke();
       setPrevPosition({ x: newX, y: newY });
+      
     };
 
     const handleMouseUp = () => {
@@ -559,10 +537,12 @@ const Game = () => {
  // <Button onClick={logout}>Logout</Button>
   
   return (
-
+   
     <div className="Game container">
+
       <div className={`Tracker${localStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
         <div className={`Tracker${localStorage.getItem("isDarkMode") ? "_dark" : ""} timer`}>
+
           {showtimer(time, gamePhase2, "drawing")}
         </div>
         <div className={`Canvas${localStorage.getItem("isDarkMode") ? "_dark" : ""} rounds`}>
@@ -583,6 +563,7 @@ const Game = () => {
               style={{ border: "1px solid black", background: "white" }}
             />
           </div>
+          {isDrawer2 && (
           <div className="Canvas toolbar">
             <div className="Canvas color-buttons">
               <div className="Canvas main-color-button">
@@ -759,22 +740,16 @@ const Game = () => {
               <Button 
                 onClick={handleEraseAllClick}
               >
-                Erase All
+                Clear
               </Button>
             </div>
           </div>
-          <Button
-            onClick={handleWordSelectionClick}
-            className={`tool-button ${isEraserToolSelected ? "game selected" : ""}`}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-            >
-              Open Word Selection
-          </Button>
+          )}
         </div>
+        <Chat isChatting={isChatting} setIsChatting={setIsChatting} />
       </div>
-      <Chat/>
       <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
-    </div>
+    </div>       
   );
 };
 

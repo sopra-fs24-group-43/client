@@ -48,3 +48,51 @@
     color: black;
   }
 }
+.Tracker_dark {
+  &.container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    height: 40px;
+    width: 100%;
+    background-color: $darkMode;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: $dropShadow;
+    border: 3px solid #2a2c2e;
+    border-radius: 8px;
+  }
+  &.timer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 1%;
+    height: 100%;
+    width: 10%;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+  }
+  &.rounds {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 1%;
+    height: 100%;
+    width: 10%;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+  }
+  &.word {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    width: 80%;
+    padding-left: 20%;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+  }
+}

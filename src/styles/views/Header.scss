@@ -55,3 +55,64 @@
     margin-left: -5px;
   }
 }
+.header_dark {
+  &.container {
+    background-color:#620000;
+    @include center;
+  }
+
+  &.title {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 70%;
+    height: 100%;
+    color: white;
+  }
+
+  &.logo{
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    padding-left: 48%;
+  }
+
+  &.navigation{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    width: 30%;
+    height: 100%;
+    margin-right: 6px;
+    color: white;
+  }
+
+  &.img{
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+    color: white;
+  }
+
+  .navigation-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+
+  }
+
+  .settings-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    margin-right: 25px;
+    margin-left: -5px;
+    color: white;
+  }
+}
+

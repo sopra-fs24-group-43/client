@@ -80,16 +80,16 @@ const Chat = ({isChatting, setIsChatting}) => {
   };
   
   return (
-    <div className="Chat container">
-      <div className="Chat title">Chat</div>
-        <div className="Chat messages" ref={chatMessagesRef}>
+    <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
+      <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} title`}>Chat</div>
+        <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} messages`} ref={chatMessagesRef}>
           {chatMessages.map((message, index) => (
-            <div className="Chat message" key={index}>{message}</div>
+            <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} message`} key={index}>{message}</div>
           ))}
         </div>
-      <div className="Chat input-form">
+      <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} input-form`}>
         <input
-          className="Chat input"
+          className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} input`}
           type="text"
           value={currentMessage}
           onChange={(e) => setCurrentMessage(e.target.value)}

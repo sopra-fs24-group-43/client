@@ -135,9 +135,9 @@ const Players = () => {
   }
 
   return (
-    <div className="Players container">
-      <div className="Players players">
-        <div className="Players header">
+    <div className={`Players${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
+      <div className={`Players${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} players`}>
+        <div className={`Players${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} header`}>
           {lobbyName}
         </div>
         {renderedPlayers}

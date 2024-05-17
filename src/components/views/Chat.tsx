@@ -80,16 +80,16 @@ const Chat = ({isChatting, setIsChatting}) => {
   };
   
   return (
-    <div className={`Chat${localStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
-      <div className={`Chat${localStorage.getItem("isDarkMode") ? '_dark' : ''} title`}>Chat</div>
-        <div className={`Chat${localStorage.getItem("isDarkMode") ? '_dark' : ''} messages`} ref={chatMessagesRef}>
+    <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
+      <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} title`}>Chat</div>
+        <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} messages`} ref={chatMessagesRef}>
           {chatMessages.map((message, index) => (
-            <div className={`Chat${localStorage.getItem("isDarkMode") ? '_dark' : ''} message`} key={index}>{message}</div>
+            <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} message`} key={index}>{message}</div>
           ))}
         </div>
-      <div className={`Chat${localStorage.getItem("isDarkMode") ? '_dark' : ''} input-form`}>
+      <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} input-form`}>
         <input
-          className={`Chat${localStorage.getItem("isDarkMode") ? '_dark' : ''} input`}
+          className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} input`}
           type="text"
           value={currentMessage}
           onChange={(e) => setCurrentMessage(e.target.value)}

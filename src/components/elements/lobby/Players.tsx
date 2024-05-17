@@ -135,9 +135,9 @@ const Players = () => {
   }
 
   return (
-    <div className={`Players${localStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
-      <div className={`Players${localStorage.getItem("isDarkMode") ? '_dark' : ''} players`}>
-        <div className={`Players${localStorage.getItem("isDarkMode") ? '_dark' : ''} header`}>
+    <div className={`Players${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
+      <div className={`Players${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} players`}>
+        <div className={`Players${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} header`}>
           {lobbyName}
         </div>
         {renderedPlayers}

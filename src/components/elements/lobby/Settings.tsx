@@ -117,9 +117,9 @@ const Settings = () => {
   }, []);
 
   return (
-    <div className={`Settings${localStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
+    <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
       <div className="Settings menu-form">
-        <div className={`Settings${localStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Players</div>
+        <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Players</div>
         <select className="Settings slide-down-menu" name="maxPlayers" value={maxPlayers} onChange={handleSettingsChange}>
           <option value={3}>3</option>
           <option value={4}>4</option>
@@ -130,7 +130,7 @@ const Settings = () => {
         </select>
       </div>
       <div className="Settings menu-form">
-        <div className={`Settings${localStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Rounds</div>
+        <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Rounds</div>
         <select className="Settings slide-down-menu" name="maxRounds" value={maxRounds} onChange={handleSettingsChange}>
           <option value={4}>4</option>
           <option value={5}>5</option>
@@ -138,7 +138,7 @@ const Settings = () => {
         </select>
       </div>
       <div className="Settings menu-form">
-        <div className={`Settings${localStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Drawtime</div>
+        <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Drawtime</div>
         <select className="Settings slide-down-menu" name="turnLength" value={turnLength}
                 onChange={handleSettingsChange}>
           <option value={5}>5</option>

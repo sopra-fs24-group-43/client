@@ -46,16 +46,16 @@ const LeaderboardInGame = () => {
 
       // convert the updated player list to an array of player components
       const playersArray = Object.values(updatedPlayers).map(player => (
-        <div key={player["userId"]} className={`LeaderboardInGame${localStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
-          <div className={`LeaderboardInGame${localStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}>
-            <img src="/painter.png" alt="Avatar" className={`LeaderboardInGame${localStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}/>
+        <div key={player["userId"]} className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
+          <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}>
+            <img src="/painter.png" alt="Avatar" className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}/>
           </div>
-          <div className={`LeaderboardInGame${localStorage.getItem("isDarkMode") ? "_dark" : ""} player`}>
-            <div className={`LeaderboardInGame${localStorage.getItem("isDarkMode") ? "_dark" : ""} username`}>
+          <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} player`}>
+            <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} username`}>
               {player["username"]} {sessionStorage.getItem("username") === player["username"] && " (You)"}
 
             </div>
-            <div className={`LeaderboardInGame${localStorage.getItem("isDarkMode") ? "_dark" : ""} points`}>
+            <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} points`}>
               {player["totalPoints"]} points
             </div>
           </div>
@@ -67,7 +67,7 @@ const LeaderboardInGame = () => {
   };
 
   return (
-    <div className={`LeaderboardInGame${localStorage.getItem("isDarkMode") ? "_dark" : ""} players`}>
+    <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} players`}>
       {renderedPlayers}
     </div>
   );

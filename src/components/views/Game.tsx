@@ -540,21 +540,21 @@ const Game = () => {
    
     <div className="Game container">
 
-      <div className={`Tracker${localStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
-        <div className={`Tracker${localStorage.getItem("isDarkMode") ? "_dark" : ""} timer`}>
+      <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
+        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} timer`}>
 
           {showtimer(time, gamePhase2, "drawing")}
         </div>
-        <div className={`Canvas${localStorage.getItem("isDarkMode") ? "_dark" : ""} rounds`}>
+        <div className={`Canvas${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} rounds`}>
           Round {currentRound2}/{maxRounds2}
         </div>
-        <div className={`Tracker${localStorage.getItem("isDarkMode") ? "_dark" : ""} word`}>
+        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} word`}>
           {chosenWord}
         </div>
       </div>
       <div className="Game form">
         <LeaderboardInGame/>
-        <div className={`Canvas${localStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
+        <div className={`Canvas${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
           <div className="Canvas canvas">
             <canvas
               ref={canvasRef}

@@ -76,13 +76,13 @@ const LogOrRegAndRulesForm = () => {
     }
   }
   return (
-    <div className={`LogOrRegAndRulesForm${localStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
-      <div className={`LogOrRegAndRulesForm${localStorage.getItem("isDarkMode") ? "_dark" : ""} button-container`}>
+    <div className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
+      <div className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} button-container`}>
         {buttonforreg()}
       </div>
       {buttonforguest()}
-      <div className={`LogOrRegAndRulesForm${localStorage.getItem("isDarkMode") ? "_dark" : ""} img-form`}>
-        <img src="rules.png" alt="Rule Icon" className={`LogOrRegAndRulesForm${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+      <div className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} img-form`}>
+        <img src="rules.png" alt="Rule Icon" className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
       </div>
       <div className="LogOrRegAndRulesForm game-rules">
         <div>

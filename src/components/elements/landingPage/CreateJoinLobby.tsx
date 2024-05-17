@@ -81,7 +81,7 @@ const CreateJoinLobby = () => {
 
   }
   return (
-    <div className={`CreateJoinLobby${localStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
+    <div className={`CreateJoinLobby${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
 
       <div className="CreateJoinLobby button-container">
 

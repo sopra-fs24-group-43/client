@@ -20,12 +20,12 @@ const Header = (props) => {
   };
 
   return (
-    <div className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
-      <div className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} title`}>
-        <h1 className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} logo`}>Freitagsmaler - Group 43</h1>
+    <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
+      <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} title`}>
+        <h1 className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} logo`}>Freitagsmaler - Group 43</h1>
         <ReactLogo />
       </div>
-      <div className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
+      <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
         <a href="/leaderboard" className="navigation-link">
           <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
         </a>

@@ -5,13 +5,13 @@ import "../../styles/views/ClientSettings.scss";
 
 
 const ClientSettings = ({ isOpen, onClose }) => {
-  const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem("isDarkMode")||false);
+  const [isDarkMode, setIsDarkMode] = useState(sessionStorage.getItem("isDarkMode")||false);
 
 
   const handleToggleDarkMode = () => {
-    if(localStorage.getItem("isDarkMode")) {setIsDarkMode(true);}
-    if(!isDarkMode) {localStorage.setItem("isDarkMode","_dark");}
-    else {localStorage.setItem("isDarkMode","");}
+    if(sessionStorage.getItem("isDarkMode")) {setIsDarkMode(true);}
+    if(!isDarkMode) {sessionStorage.setItem("isDarkMode","_dark");}
+    else {sessionStorage.setItem("isDarkMode","");}
     setIsDarkMode(!isDarkMode);
 
   };

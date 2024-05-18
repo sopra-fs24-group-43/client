@@ -545,8 +545,8 @@ const Game = () => {
 
           {showtimer(time, gamePhase2, "drawing")}
         </div>
-        <div className={`Canvas${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} rounds`}>
-          Round {currentRound2}/{maxRounds2}
+        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} rounds`}>
+           <div> Round {currentRound2}/{maxRounds2} </div>
         </div>
         <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} word`}>
           {chosenWord}

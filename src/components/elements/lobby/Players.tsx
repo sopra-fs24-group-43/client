@@ -16,6 +16,7 @@ const Players = () => {
   // checking if a user is a creator of a lobby
   const [isAdmin, setIsAdmin] = useState(false);
 
+
   // checking if a user is a creator of a lobby 
   useEffect(() => {
     const role = sessionStorage.getItem("role");
@@ -33,14 +34,38 @@ const Players = () => {
 
   const connect = async ()=>{
     await stompApi.connect(() => {
+      const userId = sessionStorage.getItem("userId");
+      stompApi.send(`/app/landing/alertreconnect/${userId}`, "") //added
       stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Players");
       console.log("subscribed when was NOT connected to the websocket in Players");
       stompApi.connected = true;
+      const sessionAttributeDTO1 = {
+        userId: sessionStorage.getItem("userId"),
+        reload: null
+      }
+      stompApi.send("/app/games/senduserId", JSON.stringify(sessionAttributeDTO1))
+      console.log("settings reload time") //was commented
+
+      console.log("session gameId: ", sessionStorage.getItem("gameId"))
+      console.log("session userId: ",sessionStorage.getItem("userId"))
+
     });
     await timeout(1000);
   };
 
   useEffect(() => {
+    //reload hadling
+    const handleBeforeUnload = (event) => {  //this gets executed when reloading the page, was commented
+      console.log("disconnecting before reloading page!")
+      const sessionAttributeDTO2 = {
+        userId: null,
+        reload: true
+      }
+      stompApi.send("/app/games/sendreload", JSON.stringify(sessionAttributeDTO2))
+      console.log("settings reload time")
+      stompApi.disconnect()
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
     // subscribing
     if (stompApi.isConnected()){
       stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Players");
@@ -72,6 +97,7 @@ const Players = () => {
       // }
       // unsub
       console.log("unsubscribing and cleaning up when navigating to different view from Players!");
+      window.removeEventListener('beforeunload', handleBeforeUnload) //was commented
       stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Players");
     };
   }, [stompApi.isConnected()]); // [stompApi.isConnected()]

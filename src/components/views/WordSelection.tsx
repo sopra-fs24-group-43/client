@@ -4,15 +4,15 @@ import '../../styles/views/game/WordSelection.scss';
 
 
 
-const WordSelection = ({ isOpen, onClose, time, isDrawer, sendWordChoice, threeWords }) => {
+const WordSelection = ({ gamePhase, onClose, time, isDrawer, sendWordChoice, threeWords }) => {
   const [isChoosing, setIsChoosing] = useState(false);
   const [wordIndex, setWordIndex] = useState()
   let threeWords2 = threeWords
-  if (!isOpen) return null;
+  if (gamePhase !== "choosing") return null;
 
   if (!isDrawer) {
     return (
-      <div className={`wordSelection container ${isOpen ? 'open' : ''}`}>
+      <div className={`wordSelection container ${gamePhase==="choosing" ? 'open' : ''}`}>
         <div className="wordSelection modal-content">
           <div className="wordSelection title">
             Drawer Is Choosing A Word! {time}
@@ -23,7 +23,7 @@ const WordSelection = ({ isOpen, onClose, time, isDrawer, sendWordChoice, threeW
   }
   if(isDrawer) {
     return (
-      <div className={`wordSelection container ${isOpen ? 'open' : ''}`}>
+      <div className={`wordSelection container ${gamePhase==="choosing" ? 'open' : ''}`}>
         <div className="wordSelection modal-content">
           <div className="wordSelection title">
             Select a word to draw! {time}

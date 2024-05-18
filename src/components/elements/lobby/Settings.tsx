@@ -33,12 +33,14 @@ const Settings = () => {
   // };
 
   useEffect(() => {
-    // reload hadling
-    // const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
-    //   console.log("disconnecting before reloading page!")
-    //   stompApi.disconnect()
-    // };
-    // window.addEventListener('beforeunload', handleBeforeUnload);
+    //reload hadling
+    //const handleBeforeUnload = (event) => {  //this gets executed when reloading the page, was commented
+      //console.log("disconnecting before reloading page!")
+      //stompApi.send("/app/games/setreloadtime", "")
+      //console.log("settings reload time")
+      //stompApi.disconnect()
+    //};
+    //window.addEventListener('beforeunload', handleBeforeUnload);
 
     // subscribing
     if (stompApi.isConnected()){
@@ -47,16 +49,16 @@ const Settings = () => {
     };
 
     // if not connected
-    // if (!stompApi.isConnected()){
-    //   console.log("connecting to ws in Settings view");
-    //   connect();
-    //   console.log("connected");
-    // };
+    //if (!stompApi.isConnected()){
+    //  console.log("connecting to ws in Settings view");
+      //connect();
+    //  console.log("connected");
+    //};
 
     // unsub
     return () => {  //this gets executed when navigating another page
       console.log("unsubscribing and cleaning up when navigating to different view from Settings!");
-      // window.removeEventListener('beforeunload', handleBeforeUnload)
+      //window.removeEventListener('beforeunload', handleBeforeUnload) //was commented
       stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Settings");
     };
   }, []);

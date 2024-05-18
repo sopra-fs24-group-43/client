@@ -19,6 +19,9 @@ const Table = () => {
   let isGuest
   let friends
   let registered
+  const [reconnect, setReconnect] = useState(false);
+  let reconRole
+  let reconGameId
   registered = !(sessionStorage.getItem("username")=== null || sessionStorage.getItem("userId")=== null || sessionStorage.getItem("friends")=== null || sessionStorage.getItem("isGuest") === null)
 
 
@@ -78,9 +81,45 @@ const Table = () => {
       return gamesList
     }
   }
-
+  const ReconnPopUp = ({reconnect}) => {
+    if (!reconnect) return null;
+    else {
+      return (
+        <div className={`wordSelection container ${reconnect === true ? 'open' : ''}`}>
+          <div className="wordSelection modal-content">
+            <div className="wordSelection title">
+              Would You like to Rejoin The Game You Just Left?
+            </div>
+          </div>
+          <div className="wordSelection words-container">
+            <div className="wordSelection words">
+              <button onClick={() => {
+                sessionStorage.setItem("role", reconRole)
+                sessionStorage.setItem("gameId", reconGameId)
+                stompApi.send(`/app/landing/reconnect/${userId}`, "") //added
+                setReconnect(false)
+                navigate(`/lobby/${reconGameId}`)
+              }}>
+                Yes
+              </button>
+            </div>
+            <div className="wordSelection words">
+              <button onClick={() => {setReconnect(false)}}>
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  }
   const handleResponse = (payload) => {
     var body = JSON.parse(payload.body)
+    if (body.type === "ReconnectionDTO" && registered) {
+      reconRole = body.role
+      reconGameId = body.gameId
+      setReconnect(true)
+    }
     if (body.type === "deletegame" && registered) {  //trigger a request of getallgames because some game changed
       console.log("receiving deletegame inside Table -> getallgames")
       stompApi.send("/app/landing/" + userId + "/getallgames" , "");
@@ -132,11 +171,20 @@ const Table = () => {
   }
   const connect = async ()  => {
     await stompApi.connect(() => {
+      const sessionAttributeDTO1 = {
+        userId: userId,
+        reload: null
+      }
+      stompApi.send("/app/games/senduserId", JSON.stringify(sessionAttributeDTO1))
+      stompApi.send("/app/landing/alertreconnect/"+userId, "") //added
+      stompApi.subscribe("/topic/landing/alertreconnect/"+userId, handleResponse, "Table") //added
       stompApi.subscribe("/topic/landing/" + userId, handleResponse, "Table")
       stompApi.subscribe("/topic/landing", handleResponse, "Table") //"/topic/landingTable"
-      stompApi.send("/app/landing/" + userId + "/getallgames" , "");
       stompApi.connected = true //important!!! needs to be set during the onConnectedCallback, otherwise it might happen that it connected gets set true before the ws
                                 //is fully setup
+      stompApi.send("/app/landing/" + userId + "/getallgames" , "");
+
+
     });
   }
   useEffect(() => {

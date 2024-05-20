@@ -64,7 +64,7 @@ const Game = () => {
   };
 
   const handleCloseSelection = () => {
-    setIsSelectionOpen(true); //false
+    setIsSelectionOpen(false); //false
   };
 
   useEffect(() => {
@@ -203,7 +203,7 @@ const Game = () => {
       setGamePhase2("drawing")
       wordIndex = body.wordIndex
       chosenWord = body.word
-      setIsSelectionOpen(true); // false
+      setIsSelectionOpen(false); // false
     }
     if (body.type === "TimerOut" && body.gamePhase === "drawing") {
       gamePhase = "drawing"

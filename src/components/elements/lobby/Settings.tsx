@@ -11,7 +11,7 @@ const Settings = () => {
   const [maxPlayers, setMaxPlayers] = useState(5);
   const [maxRounds, setMaxRounds] = useState(5);
   const [turnLength, setTurnLength] = useState(60); // seconds
-  const [genres, setGenres] = useState([]);
+  // const [genres, setGenres] = useState([]);
   // getting the gameId from the url
   const { gameId } = useParams();
   const lobbyId = parseInt(gameId);
@@ -57,14 +57,14 @@ const Settings = () => {
         maxPlayers: maxPlayers,
         maxRounds: maxRounds,
         turnLength: turnLength,
-        genres: genres.map(genre => genre.value)
+        // genres: genres.map(genre => genre.value)
       };
       if (stompApi.isConnected()){
         sendData(settings);
       };
     };
 
-  }, [maxPlayers, maxRounds, turnLength, genres]) 
+  }, [maxPlayers, maxRounds, turnLength]) // maxPlayers, maxRounds, turnLength, genres
 
   const sendData = async (settings) => { // needed for delaying the send function, so the connection is established
     await timeout(400);
@@ -80,12 +80,12 @@ const Settings = () => {
       setMaxPlayers(responseData.maxPlayers);
       setMaxRounds(responseData.maxRounds);
       setTurnLength(responseData.turnLength);
-      setGenres(responseData.genres.map(genre => ({ value: genre, label: genre })));
+      // setGenres(responseData.genres.map(genre => ({ value: genre, label: genre })));
     } else if (responseData.type === "getlobbyinfo") {
       setMaxPlayers(responseData.gameSettingsDTO.maxPlayers);
       setMaxRounds(responseData.gameSettingsDTO.maxRounds);
       setTurnLength(responseData.gameSettingsDTO.turnLength);
-      setGenres(responseData.gameSettingsDTO.genres.map(genre => ({ value: genre, label: genre })));
+      // setGenres(responseData.gameSettingsDTO.genres.map(genre => ({ value: genre, label: genre })));
     }
   };
 
@@ -109,9 +109,9 @@ const Settings = () => {
     };
   };
 
-  const handleGenresChange = (selectedOptions) => {
-    setGenres(selectedOptions);
-  };
+  // const handleGenresChange = (selectedOptions) => {
+  //   setGenres(selectedOptions);
+  // };
 
   const genreOptions = [
     { value: 'Science', label: 'Science' },

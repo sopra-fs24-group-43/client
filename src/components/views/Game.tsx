@@ -6,8 +6,10 @@ import "styles/views/game/Tracker.scss";
 import "styles/views/game/Canvas.scss";
 import { Context } from "../../context/Context";
 import Chat from "./Chat";
+import Settings from "./Settings";
 import LeaderboardInGame from "./LeaderboardInGame";
 import WordSelection from "./WordSelection";
+import Header from "./Header";
 
 const Game = () => {
   const navigate = useNavigate();
@@ -21,6 +23,13 @@ const Game = () => {
   const [strokeSize, setStrokeSize] = useState(3);
   const [isSelectionOpen, setIsSelectionOpen] = useState(false);
   const [isChatting, setIsChatting] = useState(false);
+  const [hotkeyInputDraw, setHotkeyInputDraw] = useState<string>("D");
+  const [hotkeyInputFill, setHotkeyInputFill] = useState<string>("F");
+  const [hotkeyInputEraser, setHotkeyInputEraser] = useState<string>("E");
+  const [hotkeyInputClear, setHotkeyInputClear] = useState<string>("C");
+
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const context = useContext(Context);
   const {stompApi, reload, setReload} = context;  //or const stompApi = context.stompApi
@@ -58,6 +67,10 @@ const Game = () => {
     navigate("/loginOrRegister");
   };
 
+  const handleCloseSettings = () => {
+    setIsSettingsOpen(false);
+  };
+
   const handleWordSelectionClick = () => {
     setIsSelectionOpen(true);
   };
@@ -69,18 +82,18 @@ const Game = () => {
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (isDrawer2 && !isChatting) {
-        switch (event.key) {
-          case "e":
+        switch (event.key.toUpperCase()) {
+          case hotkeyInputDraw:
+            handleDrawToolClick();
+            break; 
+          case hotkeyInputFill:
+            handleFillToolClick();
+            break;   
+          case hotkeyInputEraser:
             handleEraserClick();
             break;
-          case "c":
+          case hotkeyInputClear:
             handleEraseAllClick();
-            break;
-          case "f":
-            handleFillToolClick();
-            break;
-          case "d":
-            handleDrawToolClick();
             break;
           default:
             break;
@@ -88,12 +101,12 @@ const Game = () => {
       }
     };
 
-    document.addEventListener("keydown", handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
 
     return () => {
-      document.removeEventListener("keydown", handleKeyPress);
+      window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [isDrawer2, isChatting]);
+  }, [isDrawer2, isChatting, hotkeyInputDraw, hotkeyInputFill, hotkeyInputEraser, hotkeyInputClear]);
 
   function timeout(delay: number) {
     return new Promise( res => setTimeout(res, delay) );
@@ -285,7 +298,7 @@ const Game = () => {
 
     const handleMouseDown = (event: MouseEvent) => {
       
-      if (isFillToolSelected && isDrawer2) {
+      if (isFillToolSelected && isDrawer2 && !isSelectionOpen) {
         fillArea(event.offsetX, event.offsetY, ctx);
         
       } else if (isDrawToolSelected || isEraserToolSelected) {
@@ -295,7 +308,7 @@ const Game = () => {
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      if (!isDrawing || !isDrawer2 ||isFillToolSelected || (!isDrawToolSelected && !isEraserToolSelected)) return;
+      if (!isDrawing || !isDrawer2 ||isFillToolSelected || isSelectionOpen || (!isDrawToolSelected && !isEraserToolSelected)) return;
       const { x, y } = prevPosition;
       const newX = event.offsetX;
       const newY = event.offsetY;
@@ -745,6 +758,8 @@ const Game = () => {
           </div>
           )}
         </div>
+        <Settings isOpen={isSettingsOpen} onClose={handleCloseSettings} hotkeyInputDraw={hotkeyInputDraw} setHotkeyInputDraw={setHotkeyInputDraw} hotkeyInputFill={hotkeyInputFill} setHotkeyInputFill={setHotkeyInputFill} hotkeyInputEraser={hotkeyInputEraser} setHotkeyInputEraser={setHotkeyInputEraser} hotkeyInputClear={hotkeyInputClear} setHotkeyInputClear={setHotkeyInputClear} />
+        <button onClick={() => setIsSettingsOpen(true)}>Open Settings</button>
         <Chat isChatting={isChatting} setIsChatting={setIsChatting} />
       </div>
       <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>

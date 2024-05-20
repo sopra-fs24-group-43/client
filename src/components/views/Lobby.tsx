@@ -14,6 +14,7 @@ import StartGame from "components/elements/lobby/StartGame";
 
 const Lobby = () => {
   let rawUserData = useLocation()["state"];
+  const [isChatting, setIsChatting] = useState(true);
   console.log("this is useLocation in Lobby: " + JSON.stringify(rawUserData));
 
   // const navigate = useNavigate();
@@ -92,7 +93,7 @@ const Lobby = () => {
         <Settings/>
         <StartGame/>
       </div>
-      <Chat/>
+      <Chat isChatting={isChatting} setIsChatting={setIsChatting} />
     </div>
   );
 };

@@ -11,37 +11,41 @@ const Header = (props) => {
   const handleClientSettingsClick = () => {
     setIsClientSettingsOpen(true);
   };
+  function refreshPage() {
+    window.location.reload();
+  }
 
   const handleCloseClientSettings = () => {
     setIsClientSettingsOpen(false);
+    refreshPage();
   };
 
   // getting the link of current page
   const isGamePath = location.pathname.startsWith('/game');
 
   return (
-    <div className="header container">
-      <div className="header title">
-        <h1 className="header logo">Freitagsmaler - Group 43</h1>
+    <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
+      <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} title`}>
+        <h1 className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} logo`}>Freitagsmaler - Group 43</h1>
         <ReactLogo />
       </div>
       {!isGamePath && (
-        <div className="header navigation">
+        <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
           <a href="/leaderboard" className="navigation-link">
-            <img src="/leaderboard.png" alt="Leaderboard Icon" className="header img" />
+            <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </a>
           <a href="/friends" className="navigation-link">
-            <img src="/friends.png" alt="Friends Icon" className="header img" />
+            <img src="/friends.png" alt="Friends Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </a>
-          <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
-            <img src="/settings.png" alt="Settings Icon" className="header img" />
+          <button onClick={handleClientClientSettingsClick} className="navigation-link settings-button">
+            <img src="/settings.png" alt="ClientSettings Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </button>
           <a href="/profile" className="navigation-link">
-            <img src="/profile.png" alt="Profile Icon" className="header img" />
+            <img src="/profile.png" alt="Profile Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </a>
         </div>
       )}
-      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings} />
+      <ClientClientSettings isOpen={isClientClientSettingsOpen} onClose={handleCloseClientClientSettings} />
     </div>
   );
 };

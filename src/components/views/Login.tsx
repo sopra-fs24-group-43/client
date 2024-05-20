@@ -60,8 +60,8 @@ const Login = () => {
 
   return (
     <BaseContainer>
-      <div className="login container">
-        <div className="login form">
+      <div className={`login container`}>
+        <div className={`login form`}>
           <FormField
             label="Username"
             value={username}

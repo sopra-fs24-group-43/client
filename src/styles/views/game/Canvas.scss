@@ -42,8 +42,96 @@
     width: 40%;
   }
   &.main-color-button{
-    width: "50px";
-    height: "50px";
+    width: 50px;
+    height: 50px;
+    padding-right: 2%;
+  }
+  &.color-buttons-group{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+  &.color-button-row{
+    display: flex;
+    justify-content: flex-start;
+  }
+  &.color-button{
+    padding-right: 0px;
+  }
+  &.stroke-size-buttons{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+
+    height: 50px;
+    width: 28%;
+  }
+  &.stroke-size-button{
+    margin-right: 4px;
+  }
+  &.stroke-circle{
+    padding-right: 0px;
+  }
+  &.actions{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+
+    height: 50px;
+    width: 32%;
+  }
+  &.action{
+    margin-right: 4px;
+  }
+}
+
+.Canvas_dark{
+  &.container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    min-height: 100%;
+    min-width: 806px;
+
+    background-color: $darkMode;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: $dropShadow;
+    border: 3px solid #2a2c2e;
+    border-bottom-left-radius: 8px;
+  }
+  &.canvas {
+    height: 603px;
+    width: 800px;
+    margin-bottom: 6px;
+  }
+  &.toolbar{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    height: 100%;
+    width: 100%;
+    padding-left: 1%;
+    margin-bottom: 6px;
+  }
+  &.color-buttons{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-right: 6px;
+
+    height: 50px;
+    width: 40%;
+  }
+  &.main-color-button{
+    width: 50px;
+    height: 50px;
     padding-right: 2%;
   }
   &.color-buttons-group{

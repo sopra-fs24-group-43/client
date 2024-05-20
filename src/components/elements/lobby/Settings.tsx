@@ -135,9 +135,9 @@ const Settings = () => {
   }, []);
 
   return (
-    <div className="Settings container">
+    <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
       <div className="Settings menu-form">
-        <div className="Settings menu-label">Players</div>
+        <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Players</div>
         <select className="Settings slide-down-menu" name="maxPlayers" value={maxPlayers} onChange={handleSettingsChange}>
           <option value={2}>2</option>
           <option value={3}>3</option>
@@ -149,7 +149,7 @@ const Settings = () => {
         </select>
       </div>
       <div className="Settings menu-form">
-        <div className="Settings menu-label">Rounds</div>
+        <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Rounds</div>
         <select className="Settings slide-down-menu" name="maxRounds" value={maxRounds} onChange={handleSettingsChange}>
           <option value={1}>1</option>
           <option value={2}>2</option>
@@ -160,7 +160,7 @@ const Settings = () => {
         </select>
       </div>
       <div className="Settings menu-form">
-        <div className="Settings menu-label">Drawtime</div>
+        <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Drawtime</div>
         <select className="Settings slide-down-menu" name="turnLength" value={turnLength} onChange={handleSettingsChange}>
           <option value={5}>5s</option>
           <option value={15}>15s</option>

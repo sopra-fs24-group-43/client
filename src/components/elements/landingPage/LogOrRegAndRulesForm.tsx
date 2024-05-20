@@ -43,10 +43,10 @@ const LogOrRegAndRulesForm = () => {
   const buttonforreg = () => {
     if (registered) {
       if (isGuest === "true") {
-        return "playing as guest"
+        return <div> playing as guest </div>
       }
       if (isGuest === "false") {
-        return "logged in"
+        return <div> logged in </div>
       }
     }
     else {
@@ -76,13 +76,13 @@ const LogOrRegAndRulesForm = () => {
     }
   }
   return (
-    <div className="LogOrRegAndRulesForm form">
-      <div className="LogOrRegAndRulesForm button-container">
+    <div className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
+      <div className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} button-container`}>
         {buttonforreg()}
       </div>
       {buttonforguest()}
-      <div className="LogOrRegAndRulesForm img-form">
-        <img src="rules.png" alt="Rule Icon" className="LogOrRegAndRulesForm img" />
+      <div className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} img-form`}>
+        <img src="rules.png" alt="Rule Icon" className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
       </div>
       <div className="LogOrRegAndRulesForm game-rules">
         <div>

@@ -3,13 +3,14 @@ import { useNavigate } from "react-router-dom";
 import "styles/views/Chat.scss";
 import { Context } from "../../context/Context";
 
-const Chat = () => {
+const Chat = ({isChatting, setIsChatting}) => {
   const navigate = useNavigate();
   const [chatMessages, setChatMessages] = useState<string[]>([]);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const chatMessagesRef = useRef(null);
   const context = useContext(Context);
   const {stompApi, reload, setReload} = context;  //or const stompApi = context.stompApi
+  // const [isChatting, setIsChatting] = useState(false);
 
   let gameId;
   gameId = sessionStorage.getItem("gameId")
@@ -69,21 +70,31 @@ const Chat = () => {
       handleSendMessage();
     }
   };
+
+  const handleFocus = () => {
+    setIsChatting(true);
+  };
+
+  const handleClose = () => {
+    setIsChatting(false); 
+  };
   
   return (
-    <div className="Chat container">
-      <div className="Chat title">Chat</div>
-        <div className="Chat messages" ref={chatMessagesRef}>
+    <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
+      <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} title`}>Chat</div>
+        <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} messages`} ref={chatMessagesRef}>
           {chatMessages.map((message, index) => (
-            <div className="Chat message" key={index}>{message}</div>
+            <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} message`} key={index}>{message}</div>
           ))}
         </div>
-      <div className="Chat input-form">
+      <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} input-form`}>
         <input
-          className="Chat input"
+          className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} input`}
           type="text"
           value={currentMessage}
           onChange={(e) => setCurrentMessage(e.target.value)}
+          onFocus={handleFocus}
+          onBlur={handleClose}
           onKeyDown={handleKeyPress} 
           placeholder="Type your guess here..."
         />

@@ -16,6 +16,7 @@ const Players = () => {
   // checking if a user is a creator of a lobby
   const [isAdmin, setIsAdmin] = useState(false);
 
+
   // checking if a user is a creator of a lobby 
   useEffect(() => {
     const role = sessionStorage.getItem("role");
@@ -33,7 +34,7 @@ const Players = () => {
 
   const connect = async ()=>{
     await stompApi.connect(() => {
-      stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Players");
+      const userId = sessionStorage.getItem("userId");
       console.log("subscribed when was NOT connected to the websocket in Players");
       stompApi.connected = true;
     });
@@ -41,6 +42,15 @@ const Players = () => {
   };
 
   useEffect(() => {
+    //reload hadling
+    /*
+    const handleBeforeUnload = (event) => {  //this gets executed when reloading the page, was commented
+      console.log("disconnecting before reloading page!")
+      stompApi.disconnect()
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+     */
     // subscribing
     if (stompApi.isConnected()){
       stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Players");
@@ -60,19 +70,6 @@ const Players = () => {
 
     if (stompApi.isConnected()){
       sendData();
-    };
- 
-    // cleaning up
-    return () => {  //this gets executed when navigating another page
-      // if (sessionStorage.getItem("role") === "admin"){
-      //   deleteLobby();
-      // }
-      // if (sessionStorage.getItem("role") === "player"){
-      //   leaveLobby();
-      // }
-      // unsub
-      console.log("unsubscribing and cleaning up when navigating to different view from Players!");
-      stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Players");
     };
   }, [stompApi.isConnected()]); // [stompApi.isConnected()]
 

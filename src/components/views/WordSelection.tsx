@@ -5,17 +5,19 @@ import '../../styles/views/game/WordSelection.scss';
 
 
 
-const WordSelection = ({ isOpen, onClose, time, isDrawer, sendWordChoice, threeWords }) => {
+const WordSelection = ({ gamePhase, onClose, time, isDrawer, sendWordChoice, threeWords }) => {
   const [isChoosing, setIsChoosing] = useState(false);
   const [wordIndex, setWordIndex] = useState()
   let threeWords2 = threeWords
-  if (!isOpen) return null;
+  if (gamePhase !== "choosing") return null;
 
   if (!isDrawer) {
     return (
-      <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container ${isOpen ? 'open' : ''}`}>
+
+      <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container ${gamePhase==="choosing" ? 'open' : ''}`}>
         <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} modal-content`}>
           <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} title`}>
+
             Drawer Is Choosing A Word! {time}
           </div>
         </div>
@@ -24,7 +26,8 @@ const WordSelection = ({ isOpen, onClose, time, isDrawer, sendWordChoice, threeW
   }
   if(isDrawer) {
     return (
-      <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container ${isOpen ? 'open' : ''}`}>
+
+      <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container ${gamePhase==="choosing" ? 'open' : ''}`}>
         <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} modal-content`}>
           <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} title`}>
             Select a word to draw! {time}

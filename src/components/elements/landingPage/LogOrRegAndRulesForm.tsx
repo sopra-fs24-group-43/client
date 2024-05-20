@@ -24,6 +24,12 @@ const LogOrRegAndRulesForm = () => {
       sessionStorage.setItem("isGuest", body.isGuest);
       isGuest = true
       setReload(!reload)
+      const sessionAttributeDTO1 = {
+        userId: body.userId,
+        reload: null
+      }
+      stompApi.send("/app/games/senduserId", JSON.stringify(sessionAttributeDTO1))
+
       stompApi.unsubscribe("/topic/landing", "LogOrRegAndRulesForm")
     }
   }

@@ -3,6 +3,7 @@ import "styles/views/Table.scss"
 import {useNavigate} from "react-router-dom";
 import {Button} from "../../ui/Button";
 import { Context } from "../../../context/Context";
+import ReconnectPopUp from "../../views/ReconnectPopUp"
 
 
 const Table = () => {
@@ -19,6 +20,9 @@ const Table = () => {
   let isGuest
   let friends
   let registered
+  const [reconnect, setReconnect] = useState(false)
+  const [reconRole, setReconRole] = useState()
+  const [reconGameId, setReconGameId] = useState()
   registered = !(sessionStorage.getItem("username")=== null || sessionStorage.getItem("userId")=== null || sessionStorage.getItem("friends")=== null || sessionStorage.getItem("isGuest") === null)
 
 
@@ -79,8 +83,23 @@ const Table = () => {
     }
   }
 
+  const Reconfunc = (userId, reconRole, reconGameId) => {
+    sessionStorage.setItem("role", reconRole)
+    sessionStorage.setItem("gameId", reconGameId)
+    stompApi.send(`/app/landing/reconnect/${userId}`, "") //added
+    setReconnect(false)
+    navigate(`/game/${reconGameId}`)
+  }
   const handleResponse = (payload) => {
     var body = JSON.parse(payload.body)
+    if (body.type === "ReconnectionDTO" && registered) {
+      console.log("reconRole: "+body.role)
+      console.log("reconGameId: "+body.gameId)
+      setReconRole(body.role)
+      setReconGameId(body.gameId)
+      console.log("settings recon")
+      setReconnect(true)
+    }
     if (body.type === "deletegame" && registered) {  //trigger a request of getallgames because some game changed
       console.log("receiving deletegame inside Table -> getallgames")
       stompApi.send("/app/landing/" + userId + "/getallgames" , "");
@@ -132,18 +151,29 @@ const Table = () => {
   }
   const connect = async ()  => {
     await stompApi.connect(() => {
+      stompApi.send("/app/landing/alertreconnect/"+userId, "") //added
+      stompApi.subscribe("/topic/landing/alertreconnect/"+userId, handleResponse, "Table") //added
       stompApi.subscribe("/topic/landing/" + userId, handleResponse, "Table")
       stompApi.subscribe("/topic/landing", handleResponse, "Table") //"/topic/landingTable"
-      stompApi.send("/app/landing/" + userId + "/getallgames" , "");
       stompApi.connected = true //important!!! needs to be set during the onConnectedCallback, otherwise it might happen that it connected gets set true before the ws
                                 //is fully setup
+      stompApi.send("/app/landing/" + userId + "/getallgames" , "");
+
+
     });
   }
   useEffect(() => {
 
     const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
       console.log("disconnecting before reloading page!")
-      stompApi.disconnect()
+      const sessionAttributeDTO2 = {
+        userId: null,
+        reload: true
+      }
+      if (stompApi.isConnected()) {
+        stompApi.send("/app/games/sendreload", JSON.stringify(sessionAttributeDTO2))
+        stompApi.disconnect()
+      }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
 
@@ -193,6 +223,7 @@ const Table = () => {
       {gamestorender()}
       </tbody>
     </table>
+    <ReconnectPopUp reconnect={reconnect} setReconnect={setReconnect} Reconfunc={Reconfunc} userId={userId} reconRole={reconRole} reconGameId={reconGameId}/>
   </div>
 )
   ;

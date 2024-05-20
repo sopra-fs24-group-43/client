@@ -33,10 +33,21 @@ const Settings = () => {
   };
   
   useEffect(() => {
+
     // subscribing
     if (stompApi.isConnected()){
       stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Settings");
       console.log("subscribed when was connected to the websocket in Settings");
+
+    };
+
+    // if not connected
+    //if (!stompApi.isConnected()){
+    //  console.log("connecting to ws in Settings view");
+      //connect();
+    //  console.log("connected");
+    //};
+
     } else if (!stompApi.isConnected()){
       subscribe()
     }
@@ -44,7 +55,7 @@ const Settings = () => {
     // unsub
     return () => {  //this gets executed when navigating another page
       console.log("unsubscribing and cleaning up when navigating to different view from Settings!");
-      // window.removeEventListener('beforeunload', handleBeforeUnload)
+      //window.removeEventListener('beforeunload', handleBeforeUnload)
       stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Settings");
     };
   }, []);

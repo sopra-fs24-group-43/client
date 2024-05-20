@@ -8,7 +8,9 @@ import { Context } from "../../context/Context";
 import Chat from "./Chat";
 import LeaderboardInGame from "./LeaderboardInGame";
 import WordSelection from "./WordSelection";
+import ReconnectPopUp from "../views/ReconnectPopUp";
 import Podium from "components/elements/game/Podium";
+
 
 const Game = () => {
   const navigate = useNavigate();
@@ -29,9 +31,11 @@ const Game = () => {
   let gameId
   let userId
   let subscribed
-  let gamePhase //if drawing{ drawing} else { if choosing {choosing } else {leaderboard}
-  const [gamePhase2, setGamePhase2] = useState<string>()
+
+  let gamePhase = "started" //if drawing{ drawing} else { if choosing {choosing } else {leaderboard}
+  const [gamePhase2, setGamePhase2] = useState("started")
   let endGame
+  const [endGame2, setEndGame2] = useState()
   let connectedPlayers
   const [connectedPlayers2, setConnectedPlayers2] = useState()
   let playersOriginally
@@ -54,6 +58,11 @@ const Game = () => {
   role = sessionStorage.getItem("role")
   gameId = sessionStorage.getItem("gameId")
   userId = parseInt(sessionStorage.getItem("userId"))
+
+  const [reconnect, setReconnect] = useState(false)
+  const [reconRole, setReconRole] = useState()
+  const [reconGameId, setReconGameId] = useState()
+
   const logout = (): void => { //remove this?
     sessionStorage.removeItem("token");
     navigate("/loginOrRegister");
@@ -101,6 +110,9 @@ const Game = () => {
   };
   const connect = async ()  => {
     await stompApi.connect(() => {
+      stompApi.send("/app/landing/alertreconnect/"+userId, "") //added
+      stompApi.subscribe("/topic/landing/alertreconnect/"+userId, onHandleGeneralResponse, "Game") //added
+      stompApi.subscribe(`/topic/games/${gameId}/general/${userId}`, onHandleGeneraluserIdResponse, "Game")
       stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse, "Game");
@@ -111,16 +123,26 @@ const Game = () => {
       subscribed = true
       stompApi.connected = true //important!!! needs to be set during the onConnectedCallback, otherwise it might happen that it connected gets set true before the ws
                                 //is fully setup
+      stompApi.send(`/app/games/${gameId}/getgamestate/${userId}`, "")
       setReload(!reload) //makes so it subscribes in Chat
+      /*
       if (role === "admin") {
         timeout(1000);
         stompApi.send(`/app/games/${gameId}/nextturn`, "")
       }
+
+       */
     });
   }
   useEffect(() => {
     const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
       console.log("disconnecting before reloading page!")
+      const sessionAttributeDTO2 = {
+        userId: null,
+        reload: true
+      }
+      stompApi.send("/app/games/sendreload", JSON.stringify(sessionAttributeDTO2))
+
       stompApi.disconnect()
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -134,18 +156,21 @@ const Game = () => {
       navigate("/loginOrRegister");
     }
     if (stompApi.isConnected()) { // && !subscribed
+      stompApi.subscribe(`/topic/games/${gameId}/general/${userId}`, onHandleGeneraluserIdResponse, "Game")
+      stompApi.subscribe(`/topic/games/${gameId}/general`, onHandleGeneralResponse, "Game")
       stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/eraseAll`, onHandleEraseAllResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse, "Game");
-
-      stompApi.subscribe(`/topic/games/${gameId}/general`, onHandleGeneralResponse, "Game")
       subscribed = true
+      stompApi.send(`/app/games/${gameId}/getgamestate/${userId}`, "")
+      /*
       if (stompApi.isConnected() && role === "admin") {
         stompApi.send(`/app/games/${gameId}/nextturn`, "")
       }
+       */
     }
     return () => {
       console.log("unsubscribing and cleaning up when navigating to different view from Game!")
@@ -153,7 +178,6 @@ const Game = () => {
 
     }
   }, [navigate]);
-
   const sendWordChoice = (wordIndex, threeWords) => {
     
     let chosenWord = threeWords[wordIndex]
@@ -162,6 +186,7 @@ const Game = () => {
       wordIndex: wordIndex,
       word: chosenWord
     }
+    console.log("sending word v1")
     stompApi.send(`/app/games/${gameId}/sendchosenword`, JSON.stringify(ChooseWordDTO))
     handleEraseAllClick();
   
@@ -169,19 +194,24 @@ const Game = () => {
   const getRandomInt = (max) => {
     return Math.floor(Math.random()*3)
   }
-  const onHandleGeneralResponse = (payload) => {
+  const Reconfunc = (userId, reconRole, reconGameId) => {
+    sessionStorage.setItem("role", reconRole)
+    sessionStorage.setItem("gameId", reconGameId)
+    stompApi.send(`/app/landing/reconnect/${userId}`, "") //added
+    setReconnect(false)
+    navigate(`/game/${reconGameId}`)
+  }
+  const onHandleGeneraluserIdResponse = (payload) => {
     const body = JSON.parse(payload.body);
-    if (body.type === "leaderboard"  && role === "admin") { //just for testing
-      stompApi.send(`/app/games/${gameId}/nextturn`, "")
-    }
     if (body.type === "GameStateDTO") {
-      gamePhase = "choosing"
-      setGamePhase2("choosing")
+      //sets everything except for role, gameId, userId, subscribed
+      //chosenWord, wordIndex
       maxRounds = body.maxRounds
       setMaxRounds2(body.maxRounds)
       playersOriginally = body.playersOriginally
       setPlayersOriginally(body.playersOriginally)
       endGame = body.endGame
+      setEndGame2(body.end)
       connectedPlayers = body.connectedPlayers
       setConnectedPlayers2(body.connectedPlayers)
       currentRound = body.currentRound
@@ -194,29 +224,105 @@ const Game = () => {
       Drawer = body.drawer
       setIsDrawer2(userId === drawingOrder[Drawer])
       isDrawer = userId === drawingOrder[Drawer]
-      console.log("userIdofDrawer, userId, isDrawer: ", drawingOrder[Drawer], userId, isDrawer)
+      gamePhase = body.gamePhase
+      setGamePhase2(body.gamePhase)
+      chosenWord = body.actualCurrentWord
+      console.log("gamePhase: ",gamePhase)
+      //body.actualCurrentWord is null if no choosing took place already,
+      //if choosing is taking place right now, it is a old word and will be updated with the choosing,
+      //if the choosing just happend it is up to date
+      console.log("Drawer, drawingOrder, userIdofDrawer, userId, isDrawer: ", Drawer, drawingOrder, drawingOrder[Drawer], userId, isDrawer)
       console.log("isDrawer: ", isDrawer)
-      setIsSelectionOpen(true); // true
+      //setIsSelectionOpen(true);
+      if (body.gamePhase === "started" && role === "admin" && gamePhase === "started") { //depends on whether we demote a reconnecting admin to a player and promote a random player
+        stompApi.send(`/app/games/${gameId}/nextturn`, "")
+      }
+    }
+  }
+  const onHandleGeneralResponse = (payload) => {
+    const body = JSON.parse(payload.body);
+    if (body.type === "sendcanvasforrecon") {
+      if (isDrawer) {
+        /*send to this the whole canvas
+      @MessageMapping("/games/{gameId}/sendcanvasforrecon/{userId}")
+        public void sendcanvasforrecon(@DestinationVariable int gameId, @DestinationVariable int userId, FillCoordinates fillCoordinates) {
+        this.webSocketService.sendMessageToClients("/topic/games/" + gameId + "/fill/" + userId, fillCoordinates);  //has userId in mapping!
+      }
+
+         */
+      }
+    }
+    if (body.type === "ReconnectionDTO") {
+      console.log("reconRole: "+body.role)
+      console.log("reconGameId: "+body.gameId)
+      setReconRole(body.role)
+      setReconGameId(body.gameId)
+      console.log("settings recon")
+      setReconnect(true)
+    }
+    if (body.type === "TimerOut"  && role === "admin" && body.gamePhase === "leaderboard" && body.time === 0 && !endGame) {
+      stompApi.send(`/app/games/${gameId}/nextturn`, "")
+    }
+    if (body.type === "leaderboard") {
+      gamePhase = "leaderboard"
+      endGame = body.endGame
+      setEndGame2(body.endGame)
+      setGamePhase2("leaderboard")
+    }
+    if (body.type === "GameStateDTO") {
+      //sets everything except for role, gameId, userId, subscribed
+      //chosenWord, wordIndex
+      maxRounds = body.maxRounds
+      setMaxRounds2(body.maxRounds)
+      playersOriginally = body.playersOriginally
+      setPlayersOriginally(body.playersOriginally)
+      endGame = body.endGame
+      setEndGame2(body.endGame)
+      connectedPlayers = body.connectedPlayers
+      setConnectedPlayers2(body.connectedPlayers)
+      currentRound = body.currentRound
+      setCurrentRound2(body.currentRound)
+      currentTurn = body.currentTurn
+      setCurrentTurn2(body.currentTurn)
+      threeWords = body.threeWords
+      setThreeWords2(body.threeWords)
+      drawingOrder = body.drawingOrder
+      Drawer = body.drawer
+      setIsDrawer2(userId === drawingOrder[Drawer])
+      isDrawer = userId === drawingOrder[Drawer]
+      gamePhase = body.gamePhase
+      setGamePhase2(body.gamePhase)
+      chosenWord = body.actualCurrentWord
+      console.log("gamePhase: ",gamePhase)
+      //body.actualCurrentWord is null if no choosing took place already,
+      //if choosing is taking place right now, it is a old word and will be updated with the choosing,
+      //if the choosing just happend it is up to date
+      console.log("Drawer, drawingOrder, userIdofDrawer, userId, isDrawer: ", Drawer, drawingOrder, drawingOrder[Drawer], userId, isDrawer)
+      console.log("isDrawer: ", isDrawer)
+      //setIsSelectionOpen(true);
+      if (body.gamePhase === "started" && role === "admin" && gamePhase === "started" && !body.endGame) {
+        stompApi.send(`/app/games/${gameId}/nextturn`, "")
+      }
+
     }
     if (body.type === "startdrawing") {
-      gamePhase = "drawing"
       setGamePhase2("drawing")
       wordIndex = body.wordIndex
       chosenWord = body.word
-      setIsSelectionOpen(false); // false
+      gamePhase = "drawing"
+
     }
     if (body.type === "TimerOut" && body.gamePhase === "drawing") {
       gamePhase = "drawing"
       setGamePhase2("drawing")
-
       setTime(body.time)
     }
     if (body.type === "TimerOut" && body.gamePhase === "choosing") {
       gamePhase = "choosing"
       setGamePhase2("choosing")
-
       setTime(body.time)
-      if (body.time === 0 && isDrawer && gamePhase === "choosing") {
+
+      if (body.time === 0 && isDrawer && gamePhase === "choosing") { //do this in back-end
         wordIndex = getRandomInt(3)
         chosenWord = threeWords[wordIndex]
         const ChooseWordDTO =  {
@@ -224,13 +330,9 @@ const Game = () => {
           wordIndex: wordIndex,
           word: chosenWord
         }
+        console.log("sending word v2")
         stompApi.send(`/app/games/${gameId}/sendchosenword`, JSON.stringify(ChooseWordDTO))
       }
-    }
-    if (body.type === "leaderboard") {
-      gamePhase = "leaderboard"
-      setGamePhase2("leaderboard")
-
     }
   }
   const showtimer = (time, gamePhase2, wantedgamePhase) => {
@@ -752,6 +854,10 @@ const Game = () => {
         </div>
         <Chat isChatting={isChatting} setIsChatting={setIsChatting} />
       </div>
+      <Chat/>
+      <WordSelection gamePhase={gamePhase2} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
+      <ReconnectPopUp reconnect={reconnect} setReconnect={setReconnect} Reconfunc={Reconfunc} userId={userId} reconRole={reconRole} reconGameId={reconGameId}/>
+
     </div>
   );
 };

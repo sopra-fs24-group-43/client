@@ -6,8 +6,6 @@ import "../../styles/views/game/LeaderboardInGame.scss"
 import { Context } from "../../context/Context";
 
 const LeaderboardInGame = () => {
-  const navigate = useNavigate();
-
   // getting the gameId from the url
   const { gameId } = useParams();
   const lobbyId = parseInt(gameId);
@@ -16,20 +14,6 @@ const LeaderboardInGame = () => {
   const context = useContext(Context);
   const {stompApi} = context;  //or const stompApi = context.stompApi
 
-  // websocket connection establishing
-  // function timeout(delay: number) {
-  //   return new Promise( res => setTimeout(res, delay) );
-  // };
-
-  // const connect = async ()=>{
-  //   await stompApi.connect(() => {
-  //     stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "LeaderboardInGame");
-  //     console.log("subscribed when was NOT connected to the websocket in LeaderboardInGame");
-  //     stompApi.connected = true;
-  //   });
-  //   await timeout(1000);
-  // };
-
   useEffect(() => {
     // subscribing
     if (stompApi.isConnected()){
@@ -37,23 +21,8 @@ const LeaderboardInGame = () => {
       console.log("subscribed when was connected to the websocket in LeaderboardInGame");
       
       // sending the data
-      //stompApi.send(`/app/games/${lobbyId}/endturn`, "");
+      stompApi.send(`/app/games/${lobbyId}/endturn`, "");
     };
-
-    // if not connected
-    // if (!stompApi.isConnected()){
-    //   console.log("connecting to ws in LeaderboardInGame view");
-    //   connect();
-    //   // stompApi.send(`/app/games/${lobbyId}/getlobbyinfo`, JSON.stringify(lobbyId));
-    //   console.log("connected");
-
-    //   console.log("sending data from the LeaderboardInGame");
-    //   sendData();
-    // };
-
-    // if (stompApi.isConnected()){
-    //   sendData();
-    // };
  
     // cleaning up
     return () => {  //this gets executed when navigating another page
@@ -61,12 +30,6 @@ const LeaderboardInGame = () => {
       stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "LeaderboardInGame");
     };
   }, [stompApi.isConnected()]); // [stompApi.isConnected()]
-
-  // const sendData = async () => { // needed for delaying the send function, so the connection is established
-  //   await timeout(1100); // !!!!! needs a little bit more time!
-  //   console.log("sending the message from the LeaderboardInGame");
-  //   stompApi.send(`/app/games/${lobbyId}/getlobbyinfo`, "");
-  // };
 
   // create lists to track players in the lobby
   const [players, setPlayers] = useState({}); // before <{[key: string]: any}>
@@ -78,32 +41,33 @@ const LeaderboardInGame = () => {
 
       const newPlayersData = responseData.userIdToPlayer;
 
-      // Combine the new player data with the existing player list
+      // combine the new player data with the existing player list
       const updatedPlayers = { ...players, ...newPlayersData };
 
-      // Convert the updated player list to an array of player components
+      // convert the updated player list to an array of player components
       const playersArray = Object.values(updatedPlayers).map(player => (
-        <div key={player["userId"]} className="LeaderboardInGame form">
-          <div className="LeaderboardInGame avatar">
-            <img src="/painter.png" alt="Avatar" className="LeaderboardInGame avatar"/>
+        <div key={player["userId"]} className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
+          <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}>
+            <img src="/painter.png" alt="Avatar" className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}/>
           </div>
-          <div className="LeaderboardInGame player">
-            <div className="LeaderboardInGame username">
-              {player["username"]}
+          <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} player`}>
+            <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} username`}>
+              {player["username"]} {sessionStorage.getItem("username") === player["username"] && " (You)"}
+
             </div>
-            <div className="LeaderboardInGame points">
+            <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} points`}>
               {player["totalPoints"]} points
             </div>
           </div>
         </div>
       ));
       setPlayers(updatedPlayers);
-      setRenderedPlayers(playersArray); // Set the array of player components in the state
+      setRenderedPlayers(playersArray);
     }
   };
 
   return (
-    <div className="LeaderboardInGame players">
+    <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} players`}>
       {renderedPlayers}
     </div>
   );

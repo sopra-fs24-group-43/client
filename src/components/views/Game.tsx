@@ -9,6 +9,9 @@ import Chat from "./Chat";
 import LeaderboardInGame from "./LeaderboardInGame";
 import WordSelection from "./WordSelection";
 import ReconnectPopUp from "../views/ReconnectPopUp";
+import Podium from "components/elements/game/Podium";
+
+
 const Game = () => {
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -20,6 +23,7 @@ const Game = () => {
   const [isEraserToolSelected, setIsEraserToolSelected] = useState(false);
   const [strokeSize, setStrokeSize] = useState(3);
   const [isSelectionOpen, setIsSelectionOpen] = useState(false);
+  const [isChatting, setIsChatting] = useState(false);
 
   const context = useContext(Context);
   const {stompApi, reload, setReload} = context;  //or const stompApi = context.stompApi
@@ -27,6 +31,7 @@ const Game = () => {
   let gameId
   let userId
   let subscribed
+
   let gamePhase = "started" //if drawing{ drawing} else { if choosing {choosing } else {leaderboard}
   const [gamePhase2, setGamePhase2] = useState("started")
   let endGame
@@ -48,7 +53,7 @@ const Game = () => {
   let chosenWord
   let wordIndex //0,1 or 2
   let drawingOrder //List of userIds is correct order
-  const [isDrawer2, setIsDrawer2] = useState()
+  const [isDrawer2, setIsDrawer2] = useState<boolean>()
   const [time, setTime] = useState()
   role = sessionStorage.getItem("role")
   gameId = sessionStorage.getItem("gameId")
@@ -68,55 +73,28 @@ const Game = () => {
   };
 
   const handleCloseSelection = () => {
-    setIsSelectionOpen(false);
+    setIsSelectionOpen(false); //false
   };
-
-
-
-   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "e":
-          handleEraserClick();
-          break;
-        case "c":
-          handleEraseAllClick();
-          break;
-        case "f":
-          handleFillToolClick();
-          break;
-        case "d": 
-          handleDrawToolClick();
-          break;
-        default:
-          break;
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, []);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "e":
-          handleEraserClick();
-          break;
-        case "c":
-          handleEraseAllClick();
-          break;
-        case "f":
-          handleFillToolClick();
-          break;
-        case "d": 
-          handleDrawToolClick();
-          break;
-        default:
-          break;
+      if (isDrawer2 && !isChatting) {
+        switch (event.key) {
+          case "e":
+            handleEraserClick();
+            break;
+          case "c":
+            handleEraseAllClick();
+            break;
+          case "f":
+            handleFillToolClick();
+            break;
+          case "d":
+            handleDrawToolClick();
+            break;
+          default:
+            break;
+        }
       }
     };
 
@@ -125,7 +103,8 @@ const Game = () => {
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, []);
+  }, [isDrawer2, isChatting]);
+
   function timeout(delay: number) {
     return new Promise( res => setTimeout(res, delay) );
   };
@@ -200,7 +179,7 @@ const Game = () => {
     }
   }, [navigate]);
   const sendWordChoice = (wordIndex, threeWords) => {
-
+    
     let chosenWord = threeWords[wordIndex]
     const ChooseWordDTO =  {
       type: "chooseword",
@@ -209,6 +188,8 @@ const Game = () => {
     }
     console.log("sending word v1")
     stompApi.send(`/app/games/${gameId}/sendchosenword`, JSON.stringify(ChooseWordDTO))
+    handleEraseAllClick();
+  
   }
   const getRandomInt = (max) => {
     return Math.floor(Math.random()*3)
@@ -322,12 +303,14 @@ const Game = () => {
       if (body.gamePhase === "started" && role === "admin" && gamePhase === "started" && !body.endGame) {
         stompApi.send(`/app/games/${gameId}/nextturn`, "")
       }
+
     }
     if (body.type === "startdrawing") {
       setGamePhase2("drawing")
       wordIndex = body.wordIndex
       chosenWord = body.word
       gamePhase = "drawing"
+
     }
     if (body.type === "TimerOut" && body.gamePhase === "drawing") {
       gamePhase = "drawing"
@@ -383,7 +366,6 @@ const Game = () => {
     ctx.moveTo(x, y);
     ctx.lineTo(newX, newY);
     ctx.stroke();
-    
   }
 
   useEffect(() => {
@@ -405,7 +387,8 @@ const Game = () => {
     ctx.lineJoin = "round";
 
     const handleMouseDown = (event: MouseEvent) => {
-      if (isFillToolSelected) {
+      
+      if (isFillToolSelected && isDrawer2) {
         fillArea(event.offsetX, event.offsetY, ctx);
         
       } else if (isDrawToolSelected || isEraserToolSelected) {
@@ -415,12 +398,11 @@ const Game = () => {
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      if (!isDrawing || isFillToolSelected || (!isDrawToolSelected && !isEraserToolSelected)) return;
+      if (!isDrawing || !isDrawer2 ||isFillToolSelected || (!isDrawToolSelected && !isEraserToolSelected)) return;
       const { x, y } = prevPosition;
       const newX = event.offsetX;
       const newY = event.offsetY;
       var eraserSelected = false;
-      console.log("isEraserToolSelected::::::", isEraserToolSelected);
       if (isEraserToolSelected) {
         eraserSelected = true;
         ctx.lineWidth = 15;
@@ -429,13 +411,15 @@ const Game = () => {
         eraserSelected = false;
         ctx.lineWidth = strokeSize;
       }
+     
       stompApi.send(`/app/games/${gameId}/coordinates`, JSON.stringify({ x, y, newX, newY, selectedColor, strokeSize, eraserSelected}));
-
+     
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(newX, newY);
       ctx.stroke();
       setPrevPosition({ x: newX, y: newY });
+      
     };
 
     const handleMouseUp = () => {
@@ -656,22 +640,23 @@ const Game = () => {
  // <Button onClick={logout}>Logout</Button>
   
   return (
-
     <div className="Game container">
-      <div className="Tracker container">
-        <div className="Tracker timer">
+
+      <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
+        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} timer`}>
+
           {showtimer(time, gamePhase2, "drawing")}
         </div>
-        <div className="Tracker rounds">
-          Round {currentRound2}/{maxRounds2}
+        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} rounds`}>
+           <div> Round {currentRound2}/{maxRounds2} </div>
         </div>
-        <div className="Tracker word">
+        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} word`}>
           {chosenWord}
         </div>
       </div>
       <div className="Game form">
         <LeaderboardInGame/>
-        <div className="Canvas container">
+        <div className={`Canvas${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
           <div className="Canvas canvas">
             <canvas
               ref={canvasRef}
@@ -679,7 +664,12 @@ const Game = () => {
               height={600}
               style={{ border: "1px solid black", background: "white" }}
             />
+            <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
+            {false &&(
+              <Podium/>
+            )}
           </div>
+          {isDrawer2 && (
           <div className="Canvas toolbar">
             <div className="Canvas color-buttons">
               <div className="Canvas main-color-button">
@@ -829,40 +819,45 @@ const Game = () => {
               <Button
                 onClick={handleDrawToolClick}
                 className={`Canvas action ${isDrawToolSelected ? "game selected" : ""}`}
+                style={{
+                  outline: isDrawToolSelected ? "3px solid black" : "none",   
+                }}
               >
                 Draw
               </Button>
               <Button
                 onClick={handleFillToolClick}
                 className={`Canvas action ${isFillToolSelected ? "game selected" : ""}`}
+                style={{
+                  outline: isFillToolSelected ? "3px solid black" : "none",   
+                }}
               >
                 Fill
               </Button>
               <Button
                 onClick={handleEraserClick}
                 className={`Canvas action ${isEraserToolSelected ? "game selected" : ""}`}
+                style={{
+                  outline: isEraserToolSelected ? "3px solid black" : "none",   
+                }}
               >
                 Eraser
               </Button>
               <Button 
                 onClick={handleEraseAllClick}
               >
-                Erase All
+                Clear
               </Button>
             </div>
           </div>
-          <Button
-            onClick={handleWordSelectionClick}
-            className={`tool-button ${isEraserToolSelected ? "game selected" : ""}`}
-            style={{ marginRight: "4px", marginTop: "7px"}}
-            >
-              Open Word Selection
-          </Button>
+          )}
         </div>
+        <Chat isChatting={isChatting} setIsChatting={setIsChatting} />
       </div>
       <Chat/>
       <WordSelection gamePhase={gamePhase2} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
       <ReconnectPopUp reconnect={reconnect} setReconnect={setReconnect} Reconfunc={Reconfunc} userId={userId} reconRole={reconRole} reconGameId={reconGameId}/>
+
     </div>
   );
 };

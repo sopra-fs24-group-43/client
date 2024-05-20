@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "jsx": "react",
-    "baseUrl": "src"
+    "baseUrl": "src",
+    // "allowSyntheticDefaultImports": true
+    // "esModuleInterop": true // TypeScript needs to be configured to allow default imports for certain modules
   },
   "include": [
     "src"

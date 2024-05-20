@@ -17,7 +17,7 @@ export const ContextProvider: React.FC<ContextProviderProps> = ({ children }) =>
 
 
   const stompApi = useStomp()
-  const [reload, setReload] = useState()
+  const [reload, setReload] = useState<boolean>()
 
   const content: IContext = {
     reload,

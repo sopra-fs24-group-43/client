@@ -8,7 +8,7 @@ import { Context } from "../../context/Context";
 import Chat from "./Chat";
 import LeaderboardInGame from "./LeaderboardInGame";
 import WordSelection from "./WordSelection";
-
+import ReconnectPopUp from "../views/ReconnectPopUp";
 const Game = () => {
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -30,6 +30,7 @@ const Game = () => {
   let gamePhase = "started" //if drawing{ drawing} else { if choosing {choosing } else {leaderboard}
   const [gamePhase2, setGamePhase2] = useState("started")
   let endGame
+  const [endGame2, setEndGame2] = useState()
   let connectedPlayers
   const [connectedPlayers2, setConnectedPlayers2] = useState()
   let playersOriginally
@@ -53,9 +54,9 @@ const Game = () => {
   gameId = sessionStorage.getItem("gameId")
   userId = parseInt(sessionStorage.getItem("userId"))
 
-  const [reconnect, setReconnect] = useState(false); //added!
-  let reconRole
-  let reconGameId
+  const [reconnect, setReconnect] = useState(false)
+  const [reconRole, setReconRole] = useState()
+  const [reconGameId, setReconGameId] = useState()
 
   const logout = (): void => { //remove this?
     sessionStorage.removeItem("token");
@@ -198,39 +199,6 @@ const Game = () => {
 
     }
   }, [navigate]);
-  const ReconnPopUp = ({reconnect}) => {
-    if (!reconnect) return null;
-    else {
-      return (
-        <div className={`wordSelection container ${reconnect === true ? 'open' : ''}`}>
-          <div className="wordSelection modal-content">
-            <div className="wordSelection title">
-              Would You like to Rejoin The Game You Just Left?
-            </div>
-          </div>
-          <div className="wordSelection words-container">
-            <div className="wordSelection words">
-              <button onClick={() => {
-                sessionStorage.setItem("role", reconRole)
-                sessionStorage.setItem("gameId", reconGameId)
-                stompApi.send(`/app/landing/reconnect/${userId}`, "") //added
-                setReconnect(false)
-                navigate(`/lobby/${reconGameId}`)
-              }}>
-                Yes
-              </button>
-            </div>
-            <div className="wordSelection words">
-              <button onClick={() => {setReconnect(false)}}>
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      )
-    }
-  }
-
   const sendWordChoice = (wordIndex, threeWords) => {
 
     let chosenWord = threeWords[wordIndex]
@@ -245,6 +213,13 @@ const Game = () => {
   const getRandomInt = (max) => {
     return Math.floor(Math.random()*3)
   }
+  const Reconfunc = (userId, reconRole, reconGameId) => {
+    sessionStorage.setItem("role", reconRole)
+    sessionStorage.setItem("gameId", reconGameId)
+    stompApi.send(`/app/landing/reconnect/${userId}`, "") //added
+    setReconnect(false)
+    navigate(`/game/${reconGameId}`)
+  }
   const onHandleGeneraluserIdResponse = (payload) => {
     const body = JSON.parse(payload.body);
     if (body.type === "GameStateDTO") {
@@ -255,6 +230,7 @@ const Game = () => {
       playersOriginally = body.playersOriginally
       setPlayersOriginally(body.playersOriginally)
       endGame = body.endGame
+      setEndGame2(body.end)
       connectedPlayers = body.connectedPlayers
       setConnectedPlayers2(body.connectedPlayers)
       currentRound = body.currentRound
@@ -284,16 +260,32 @@ const Game = () => {
   }
   const onHandleGeneralResponse = (payload) => {
     const body = JSON.parse(payload.body);
+    if (body.type === "sendcanvasforrecon") {
+      if (isDrawer) {
+        /*send to this the whole canvas
+      @MessageMapping("/games/{gameId}/sendcanvasforrecon/{userId}")
+        public void sendcanvasforrecon(@DestinationVariable int gameId, @DestinationVariable int userId, FillCoordinates fillCoordinates) {
+        this.webSocketService.sendMessageToClients("/topic/games/" + gameId + "/fill/" + userId, fillCoordinates);  //has userId in mapping!
+      }
+
+         */
+      }
+    }
     if (body.type === "ReconnectionDTO") {
-      reconRole = body.role
-      reconGameId = body.gameId
+      console.log("reconRole: "+body.role)
+      console.log("reconGameId: "+body.gameId)
+      setReconRole(body.role)
+      setReconGameId(body.gameId)
+      console.log("settings recon")
       setReconnect(true)
     }
-    if (body.type === "TimerOut"  && role === "admin" && body.gamePhase === "leaderboard" && body.time === 0) {
+    if (body.type === "TimerOut"  && role === "admin" && body.gamePhase === "leaderboard" && body.time === 0 && !endGame) {
       stompApi.send(`/app/games/${gameId}/nextturn`, "")
     }
     if (body.type === "leaderboard") {
       gamePhase = "leaderboard"
+      endGame = body.endGame
+      setEndGame2(body.endGame)
       setGamePhase2("leaderboard")
     }
     if (body.type === "GameStateDTO") {
@@ -304,6 +296,7 @@ const Game = () => {
       playersOriginally = body.playersOriginally
       setPlayersOriginally(body.playersOriginally)
       endGame = body.endGame
+      setEndGame2(body.endGame)
       connectedPlayers = body.connectedPlayers
       setConnectedPlayers2(body.connectedPlayers)
       currentRound = body.currentRound
@@ -326,7 +319,7 @@ const Game = () => {
       console.log("Drawer, drawingOrder, userIdofDrawer, userId, isDrawer: ", Drawer, drawingOrder, drawingOrder[Drawer], userId, isDrawer)
       console.log("isDrawer: ", isDrawer)
       //setIsSelectionOpen(true);
-      if (body.gamePhase === "started" && role === "admin" && gamePhase === "started") {
+      if (body.gamePhase === "started" && role === "admin" && gamePhase === "started" && !body.endGame) {
         stompApi.send(`/app/games/${gameId}/nextturn`, "")
       }
     }
@@ -869,7 +862,7 @@ const Game = () => {
       </div>
       <Chat/>
       <WordSelection gamePhase={gamePhase2} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
-      {ReconnPopUp(reconnect)}
+      <ReconnectPopUp reconnect={reconnect} setReconnect={setReconnect} Reconfunc={Reconfunc} userId={userId} reconRole={reconRole} reconGameId={reconGameId}/>
     </div>
   );
 };

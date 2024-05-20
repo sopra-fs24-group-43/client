@@ -39,8 +39,11 @@
   }
 
   .modal-content {
-    background-color: var(--background, darkred);
-    color: var(--textColor, white);
+    background-color: var(--background, #FFC0CB);
+    color: var(--textColor, black);
+    border: 3px solid #2a2c2e;
+    border-bottom-right-radius: 8px;
+    border-top-right-radius: 8px;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);

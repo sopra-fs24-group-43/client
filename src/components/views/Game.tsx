@@ -201,6 +201,10 @@ const Game = () => {
     console.log("sending word v1")
     stompApi.send(`/app/games/${gameId}/sendchosenword`, JSON.stringify(ChooseWordDTO))
     handleEraseAllClick();
+    setIsEraserToolSelected(false);
+    setIsDrawToolSelected(true);
+    setIsFillToolSelected(false);
+
   
   }
   const getRandomInt = (max) => {

@@ -664,7 +664,7 @@ const Game = () => {
               height={600}
               style={{ border: "1px solid black", background: "white" }}
             />
-            <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
+            <WordSelection gamePhase={gamePhase2} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
             {false &&(
               <Podium/>
             )}
@@ -854,10 +854,7 @@ const Game = () => {
         </div>
         <Chat isChatting={isChatting} setIsChatting={setIsChatting} />
       </div>
-      <Chat/>
-      <WordSelection gamePhase={gamePhase2} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
       <ReconnectPopUp reconnect={reconnect} setReconnect={setReconnect} Reconfunc={Reconfunc} userId={userId} reconRole={reconRole} reconGameId={reconGameId}/>
-
     </div>
   );
 };

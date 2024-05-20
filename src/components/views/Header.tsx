@@ -7,6 +7,10 @@ import '../../styles/views/Header.scss';
 
 const Header = (props) => {
   const [isClientSettingsOpen, setIsClientSettingsOpen] = useState(false);
+  const [hotkeyInputDraw, setHotkeyInputDraw] = useState<string>("D");
+  const [hotkeyInputFill, setHotkeyInputFill] = useState<string>("F");
+  const [hotkeyInputEraser, setHotkeyInputEraser] = useState<string>("E");
+  const [hotkeyInputClear, setHotkeyInputClear] = useState<string>("C");
 
   const handleClientSettingsClick = () => {
     setIsClientSettingsOpen(true);
@@ -45,7 +49,7 @@ const Header = (props) => {
           </a>
         </div>
       )}
-      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings} />
+      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings} hotkeyInputDraw={hotkeyInputDraw} setHotkeyInputDraw={setHotkeyInputDraw} hotkeyInputFill={hotkeyInputFill} setHotkeyInputFill={setHotkeyInputFill} hotkeyInputEraser={hotkeyInputEraser} setHotkeyInputEraser={setHotkeyInputEraser} hotkeyInputClear={hotkeyInputClear} setHotkeyInputClear={setHotkeyInputClear} />
     </div>
   );
 };

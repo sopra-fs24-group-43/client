@@ -63,3 +63,4 @@ To learn React, check out the [React documentation](https://react.dev/).
 
 
 > Thanks to Lucas Pelloni Kyrill Hux and Marco Leder for working on the template.
+

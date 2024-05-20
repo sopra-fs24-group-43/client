@@ -8,6 +8,7 @@ import { Context } from "../../context/Context";
 import Chat from "./Chat";
 import LeaderboardInGame from "./LeaderboardInGame";
 import WordSelection from "./WordSelection";
+import Podium from "components/elements/game/Podium";
 
 const Game = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const Game = () => {
   let userId
   let subscribed
   let gamePhase //if drawing{ drawing} else { if choosing {choosing } else {leaderboard}
-  const [gamePhase2, setGamePhase2] = useState()
+  const [gamePhase2, setGamePhase2] = useState<string>()
   let endGame
   let connectedPlayers
   const [connectedPlayers2, setConnectedPlayers2] = useState()
@@ -48,7 +49,7 @@ const Game = () => {
   let chosenWord
   let wordIndex //0,1 or 2
   let drawingOrder //List of userIds is correct order
-  const [isDrawer2, setIsDrawer2] = useState()
+  const [isDrawer2, setIsDrawer2] = useState<boolean>()
   const [time, setTime] = useState()
   role = sessionStorage.getItem("role")
   gameId = sessionStorage.getItem("gameId")
@@ -195,7 +196,7 @@ const Game = () => {
       isDrawer = userId === drawingOrder[Drawer]
       console.log("userIdofDrawer, userId, isDrawer: ", drawingOrder[Drawer], userId, isDrawer)
       console.log("isDrawer: ", isDrawer)
-      setIsSelectionOpen(true);
+      setIsSelectionOpen(false); // true
     }
     if (body.type === "startdrawing") {
       gamePhase = "drawing"
@@ -537,7 +538,6 @@ const Game = () => {
  // <Button onClick={logout}>Logout</Button>
   
   return (
-   
     <div className="Game container">
 
       <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
@@ -562,6 +562,8 @@ const Game = () => {
               height={600}
               style={{ border: "1px solid black", background: "white" }}
             />
+            <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
+            <Podium/>
           </div>
           {isDrawer2 && (
           <div className="Canvas toolbar">
@@ -748,8 +750,7 @@ const Game = () => {
         </div>
         <Chat isChatting={isChatting} setIsChatting={setIsChatting} />
       </div>
-      <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
-    </div>       
+    </div>
   );
 };
 

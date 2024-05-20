@@ -3,6 +3,7 @@ import "styles/views/Table.scss"
 import {useNavigate} from "react-router-dom";
 import {Button} from "../../ui/Button";
 import { Context } from "../../../context/Context";
+import ReconnectPopUp from "../../views/ReconnectPopUp"
 
 
 const Table = () => {
@@ -19,9 +20,9 @@ const Table = () => {
   let isGuest
   let friends
   let registered
-  const [reconnect, setReconnect] = useState(false);
-  let reconRole
-  let reconGameId
+  const [reconnect, setReconnect] = useState(false)
+  const [reconRole, setReconRole] = useState()
+  const [reconGameId, setReconGameId] = useState()
   registered = !(sessionStorage.getItem("username")=== null || sessionStorage.getItem("userId")=== null || sessionStorage.getItem("friends")=== null || sessionStorage.getItem("isGuest") === null)
 
 
@@ -81,43 +82,22 @@ const Table = () => {
       return gamesList
     }
   }
-  const ReconnPopUp = ({reconnect}) => {
-    if (!reconnect) return null;
-    else {
-      return (
-        <div className={`wordSelection container ${reconnect === true ? 'open' : ''}`}>
-          <div className="wordSelection modal-content">
-            <div className="wordSelection title">
-              Would You like to Rejoin The Game You Just Left?
-            </div>
-          </div>
-          <div className="wordSelection words-container">
-            <div className="wordSelection words">
-              <button onClick={() => {
-                sessionStorage.setItem("role", reconRole)
-                sessionStorage.setItem("gameId", reconGameId)
-                stompApi.send(`/app/landing/reconnect/${userId}`, "") //added
-                setReconnect(false)
-                navigate(`/lobby/${reconGameId}`)
-              }}>
-                Yes
-              </button>
-            </div>
-            <div className="wordSelection words">
-              <button onClick={() => {setReconnect(false)}}>
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      )
-    }
+
+  const Reconfunc = (userId, reconRole, reconGameId) => {
+    sessionStorage.setItem("role", reconRole)
+    sessionStorage.setItem("gameId", reconGameId)
+    stompApi.send(`/app/landing/reconnect/${userId}`, "") //added
+    setReconnect(false)
+    navigate(`/game/${reconGameId}`)
   }
   const handleResponse = (payload) => {
     var body = JSON.parse(payload.body)
     if (body.type === "ReconnectionDTO" && registered) {
-      reconRole = body.role
-      reconGameId = body.gameId
+      console.log("reconRole: "+body.role)
+      console.log("reconGameId: "+body.gameId)
+      setReconRole(body.role)
+      setReconGameId(body.gameId)
+      console.log("settings recon")
       setReconnect(true)
     }
     if (body.type === "deletegame" && registered) {  //trigger a request of getallgames because some game changed
@@ -171,11 +151,6 @@ const Table = () => {
   }
   const connect = async ()  => {
     await stompApi.connect(() => {
-      const sessionAttributeDTO1 = {
-        userId: userId,
-        reload: null
-      }
-      stompApi.send("/app/games/senduserId", JSON.stringify(sessionAttributeDTO1))
       stompApi.send("/app/landing/alertreconnect/"+userId, "") //added
       stompApi.subscribe("/topic/landing/alertreconnect/"+userId, handleResponse, "Table") //added
       stompApi.subscribe("/topic/landing/" + userId, handleResponse, "Table")
@@ -191,7 +166,14 @@ const Table = () => {
 
     const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
       console.log("disconnecting before reloading page!")
-      stompApi.disconnect()
+      const sessionAttributeDTO2 = {
+        userId: null,
+        reload: true
+      }
+      if (stompApi.isConnected()) {
+        stompApi.send("/app/games/sendreload", JSON.stringify(sessionAttributeDTO2))
+        stompApi.disconnect()
+      }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
 
@@ -241,6 +223,7 @@ const Table = () => {
       {gamestorender()}
       </tbody>
     </table>
+    <ReconnectPopUp reconnect={reconnect} setReconnect={setReconnect} Reconfunc={Reconfunc} userId={userId} reconRole={reconRole} reconGameId={reconGameId}/>
   </div>
 )
   ;

@@ -8,7 +8,7 @@ interface ContextProviderProps {
 interface IContext {
   reload: boolean;
   stompApi: StompApi;
-  setReload: (reload: number) => void;
+  setReload: (reload: boolean) => void;
 }
 export const Context = createContext<IContext>(null)
 

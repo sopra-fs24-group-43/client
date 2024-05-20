@@ -52,6 +52,11 @@ const Game = () => {
   role = sessionStorage.getItem("role")
   gameId = sessionStorage.getItem("gameId")
   userId = parseInt(sessionStorage.getItem("userId"))
+
+  const [reconnect, setReconnect] = useState(false); //added!
+  let reconRole
+  let reconGameId
+
   const logout = (): void => { //remove this?
     sessionStorage.removeItem("token");
     navigate("/loginOrRegister");
@@ -125,13 +130,8 @@ const Game = () => {
   };
   const connect = async ()  => {
     await stompApi.connect(() => {
-      stompApi.send(`/app/games/${gameId}/reconnect/${userId}`)
-      const sessionAttributeDTO1 = {
-        userId: sessionStorage.getItem("userId"),
-        reload: null
-      }
-      stompApi.send("/app/games/senduserId", JSON.stringify(sessionAttributeDTO1))
-
+      stompApi.send("/app/landing/alertreconnect/"+userId, "") //added
+      stompApi.subscribe("/topic/landing/alertreconnect/"+userId, onHandleGeneralResponse, "Game") //added
       stompApi.subscribe(`/topic/games/${gameId}/general/${userId}`, onHandleGeneraluserIdResponse, "Game")
       stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/fill`, onHandleFillResponse, "Game");
@@ -198,6 +198,38 @@ const Game = () => {
 
     }
   }, [navigate]);
+  const ReconnPopUp = ({reconnect}) => {
+    if (!reconnect) return null;
+    else {
+      return (
+        <div className={`wordSelection container ${reconnect === true ? 'open' : ''}`}>
+          <div className="wordSelection modal-content">
+            <div className="wordSelection title">
+              Would You like to Rejoin The Game You Just Left?
+            </div>
+          </div>
+          <div className="wordSelection words-container">
+            <div className="wordSelection words">
+              <button onClick={() => {
+                sessionStorage.setItem("role", reconRole)
+                sessionStorage.setItem("gameId", reconGameId)
+                stompApi.send(`/app/landing/reconnect/${userId}`, "") //added
+                setReconnect(false)
+                navigate(`/lobby/${reconGameId}`)
+              }}>
+                Yes
+              </button>
+            </div>
+            <div className="wordSelection words">
+              <button onClick={() => {setReconnect(false)}}>
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  }
 
   const sendWordChoice = (wordIndex, threeWords) => {
 
@@ -252,6 +284,11 @@ const Game = () => {
   }
   const onHandleGeneralResponse = (payload) => {
     const body = JSON.parse(payload.body);
+    if (body.type === "ReconnectionDTO") {
+      reconRole = body.role
+      reconGameId = body.gameId
+      setReconnect(true)
+    }
     if (body.type === "TimerOut"  && role === "admin" && body.gamePhase === "leaderboard" && body.time === 0) {
       stompApi.send(`/app/games/${gameId}/nextturn`, "")
     }
@@ -832,6 +869,7 @@ const Game = () => {
       </div>
       <Chat/>
       <WordSelection gamePhase={gamePhase2} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
+      {ReconnPopUp(reconnect)}
     </div>
   );
 };

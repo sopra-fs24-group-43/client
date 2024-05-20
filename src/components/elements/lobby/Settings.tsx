@@ -36,8 +36,6 @@ const Settings = () => {
     //reload hadling
     //const handleBeforeUnload = (event) => {  //this gets executed when reloading the page, was commented
       //console.log("disconnecting before reloading page!")
-      //stompApi.send("/app/games/setreloadtime", "")
-      //console.log("settings reload time")
       //stompApi.disconnect()
     //};
     //window.addEventListener('beforeunload', handleBeforeUnload);
@@ -58,7 +56,7 @@ const Settings = () => {
     // unsub
     return () => {  //this gets executed when navigating another page
       console.log("unsubscribing and cleaning up when navigating to different view from Settings!");
-      //window.removeEventListener('beforeunload', handleBeforeUnload) //was commented
+      //window.removeEventListener('beforeunload', handleBeforeUnload)
       stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Settings");
     };
   }, []);

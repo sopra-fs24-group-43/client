@@ -24,7 +24,7 @@ const WordSelection = ({ isOpen, onClose, time, isDrawer, sendWordChoice, threeW
   }
   if(isDrawer) {
     return (
-      <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} ${isOpen ? 'open' : ''}`}>
+      <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container ${isOpen ? 'open' : ''}`}>
         <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} modal-content`}>
           <div className={`wordSelection${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} title`}>
             Select a word to draw! {time}

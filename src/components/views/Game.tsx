@@ -64,7 +64,7 @@ const Game = () => {
   };
 
   const handleCloseSelection = () => {
-    setIsSelectionOpen(false);
+    setIsSelectionOpen(true); //false
   };
 
   useEffect(() => {
@@ -196,14 +196,14 @@ const Game = () => {
       isDrawer = userId === drawingOrder[Drawer]
       console.log("userIdofDrawer, userId, isDrawer: ", drawingOrder[Drawer], userId, isDrawer)
       console.log("isDrawer: ", isDrawer)
-      setIsSelectionOpen(false); // true
+      setIsSelectionOpen(true); // true
     }
     if (body.type === "startdrawing") {
       gamePhase = "drawing"
       setGamePhase2("drawing")
       wordIndex = body.wordIndex
       chosenWord = body.word
-      setIsSelectionOpen(false);
+      setIsSelectionOpen(true); // false
     }
     if (body.type === "TimerOut" && body.gamePhase === "drawing") {
       gamePhase = "drawing"
@@ -563,7 +563,9 @@ const Game = () => {
               style={{ border: "1px solid black", background: "white" }}
             />
             <WordSelection isOpen={isSelectionOpen} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
-            <Podium/>
+            {false &&(
+              <Podium/>
+            )}
           </div>
           {isDrawer2 && (
           <div className="Canvas toolbar">

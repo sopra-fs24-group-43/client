@@ -21,7 +21,7 @@ const Header = (props) => {
   };
 
   // getting the link of current page
-  const isGamePath = location.pathname.startsWith('/game');
+  const isGamePath = location.pathname.startsWith("/game");
 
   return (
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
@@ -37,7 +37,7 @@ const Header = (props) => {
           <a href="/friends" className="navigation-link">
             <img src="/friends.png" alt="Friends Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </a>
-          <button onClick={handleClientClientSettingsClick} className="navigation-link settings-button">
+          <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
             <img src="/settings.png" alt="ClientSettings Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </button>
           <a href="/profile" className="navigation-link">
@@ -45,7 +45,7 @@ const Header = (props) => {
           </a>
         </div>
       )}
-      <ClientClientSettings isOpen={isClientClientSettingsOpen} onClose={handleCloseClientClientSettings} />
+      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings} />
     </div>
   );
 };

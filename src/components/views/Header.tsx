@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ReactLogo } from '../ui/ReactLogo';
 import PropTypes from 'prop-types';
-import Settings from './Settings';
+import ClientSettings from './ClientSettings';
 import '../../styles/views/Header.scss';
 
 const Header = (props) => {
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isClientSettingsOpen, setIsClientSettingsOpen] = useState(false);
 
-  const handleSettingsClick = () => {
-    setIsSettingsOpen(true);
+  const handleClientSettingsClick = () => {
+    setIsClientSettingsOpen(true);
   };
 
-  const handleCloseSettings = () => {
-    setIsSettingsOpen(false);
+  const handleCloseClientSettings = () => {
+    setIsClientSettingsOpen(false);
   };
+
+  // getting the link of current page
+  const isGamePath = location.pathname.startsWith('/game');
 
   return (
     <div className="header container">
@@ -21,22 +25,23 @@ const Header = (props) => {
         <h1 className="header logo">Freitagsmaler - Group 43</h1>
         <ReactLogo />
       </div>
-      <div className="header navigation">
-        <a href="/leaderboard" className="navigation-link">
-          <img src="/leaderboard.png" alt="Leaderboard Icon" className="header img" />
-        </a>
-        <a href="/friends" className="navigation-link">
-          <img src="/friends.png" alt="Friends Icon" className="header img" />
-        </a>
-        <button onClick={handleSettingsClick} className="navigation-link settings-button">
-          <img src="/settings.png" alt="Settings Icon" className="header img" />
-        </button>
-        <a href="/profile" className="navigation-link">
-          <img src="/profile.png" alt="Profile Icon" className="header img" />
-        </a>
-      </div>
-
-      <Settings isOpen={isSettingsOpen} onClose={handleCloseSettings} />
+      {!isGamePath && (
+        <div className="header navigation">
+          <a href="/leaderboard" className="navigation-link">
+            <img src="/leaderboard.png" alt="Leaderboard Icon" className="header img" />
+          </a>
+          <a href="/friends" className="navigation-link">
+            <img src="/friends.png" alt="Friends Icon" className="header img" />
+          </a>
+          <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
+            <img src="/settings.png" alt="Settings Icon" className="header img" />
+          </button>
+          <a href="/profile" className="navigation-link">
+            <img src="/profile.png" alt="Profile Icon" className="header img" />
+          </a>
+        </div>
+      )}
+      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings} />
     </div>
   );
 };

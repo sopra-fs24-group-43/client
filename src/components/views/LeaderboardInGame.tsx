@@ -21,7 +21,7 @@ const LeaderboardInGame = () => {
       console.log("subscribed when was connected to the websocket in LeaderboardInGame");
       
       // sending the data
-      //stompApi.send(`/app/games/${lobbyId}/endturn`, "");
+      stompApi.send(`/app/games/${lobbyId}/endturn`, "");
     };
  
     // cleaning up

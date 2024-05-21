@@ -59,6 +59,20 @@ const Login = () => {
     }
   };
 
+  const fetchAndSaveUserSettings = async (userId) => {
+    try {
+      const settingsResponse = await api.get(`/users/${userId}`);
+      const userSettings = new User(settingsResponse.data);
+      console.log("HOTKEYS::" + userSettings.hotkeyInputDraw);
+      sessionStorage.setItem("hotkeyInputDraw", userSettings.hotkeyInputDraw);
+      sessionStorage.setItem("hotkeyInputFill", userSettings.hotkeyInputFill);
+      sessionStorage.setItem("hotkeyInputEraser", userSettings.hotkeyInputEraser);
+      sessionStorage.setItem("hotkeyInputClear", userSettings.hotkeyInputClear);
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
   const doLogin = async () => {
     try {
       const requestBody = JSON.stringify({ username: loginUsername, password: loginPassword });
@@ -72,6 +86,10 @@ const Login = () => {
       sessionStorage.setItem("userId", user.id);
       sessionStorage.setItem("friends", user.friends);
       sessionStorage.setItem("isGuest", "false");
+      
+      await fetchAndSaveUserSettings(user.id);
+
+      
       // Login successfully worked --> navigate to the route /game in the GameRouter
       navigate("/LandingPage");
     } catch (error) {

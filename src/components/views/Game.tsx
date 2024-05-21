@@ -12,6 +12,7 @@ import ReconnectPopUp from "../views/ReconnectPopUp";
 import Podium from "components/elements/game/Podium";
 import Header from "./Header";
 import ClientSettings from "./ClientSettings";
+import { api, handleError } from "helpers/api";
 
 
 
@@ -27,10 +28,10 @@ const Game = () => {
   const [strokeSize, setStrokeSize] = useState(3);
   const [isSelectionOpen, setIsSelectionOpen] = useState(false);
   const [isChatting, setIsChatting] = useState(false);
-  const [hotkeyInputDraw, setHotkeyInputDraw] = useState<string>("D");
-  const [hotkeyInputFill, setHotkeyInputFill] = useState<string>("F");
-  const [hotkeyInputEraser, setHotkeyInputEraser] = useState<string>("E");
-  const [hotkeyInputClear, setHotkeyInputClear] = useState<string>("C");
+  const [hotkeyInputDraw, setHotkeyInputDraw] = useState<string>();
+  const [hotkeyInputFill, setHotkeyInputFill] = useState<string>();
+  const [hotkeyInputEraser, setHotkeyInputEraser] = useState<string>();
+  const [hotkeyInputClear, setHotkeyInputClear] = useState<string>();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -92,7 +93,21 @@ const Game = () => {
     setIsSettingsOpen(false);
   };
 
+  const getHotkeys = async () => {
+    try {
+      const response = await api.get(`/users/${sessionStorage.getItem("userId")}`);
+      const { hotkeyInputDraw, hotkeyInputFill, hotkeyInputEraser, hotkeyInputClear } = response.data;
+      setHotkeyInputDraw(hotkeyInputDraw);
+      setHotkeyInputFill(hotkeyInputFill);
+      setHotkeyInputEraser(hotkeyInputEraser);
+      setHotkeyInputClear(hotkeyInputClear);
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
   useEffect(() => {
+    getHotkeys();
     const handleKeyPress = (event: KeyboardEvent) => {
       if (isDrawer2 && !isChatting) {
         switch (event.key.toUpperCase()) {
@@ -114,10 +129,9 @@ const Game = () => {
       }
     };
 
-    document.addEventListener("keydown", handleKeyPress);
-
+    window.addEventListener("keydown", handleKeyPress);
     return () => {
-      document.removeEventListener("keydown", handleKeyPress);
+      window.removeEventListener("keydown", handleKeyPress);
     };
   }, [isDrawer2, isChatting, hotkeyInputDraw, hotkeyInputFill, hotkeyInputEraser, hotkeyInputClear]);
 
@@ -957,7 +971,7 @@ const Game = () => {
           </div>
           )}
         </div>
-        <ClientSettings isOpen={isSettingsOpen} onClose={handleCloseSettings} hotkeyInputDraw={hotkeyInputDraw} setHotkeyInputDraw={setHotkeyInputDraw} hotkeyInputFill={hotkeyInputFill} setHotkeyInputFill={setHotkeyInputFill} hotkeyInputEraser={hotkeyInputEraser} setHotkeyInputEraser={setHotkeyInputEraser} hotkeyInputClear={hotkeyInputClear} setHotkeyInputClear={setHotkeyInputClear} />
+        <ClientSettings isOpen={isSettingsOpen} onClose={handleCloseSettings}/>
         <button onClick={() => setIsSettingsOpen(true)}>Open Settings</button>
         <Chat isChatting={isChatting} setIsChatting={setIsChatting} />
       </div>

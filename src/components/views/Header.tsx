@@ -49,7 +49,7 @@ const Header = (props) => {
           </a>
         </div>
       )}
-      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings} hotkeyInputDraw={hotkeyInputDraw} setHotkeyInputDraw={setHotkeyInputDraw} hotkeyInputFill={hotkeyInputFill} setHotkeyInputFill={setHotkeyInputFill} hotkeyInputEraser={hotkeyInputEraser} setHotkeyInputEraser={setHotkeyInputEraser} hotkeyInputClear={hotkeyInputClear} setHotkeyInputClear={setHotkeyInputClear} />
+      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings}/>
     </div>
   );
 };

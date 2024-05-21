@@ -18,6 +18,7 @@
         }
     },
     "rules": {
+        "padding-line-between-statements": "off",
         "newline-before-return": "off",
         "no-multiple-empty-lines": "off",
         "quotes": "off",
@@ -26,15 +27,7 @@
         "react/prop-types": "off",
         "eqeqeq": "error",
         "no-unreachable": "error",
-        "no-duplicate-imports": "error",
-        "no-multiple-empty-lines": "warn",
-        "indent": ["warn", 2],
-        "quotes": ["warn", "double"],
-        "newline-before-return": "warn",
-        "padding-line-between-statements": [
-            "warn",
-            { "blankLine": "always", "prev": "*", "next": "export" }
-        ]
+        "no-duplicate-imports": "error"
     },
     "ignorePatterns": ["node_modules", "build", "dist", "public"]
 

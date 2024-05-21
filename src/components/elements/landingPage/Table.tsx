@@ -146,7 +146,8 @@ const Table = () => {
     }
     else {
       setcheckedgames(true)
-      console.log("no games received")
+      console.log("no games in the gamesDTO")
+      setgames([])
     }
   }
   const connect = async ()  => {
@@ -158,8 +159,6 @@ const Table = () => {
       stompApi.connected = true //important!!! needs to be set during the onConnectedCallback, otherwise it might happen that it connected gets set true before the ws
                                 //is fully setup
       stompApi.send("/app/landing/" + userId + "/getallgames" , "");
-
-
     });
   }
   useEffect(() => {

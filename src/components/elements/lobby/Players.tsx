@@ -35,22 +35,30 @@ const Players = () => {
   const connect = async ()=>{
     await stompApi.connect(() => {
       const userId = sessionStorage.getItem("userId");
+      stompApi.send("/app/landing/alertreconnect/"+userId, "") //added
+      stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Players");
       console.log("subscribed when was NOT connected to the websocket in Players");
       stompApi.connected = true;
     });
-    // await timeout(1000);
   };
 
   useEffect(() => {
     //reload hadling
-    /*
+
     const handleBeforeUnload = (event) => {  //this gets executed when reloading the page, was commented
       console.log("disconnecting before reloading page!")
-      stompApi.disconnect()
+      const sessionAttributeDTO2 = {
+        userId: null,
+        reload: true
+      }
+      if (stompApi.isConnected()) {
+        stompApi.send("/app/games/sendreload", JSON.stringify(sessionAttributeDTO2))
+        stompApi.disconnect()
+      }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-     */
+
     // subscribing
     if (stompApi.isConnected()){
       stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Players");

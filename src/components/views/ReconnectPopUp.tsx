@@ -4,10 +4,6 @@ import '../../styles/views/game/WordSelection.scss';
 import WordSelection from "./WordSelection";
 
 const ReconnPopUp = ({reconnect, setReconnect, Reconfunc, userId, reconRole, reconGameId}) => {
-  console.log("deciding recon")
-  console.log(reconnect)
-  console.log(typeof reconnect)
-  console.log(userId, reconRole, reconGameId)
   if (!reconnect) {
     console.log("not showing recon")
     return null;

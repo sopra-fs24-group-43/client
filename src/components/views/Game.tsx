@@ -972,7 +972,6 @@ const Game = () => {
           )}
         </div>
         <ClientSettings isOpen={isSettingsOpen} onClose={handleCloseSettings}/>
-        <button onClick={() => setIsSettingsOpen(true)}>Open Settings</button>
         <Chat isChatting={isChatting} setIsChatting={setIsChatting} />
       </div>
       <ReconnectPopUp reconnect={reconnect} setReconnect={setReconnect} Reconfunc={Reconfunc} userId={userId} reconRole={reconRole} reconGameId={reconGameId}/>

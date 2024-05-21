@@ -15,7 +15,7 @@ const Profile = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await api.get(`/users/${id}`);
+      const response = await api.get(`/users/${sessionStorage.getItem("userId")}`);
     } catch (error) {
       console.error(
         `Something went wrong while fetching the user profile: \n${handleError(
@@ -33,12 +33,11 @@ const Profile = () => {
     <div className="ProfileContainer">
       <div className="Profile">
         <div className="profile-info">
-          <p>Username:</p>
-          <p>Name:</p>
-          <p>ID:</p>
-          <p>Status: </p>
+          <p>Username: {sessionStorage.getItem("username")}</p>
+          <p>Name: {sessionStorage.getItem("name")}</p>
+          <p>ID:{sessionStorage.getItem("userId")}</p>
+          
           <p>Date of Birth: </p>
-          <p>Creation Date and Time: </p>
         </div>
         {editMode ? (
           <div className="profile-form">

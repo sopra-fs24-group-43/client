@@ -193,6 +193,7 @@ const Game = () => {
       console.log("connecting to ws!")
       connect();
     }
+    
     const token = sessionStorage.getItem("token");
     if (!token) { //remove this?
       navigate("/loginOrRegister");

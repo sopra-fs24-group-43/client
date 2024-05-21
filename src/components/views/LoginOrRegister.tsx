@@ -47,6 +47,7 @@ const Login = () => {
       // Store the token into the local storage.
       sessionStorage.setItem("token", user.token);
       sessionStorage.setItem("username", user.username);
+      sessionStorage.setItem("name", user.name);
       sessionStorage.setItem("userId", user.id);
       sessionStorage.setItem("friends", user.friends);
       sessionStorage.setItem("isGuest", "false");
@@ -83,6 +84,7 @@ const Login = () => {
       // Store the token into the local storage.
       sessionStorage.setItem("token", user.token);
       sessionStorage.setItem("username", user.username);
+      sessionStorage.setItem("name", user.name);
       sessionStorage.setItem("userId", user.id);
       sessionStorage.setItem("friends", user.friends);
       sessionStorage.setItem("isGuest", "false");

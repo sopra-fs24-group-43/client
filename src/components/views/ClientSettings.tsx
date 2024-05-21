@@ -22,6 +22,7 @@ const ClientSettings = ({ isOpen, onClose }) => {
 
   const doHotkeys = useCallback(
     debounce(async () => {
+      if (sessionStorage.getItem("isGuest") === "true") return;
       const requestBody = {
         hotkeyInputDraw,
         hotkeyInputFill,

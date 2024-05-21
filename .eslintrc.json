@@ -18,6 +18,11 @@
         }
     },
     "rules": {
+    
+        "newline-before-return": "off".
+        "no-multiple-empty-lines": "off",
+        "quotes": "off".
+        "indent": "off",
         "react/no-children-prop": "off",
         "react/prop-types": "off",
         "eqeqeq": "error",

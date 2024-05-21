@@ -17,8 +17,12 @@ const ClientSettings = ({ isOpen, onClose }) => {
     if(!isDarkMode) {sessionStorage.setItem("isDarkMode","_dark");}
     else {sessionStorage.setItem("isDarkMode","");}
     setIsDarkMode(!isDarkMode);
-
+    refreshPage();
   };
+
+  function refreshPage() {
+    window.location.reload();
+  }
 
   const doHotkeys = useCallback(
     debounce(async () => {

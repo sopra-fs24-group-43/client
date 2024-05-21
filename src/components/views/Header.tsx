@@ -15,13 +15,14 @@ const Header = (props) => {
   const handleClientSettingsClick = () => {
     setIsClientSettingsOpen(true);
   };
+
   function refreshPage() {
     window.location.reload();
   }
 
   const handleCloseClientSettings = () => {
     setIsClientSettingsOpen(false);
-    refreshPage();
+    
   };
 
   // getting the link of current page
@@ -44,7 +45,7 @@ const Header = (props) => {
           <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
             <img src="/settings.png" alt="ClientSettings Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </button>
-          <a href="/profile" className="navigation-link">
+          <a href="/profile/${user.id}" className="navigation-link">
             <img src="/profile.png" alt="Profile Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </a>
         </div>

@@ -7,6 +7,8 @@ import "styles/views/Login.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import { Context } from "../../context/Context"; //added
+
+
 const FormField = (props) => {
   return (
     <div className="login field">
@@ -50,6 +52,7 @@ const Login = () => {
       sessionStorage.setItem("name", user.name);
       sessionStorage.setItem("userId", user.id);
       sessionStorage.setItem("friends", user.friends);
+      sessionStorage.setItem("creation_date", user.creation_date);
       sessionStorage.setItem("isGuest", "false");
       // Login successfully worked --> navigate to the route /game in the GameRouter
       navigate("/LandingPage");
@@ -87,6 +90,7 @@ const Login = () => {
       sessionStorage.setItem("name", user.name);
       sessionStorage.setItem("userId", user.id);
       sessionStorage.setItem("friends", user.friends);
+      sessionStorage.setItem("birth_date", user.birth_date);
       sessionStorage.setItem("isGuest", "false");
       
       await fetchAndSaveUserSettings(user.id);

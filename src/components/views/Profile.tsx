@@ -1,31 +1,40 @@
-import React, { useState } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "../../styles/views/Profile.scss";
 import { api, handleError } from "helpers/api";
-import { User } from "types";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const location = useLocation();
   const [editMode, setEditMode] = useState(false);
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [newUsername, setNewUsername] = useState("");
+  const [birthDate, setBirthDate] = useState(sessionStorage.getItem("birth_date") || "");
+  const [newUsername, setNewUsername] = useState(sessionStorage.getItem("username") || "");
 
-  const fetchUserProfile = async () => {
+  const handleBirthDateChange = (event) => {
+    setBirthDate(event.target.value);
+  };
+
+  const handleUsernameChange = (event) => {
+    setNewUsername(event.target.value);
+  };
+
+  const saveProfile = async () => {
     try {
-      const response = await api.get(`/users/${sessionStorage.getItem("userId")}`);
+      const userId = sessionStorage.getItem("userId");
+      const response = await api.put(`/users/${userId}`, {
+        birth_date: birthDate,
+        username: newUsername,
+      });
+
+      sessionStorage.setItem("birth_date", birthDate);
+      sessionStorage.setItem("username", newUsername);
+      setEditMode(false);
     } catch (error) {
       console.error(
-        `Something went wrong while fetching the user profile: \n${handleError(
-          error
-        )}`
+        `Something went wrong while updating the user profile: \n${handleError(error)}`
       );
       console.error("Full Error Object:", error);
-      alert(
-        "Something went wrong while fetching the user profile! See the console for details."
-      );
+      alert("This Username is already taken.");
     }
   };
 
@@ -35,25 +44,23 @@ const Profile = () => {
         <div className="profile-info">
           <p>Username: {sessionStorage.getItem("username")}</p>
           <p>Name: {sessionStorage.getItem("name")}</p>
-          <p>ID:{sessionStorage.getItem("userId")}</p>
-          
-          <p>Date of Birth: </p>
+          <p>User ID: {sessionStorage.getItem("userId")}</p>
+          <p>Date of Birth: {sessionStorage.getItem("birth_date")}</p>
+          <p>Accoun Creation Date: {sessionStorage.getItem("creation_date")}</p>
         </div>
         {editMode ? (
           <div className="profile-form">
             <label>Edit Date of Birth:</label>
-            <input type="date" value={dateOfBirth} onChange={() => {}} />
+            <input type="date" value={birthDate} onChange={handleBirthDateChange} />
             <label>Edit Username:</label>
-            <input type="text" value={newUsername} onChange={() => {}} />
-            <Button>Save Profile</Button>
+            <input type="text" value={newUsername} onChange={handleUsernameChange} />
+            <Button onClick={saveProfile}>Save Profile</Button>
           </div>
         ) : (
           <div className="profile-buttons">
             <Button onClick={() => setEditMode(true)}>Edit Profile</Button>
             <div style={{ marginTop: "15px" }}>
-              <Button onClick={() => navigate("/landingPage")}>
-                Back to Main Page
-              </Button>
+              <Button onClick={() => navigate("/landingPage")}>Back to Main Page</Button>
             </div>
           </div>
         )}

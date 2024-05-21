@@ -94,29 +94,39 @@ const Game = () => {
   };
 
   const getHotkeys = async () => {
-    try {
-      const response = await api.get(`/users/${sessionStorage.getItem("userId")}`);
-      const { hotkeyInputDraw, hotkeyInputFill, hotkeyInputEraser, hotkeyInputClear } = response.data;
-      setHotkeyInputDraw(hotkeyInputDraw);
-      setHotkeyInputFill(hotkeyInputFill);
-      setHotkeyInputEraser(hotkeyInputEraser);
-      setHotkeyInputClear(hotkeyInputClear);
-    } catch (error) {
-      handleError(error);
+    const isGuest = sessionStorage.getItem("isGuest") === "true";
+  
+    if (isGuest) {
+      setHotkeyInputDraw(sessionStorage.getItem("hotkeyInputDraw") || "D");
+      setHotkeyInputFill(sessionStorage.getItem("hotkeyInputFill") || "F");
+      setHotkeyInputEraser(sessionStorage.getItem("hotkeyInputEraser") || "E");
+      setHotkeyInputClear(sessionStorage.getItem("hotkeyInputClear") || "C");
+    } else {
+      try {
+        const response = await api.get(`/users/${sessionStorage.getItem("userId")}`);
+        const { hotkeyInputDraw, hotkeyInputFill, hotkeyInputEraser, hotkeyInputClear } = response.data;
+        setHotkeyInputDraw(hotkeyInputDraw);
+        setHotkeyInputFill(hotkeyInputFill);
+        setHotkeyInputEraser(hotkeyInputEraser);
+        setHotkeyInputClear(hotkeyInputClear);
+      } catch (error) {
+        handleError(error);
+      }
     }
   };
-
+  
   useEffect(() => {
     getHotkeys();
-    const handleKeyPress = (event: KeyboardEvent) => {
+  
+    const handleKeyPress = (event) => {
       if (isDrawer2 && !isChatting) {
         switch (event.key.toUpperCase()) {
           case hotkeyInputDraw:
             handleDrawToolClick();
-            break; 
+            break;
           case hotkeyInputFill:
             handleFillToolClick();
-            break;   
+            break;
           case hotkeyInputEraser:
             handleEraserClick();
             break;
@@ -128,12 +138,13 @@ const Game = () => {
         }
       }
     };
-
+  
     window.addEventListener("keydown", handleKeyPress);
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [isDrawer2, isChatting, hotkeyInputDraw, hotkeyInputFill, hotkeyInputEraser, hotkeyInputClear]);
+  }, [hotkeyInputDraw, hotkeyInputFill, hotkeyInputEraser, hotkeyInputClear, isDrawer2, isChatting]);
+  
 
   function timeout(delay: number) {
     return new Promise( res => setTimeout(res, delay) );

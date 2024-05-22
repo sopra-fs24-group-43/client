@@ -164,7 +164,7 @@ const Players = () => {
                   </div>
                   <div className="Players player">
                     <div className="Players username">
-                      {player["username"]}
+                      {player["username"]} {sessionStorage.getItem("username") === player["username"] && " (You)"}
                     </div>
                     <div className="Players points">
                       {player["newlyEarnedPoints"]} points

@@ -32,6 +32,7 @@ const Podium = () => {
   const [podiumPlayers, setPodiumPlayers] = useState([]);
   const [otherPlayers, setOtherPlayers] = useState([]);
   const [winner, setWinner] = useState();
+  const [isEndGame, setIsEndGame] = useState<boolean>();
 
   const handleResponse = (payload) => {
     const responseData = JSON.parse(payload.body);
@@ -39,7 +40,8 @@ const Podium = () => {
     if (responseData.type === "leaderboard") {
       // set Players
       setPlayers(responseData.userIdToPlayerSorted);
-
+      setIsEndGame(responseData.endGame);
+      console.log("IsEndGamae === ", responseData.endGame, isEndGame);
       // convert the updated player list to an array of player components
       const playerEntries = Object.entries(responseData.userIdToPlayerSorted);
       const top3Players = playerEntries.slice(0, 3).map(([key, player]) => (
@@ -79,17 +81,21 @@ const Podium = () => {
   };
 
   return (
-    <div className="Podium container">
-      <div className="Podium title">
-        {winner} is the winner!
-      </div>
-      <div className="Podium podium-players">
-        {podiumPlayers}
-      </div>
-      <div className="Podium other-players">
-        {otherPlayers}
-      </div>
-    </div>
+    <React.Fragment>
+      {isEndGame && (
+        <div className="Podium container">
+          <div className="Podium title">
+            {winner} is the winner!
+          </div>
+          <div className="Podium podium-players">
+            {podiumPlayers}
+          </div>
+          <div className="Podium other-players">
+            {otherPlayers}
+          </div>
+        </div>
+      )}
+    </React.Fragment>
   );
 };
 

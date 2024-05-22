@@ -26,7 +26,7 @@ const Header = (props) => {
   };
 
   // getting the link of current page
-  const isGamePath = location.pathname.startsWith("/game");
+  // const isGamePath = location.pathname.startsWith("/game");
 
   return (
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
@@ -34,7 +34,7 @@ const Header = (props) => {
         <img src="/logo13.png" alt="Logo" className="header logo" /> 
         
       </div>
-      {!isGamePath && (
+      {true && (
         <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
           <a href="/leaderboard" className="navigation-link">
             <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />

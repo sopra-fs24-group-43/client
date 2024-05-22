@@ -37,7 +37,7 @@ const LeaderboardInGame = () => {
 
   const handleResponse = (payload) => {
     const responseData = JSON.parse(payload.body);
-    if (responseData.type === "leaderboard") {
+    if (responseData.type === "leaderboard" || responseData.type === "leaderboard2") {
 
       const newPlayersData = responseData.userIdToPlayer;
 

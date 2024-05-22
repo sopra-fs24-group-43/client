@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-//import Select from 'react-select';
+import Multiselect from "multiselect-react-dropdown";
 import "../../../styles/views/lobby/Settings.scss"
 
 import { Context } from "../../../context/Context";
@@ -11,7 +11,19 @@ const Settings = () => {
   const [maxPlayers, setMaxPlayers] = useState(5);
   const [maxRounds, setMaxRounds] = useState(5);
   const [turnLength, setTurnLength] = useState(60); // seconds
-  // const [genres, setGenres] = useState([]);
+  const [genres, setGenres] = useState([
+    { value: 'Science', label: 'Science' },
+    { value: 'Sport', label: 'Sport' },
+    { value: 'Philosophy', label: 'Philosophy' },
+    { value: 'Animal', label: 'Animal' },
+    { value: 'Plant', label: 'Plant' },
+    { value: 'Life', label: 'Life' },
+    { value: 'Human', label: 'Human' }
+  ]);
+  const [selectedGenres, setSelectedGenres] = useState([]);
+
+  const userInteractionRef = useRef(false);
+
   // getting the gameId from the url
   const { gameId } = useParams();
   const lobbyId = parseInt(gameId);
@@ -51,20 +63,21 @@ const Settings = () => {
 
   useEffect(() => {
     // sending the data to the server only if user is a creator of a lobby
-    if (sessionStorage.getItem("role") === "admin"){
+    if (sessionStorage.getItem("role") === "admin" && userInteractionRef.current){
       const settings = {
         type: "gameSettings",
         maxPlayers: maxPlayers,
         maxRounds: maxRounds,
         turnLength: turnLength,
-        // genres: genres.map(genre => genre.value)
+        genres: selectedGenres.map(genre => genre.value)
       };
       if (stompApi.isConnected()){
         sendData(settings);
       };
+      userInteractionRef.current = false;
     };
 
-  }, [maxPlayers, maxRounds, turnLength]) // maxPlayers, maxRounds, turnLength, genres
+  }, [maxPlayers, maxRounds, turnLength, selectedGenres]); // maxPlayers, maxRounds, turnLength, genres
 
   const sendData = async (settings) => { // needed for delaying the send function, so the connection is established
     await timeout(400);
@@ -80,17 +93,18 @@ const Settings = () => {
       setMaxPlayers(responseData.maxPlayers);
       setMaxRounds(responseData.maxRounds);
       setTurnLength(responseData.turnLength);
-      // setGenres(responseData.genres.map(genre => ({ value: genre, label: genre })));
+      setSelectedGenres(responseData.genres.map(genre => ({ value: genre, label: genre })));
     } else if (responseData.type === "getlobbyinfo") {
       setMaxPlayers(responseData.gameSettingsDTO.maxPlayers);
       setMaxRounds(responseData.gameSettingsDTO.maxRounds);
       setTurnLength(responseData.gameSettingsDTO.turnLength);
-      // setGenres(responseData.gameSettingsDTO.genres.map(genre => ({ value: genre, label: genre })));
+      setSelectedGenres(responseData.gameSettingsDTO.genres.map(genre => ({ value: genre, label: genre })));
     }
   };
 
   // handling the changes of the settings on the page
   const handleSettingsChange = (event) => {
+    userInteractionRef.current = true;
     const { name, value } = event.target;
     console.log("event: ", event, "name: ", name, "value: ", value);
 
@@ -109,19 +123,10 @@ const Settings = () => {
     };
   };
 
-  // const handleGenresChange = (selectedOptions) => {
-  //   setGenres(selectedOptions);
-  // };
-
-  const genreOptions = [
-    { value: 'Science', label: 'Science' },
-    { value: 'Sport', label: 'Sport' },
-    { value: 'Philosophy', label: 'Philosophy' },
-    { value: 'Animal', label: 'Animal' },
-    { value: 'Plant', label: 'Plant' },
-    { value: 'Life', label: 'Life' },
-    { value: 'Human', label: 'Human' }
-  ];
+  const handleGenresChange = (selectedList) => {
+    userInteractionRef.current = true;
+    setSelectedGenres(selectedList);
+  };
 
   // disabling the select element if user is not the creator of a lobby ("admin")
   useEffect(() => {
@@ -174,8 +179,17 @@ const Settings = () => {
         </select>
       </div>
       <div className="Settings menu-form">
-        <div className="Settings menu-label">Genre</div>
-
+        <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Genre</div>
+        <div className="Settings multi-select">
+          <Multiselect
+            options={genres}
+            selectedValues={selectedGenres}
+            onSelect={handleGenresChange}
+            onRemove={handleGenresChange}
+            displayValue="label"
+            disable={sessionStorage.getItem("role") !== "admin"}
+          />
+        </div>
       </div>
     </div>
   );

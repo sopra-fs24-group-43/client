@@ -665,9 +665,7 @@ const Game = () => {
               style={{ border: "1px solid black", background: "white" }}
             />
             <WordSelection gamePhase={gamePhase2} onClose={handleCloseSelection} time={time} isDrawer={isDrawer2} sendWordChoice={sendWordChoice} threeWords = {threeWords2}/>
-            {false &&(
-              <Podium/>
-            )}
+            <Podium/>
           </div>
           {isDrawer2 && (
           <div className="Canvas toolbar">

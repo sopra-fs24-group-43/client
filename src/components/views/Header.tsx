@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ReactLogo } from '../ui/ReactLogo';
 import PropTypes from 'prop-types';
 import ClientSettings from './ClientSettings';
+import FriendsPopover from './FriendsPopover';
 import '../../styles/views/Header.scss';
 
 const Header = (props) => {
   const [isClientSettingsOpen, setIsClientSettingsOpen] = useState(false);
+  // const [isGamePath, setIsGamePath] = useState(false);
+  // const location = useLocation();
+
 
   const handleClientSettingsClick = () => {
     setIsClientSettingsOpen(true);
@@ -20,8 +24,15 @@ const Header = (props) => {
     refreshPage();
   };
 
+
   // getting the link of current page
-  const isGamePath = location.pathname.startsWith("/game");
+  // useEffect (() => {
+  //   if (location.pathname.startsWith("/game")){
+  //     setIsGamePath(true)
+  //   } else {
+  //     setIsGamePath(false)
+  //   }
+  // }, [])
 
   return (
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
@@ -29,14 +40,21 @@ const Header = (props) => {
         <h1 className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} logo`}>Freitagsmaler - Group 43</h1>
         <ReactLogo />
       </div>
-      {!isGamePath && (
+      {true && (
         <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
           <a href="/leaderboard" className="navigation-link">
             <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </a>
-          <a href="/friends" className="navigation-link">
-            <img src="/friends.png" alt="Friends Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
-          </a>
+          {/* {parseInt(sessionStorage.getItem("userId"))>0 && (
+
+          )} */}
+          <FriendsPopover
+            trigger={
+              <div className="navigation-link">
+                <img src="/friends.png" alt="Friends Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+              </div>
+            }
+          />
           <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
             <img src="/settings.png" alt="ClientSettings Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </button>

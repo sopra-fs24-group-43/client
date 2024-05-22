@@ -24,11 +24,23 @@ const StartGame = () => {
     setIsAdmin(role === "admin");
   }, []);
 
-  useEffect(() => {
-    console.log("subscribing in StartGame view");
+  function timeout(delay: number) {
+    return new Promise( res => setTimeout(res, delay) );
+  };
+
+  const wait = async ()=>{
+    await timeout(600);
     if (stompApi.isConnected()){
+      console.log("subscribing in StartGame view");
       stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "StartGame");
     };
+  };
+  useEffect(() => {
+    wait();
+    // if (stompApi.isConnected()){
+    //   console.log("subscribing in StartGame view");
+    //   stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "StartGame");
+    // };
 
     //unsub
     return () => {  //this gets executed when navigating another page
@@ -50,7 +62,6 @@ const StartGame = () => {
   // handling the response by navigating all players to the Game view
   const handleResponse = (payload) => {
     const responseData = JSON.parse(payload.body);
-    console.log("handling the response in Startgame");
 
     if (responseData.type === "GameStateDTO") {
       console.log("handling the response in Startgame when type = startgame");

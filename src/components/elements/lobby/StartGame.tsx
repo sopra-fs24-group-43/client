@@ -4,7 +4,7 @@ import { Button } from "components/ui/Button";
 
 import { Context } from "../../../context/Context";
 
-const StartGame = () => {
+const StartGame = ({isGenreSelectionValid}) => {
   const navigate = useNavigate();
 
   // getting the gameId from the url
@@ -73,13 +73,13 @@ const StartGame = () => {
       navigate(`/game/${lobbyId}`);
     }
   };
-
+  console.log("isGenreSelectionValid = ", isGenreSelectionValid)
   return (
     <React.Fragment>
       {isAdmin && (
         <Button
           width="100%"
-          disabled={connectedPlayersCount <= 1}
+          disabled={connectedPlayersCount <= 1 || !isGenreSelectionValid}
           onClick={startGame}
         >
           Start Game

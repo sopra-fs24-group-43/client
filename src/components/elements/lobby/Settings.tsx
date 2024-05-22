@@ -5,7 +5,7 @@ import "../../../styles/views/lobby/Settings.scss"
 
 import { Context } from "../../../context/Context";
 
-const Settings = () => {
+const Settings = ({ setIsGenreSelectionValid }) => {
   console.log("I'm in the Settings");
   // setting up the gameSettings
   const [maxPlayers, setMaxPlayers] = useState(5);
@@ -14,14 +14,25 @@ const Settings = () => {
   const [genres, setGenres] = useState([
     { value: 'Science', label: 'Science' },
     { value: 'Sport', label: 'Sport' },
-    { value: 'Philosophy', label: 'Philosophy' },
     { value: 'Animal', label: 'Animal' },
     { value: 'Plant', label: 'Plant' },
     { value: 'Life', label: 'Life' },
     { value: 'Human', label: 'Human' }
   ]);
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const [genreWordCount] = useState({
+    Science: 79,
+    Sport: 38,
+    Animal: 88,
+    Plant: 90,
+    Life: 64,
+    Human: 76,
+    Work: 75
+  });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [playersInLobby, setPlayersInLobby] = useState();
 
+  // for disabling genres selection for non admin users
   const userInteractionRef = useRef(false);
 
   // getting the gameId from the url
@@ -77,6 +88,7 @@ const Settings = () => {
       userInteractionRef.current = false;
     };
 
+    validateGenres();
   }, [maxPlayers, maxRounds, turnLength, selectedGenres]); // maxPlayers, maxRounds, turnLength, genres
 
   const sendData = async (settings) => { // needed for delaying the send function, so the connection is established
@@ -90,15 +102,18 @@ const Settings = () => {
     const responseData = JSON.parse(payload.body); // response data from the server
     console.log("Settings' payload: ", responseData);
     if (responseData.type === "gameSettings"){
+      console.log("response data in gameSettings", responseData);
       setMaxPlayers(responseData.maxPlayers);
       setMaxRounds(responseData.maxRounds);
       setTurnLength(responseData.turnLength);
       setSelectedGenres(responseData.genres.map(genre => ({ value: genre, label: genre })));
     } else if (responseData.type === "getlobbyinfo") {
+      console.log("response data in getlobbyinfo", responseData);
       setMaxPlayers(responseData.gameSettingsDTO.maxPlayers);
       setMaxRounds(responseData.gameSettingsDTO.maxRounds);
       setTurnLength(responseData.gameSettingsDTO.turnLength);
       setSelectedGenres(responseData.gameSettingsDTO.genres.map(genre => ({ value: genre, label: genre })));
+      setPlayersInLobby(Object.keys(responseData.players).length);
     }
   };
 
@@ -126,6 +141,21 @@ const Settings = () => {
   const handleGenresChange = (selectedList) => {
     userInteractionRef.current = true;
     setSelectedGenres(selectedList);
+  };
+
+  const validateGenres = () => {
+    const totalWordsNeeded = maxRounds * playersInLobby * 3; // minimum words needed 
+    const selectedWordCount = selectedGenres.reduce((acc, genre) => acc + genreWordCount[genre.value], 0); // how many words have been selected 
+    console.log("totalWordsNeeded = ", totalWordsNeeded, "selectedWordCount = ", selectedWordCount);
+    if (selectedWordCount < totalWordsNeeded) {
+      setErrorMessage(`More genres have to be selected!`);
+      // will pass the value to the lobby, then startgame will take it and disable the startgame button
+      setIsGenreSelectionValid(false);
+    } else {
+      setErrorMessage("");
+      // will pass the value to the lobby, then startgame will take it and enable the startgame button
+      setIsGenreSelectionValid(true);
+    }
   };
 
   // disabling the select element if user is not the creator of a lobby ("admin")
@@ -180,27 +210,22 @@ const Settings = () => {
       </div>
       <div className="Settings menu-form">
         <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Genre</div>
-        <div className="Settings multi-select">
-          <Multiselect
-            options={genres}
-            selectedValues={selectedGenres}
-            onSelect={handleGenresChange}
-            onRemove={handleGenresChange}
-            displayValue="label"
-            disable={sessionStorage.getItem("role") !== "admin"}
-          />
+        <div className="Settings multi-select-warn-group">
+          {errorMessage && <div className="Settings warn">{errorMessage}</div>}
+          <div className="Settings multi-select">
+            <Multiselect
+              options={genres}
+              selectedValues={selectedGenres}
+              onSelect={handleGenresChange}
+              onRemove={handleGenresChange}
+              displayValue="label"
+              disable={sessionStorage.getItem("role") !== "admin"}
+            />
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// <Select
-//           className="Settings slide-down-menu"
-//           name="genres"
-//           value={genres}
-//           onChange={handleGenresChange}
-//           options={genreOptions}
-//           isMulti
-//         />
 export default Settings;

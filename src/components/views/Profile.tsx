@@ -9,6 +9,7 @@ const Profile = () => {
   const [editMode, setEditMode] = useState(false);
   const [birthDate, setBirthDate] = useState(sessionStorage.getItem("birth_date") || "");
   const [newUsername, setNewUsername] = useState(sessionStorage.getItem("username") || "");
+  const isGuest = sessionStorage.getItem("isGuest") === "true";
 
   const handleBirthDateChange = (event) => {
     setBirthDate(event.target.value);
@@ -58,7 +59,9 @@ const Profile = () => {
           </div>
         ) : (
           <div className="profile-buttons">
-            <Button onClick={() => setEditMode(true)}>Edit Profile</Button>
+            {!isGuest && (
+              <Button onClick={() => setEditMode(true)}>Edit Profile</Button>
+            )}
             <div style={{ marginTop: "15px" }}>
               <Button onClick={() => navigate("/landingPage")}>Back to Main Page</Button>
             </div>

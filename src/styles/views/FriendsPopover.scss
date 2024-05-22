@@ -8,6 +8,7 @@
 
   &.popover-content {
     position: absolute;
+    z-index: 2;
     min-width: 500px;
     height: 500px;
     top: calc(100% + 20px);

@@ -20,6 +20,9 @@
 
   &.menu-form {
     padding-top: 10px;
+    &:last-child {
+      padding-bottom: 10px;
+    }
     display: flex;
     flex-direction: row;
     align-items:center;
@@ -43,8 +46,23 @@
     cursor: pointer;
   }
 
-  &.multi-select {
+  &.multi-select-warn-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
     width: 40%;
+  }
+  &.warn {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    font-size: 16px; 
+    font-weight: bold; 
+    color: black; 
+  }
+  &.multi-select {
+    width: 100%;
   }
 }
 .Settings_dark {

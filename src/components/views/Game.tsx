@@ -177,14 +177,13 @@ const Game = () => {
     });
   }
   useEffect(() => {
-    const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
+    const handleBeforeUnload =  () => {  //this gets executed when reloading the page
       console.log("disconnecting before reloading page!")
       const sessionAttributeDTO2 = {
         userId: null,
         reload: true
       }
       stompApi.send("/app/games/sendreload", JSON.stringify(sessionAttributeDTO2))
-
       stompApi.disconnect()
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -292,6 +291,7 @@ const Game = () => {
   const onHandleGeneralResponse = (payload) => {
     const body = JSON.parse(payload.body);
     if (body.type === "sendcanvasforrecon") {
+      console.log("sendcanvasforrecon")
       if (isDrawer) {
 
         /*send to this the whole canvas
@@ -417,7 +417,12 @@ const Game = () => {
           return (<div> START DRAWING! </div>)
         }
         else {
-          return (<div> START GUESSING! </div>)
+          if (isCorrect2) {
+            return (<div> GUESSED CORRECTLY! </div>)
+          }
+          else {
+            return (<div> START GUESSING! </div>)
+          }
         }
       }
       else if (gamePhase2 === "choosing") {
@@ -445,7 +450,10 @@ const Game = () => {
       if (gamePhase2 === "choosing") {
         return ""
       }
-      let result = chosenWord2.toUpperCase().split('').join(' ')
+      let tempresult = chosenWord2
+      tempresult.replace(/"/g,"")
+      let result = tempresult
+      result = result.toUpperCase().split('').join(' ')
       if (gamePhase2 === "leaderboard") {
         return (<div> {result.replace(/"/g, "")} </div>)
       }
@@ -457,7 +465,7 @@ const Game = () => {
           return ( <div> { result.replace(/"/g,"") } </div>)
         }
         else {
-          return ( <div>  {"_ ".repeat(chosenWord2.length)} ({chosenWord2.length})  </div>)
+          return ( <div>  {"_ ".repeat(tempresult.length-2)} ({tempresult.length-2})  </div>)
         }
       }
     }

@@ -55,8 +55,8 @@ const Players = () => {
         reload: true
       }
       if (stompApi.isConnected()) {
-        stompApi.send("/app/games/sendreload", JSON.stringify(sessionAttributeDTO2))
-        stompApi.disconnect()
+        //stompApi.send("/app/games/sendreload", JSON.stringify(sessionAttributeDTO2))
+        //stompApi.disconnect()
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);

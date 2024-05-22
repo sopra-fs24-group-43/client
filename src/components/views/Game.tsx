@@ -162,6 +162,8 @@ const Game = () => {
       stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/general`, onHandleGeneralResponse, "Game")
+      stompApi.subscribe(`/topic/games/${gameId}/fill/${userId}`, onHandleCanvasReco, "Game")
+
       subscribed = true
       stompApi.connected = true //important!!! needs to be set during the onConnectedCallback, otherwise it might happen that it connected gets set true before the ws
                                 //is fully setup
@@ -207,6 +209,7 @@ const Game = () => {
       stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/fill/${userId}`, onHandleCanvasReco, "Game")
       subscribed = true
       stompApi.send(`/app/games/${gameId}/getgamestate/${userId}`, "")
       /*
@@ -288,11 +291,48 @@ const Game = () => {
       }
     }
   }
+
+  const onHandleCanvasReco = (payload) => {
+    console.log("IT ARRIVED AT THIS FUNCTION")
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+  
+    const payloadData = JSON.parse(payload.body);
+    const { imageDataBuffer } = payloadData;
+  
+    const img = new Image();
+    
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0); 
+    };
+  
+    img.src = imageDataBuffer;
+  };
+  
+  const sendCanvas = (ctx, userId) => {
+    const canvas = ctx.canvas;
+    const imageData = canvas.toDataURL();
+    console.log("THE IMAGE DATA IS" + imageData)
+    stompApi.send(`/app/games/${gameId}/sendcanvasforrecon/${userId}`, JSON.stringify({ imageDataBuffer: imageData }));
+  };
+
+
   const onHandleGeneralResponse = (payload) => {
     const body = JSON.parse(payload.body);
     if (body.type === "sendcanvasforrecon") {
-      console.log("sendcanvasforrecon")
-      if (isDrawer) {
+      console.log("TEST TEST TET TESTsendcanvasforrecon")
+      console.log("::::::" + body.userId + userId)
+      if (body.userId === userId) return;
+
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      sendCanvas(ctx, body.userId);
+
+
+
 
         /*send to this the whole canvas
       @MessageMapping("/games/{gameId}/sendcanvasforrecon/{userId}")
@@ -301,8 +341,12 @@ const Game = () => {
       }
 
          */
-      }
+      
     }
+
+
+
+
     if (body.type === "Answer" && !isDrawer && body.username === username) {
       isCorrect = body.IsCorrect
       setIsCorrect2(body.IsCorrect)

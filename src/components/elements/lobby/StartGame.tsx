@@ -10,6 +10,7 @@ const StartGame = () => {
   // getting the gameId from the url
   const { gameId } = useParams();
   const lobbyId = parseInt(gameId);
+  const [connectedPlayersCount, setConnectedPlayersCount] = useState(0);
 
   // getting contex
   const context = useContext(Context);
@@ -63,8 +64,12 @@ const StartGame = () => {
   const handleResponse = (payload) => {
     const responseData = JSON.parse(payload.body);
 
-    if (responseData.type === "GameStateDTO") {
-      console.log("handling the response in Startgame when type = startgame");
+    if (responseData.type === "getlobbyinfo") {
+      // Update the count of connected players
+      console.log("handling the response in Startgame when type = startgame, responseData = ", Object.keys(responseData.players).length, " data: ", responseData.players)
+      setConnectedPlayersCount(Object.keys(responseData.players).length);
+    } else if (responseData.type === "GameStateDTO") {
+      console.log("handling the response in Startgame when type = startgame, responseData = ", responseData.connectedPlayers);
       navigate(`/game/${lobbyId}`);
     }
   };
@@ -74,6 +79,7 @@ const StartGame = () => {
       {isAdmin && (
         <Button
           width="100%"
+          disabled={connectedPlayersCount <= 1}
           onClick={startGame}
         >
           Start Game

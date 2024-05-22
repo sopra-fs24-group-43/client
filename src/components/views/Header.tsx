@@ -4,6 +4,7 @@ import { ReactLogo } from '../ui/ReactLogo';
 import PropTypes from 'prop-types';
 import ClientSettings from './ClientSettings';
 import FriendsPopover from './FriendsPopover';
+import GlobalLeaderboard from './GlobalLeaderboard';
 import '../../styles/views/Header.scss';
 
 const Header = (props) => {
@@ -49,9 +50,14 @@ const Header = (props) => {
       </div>
       {true && (
         <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
-          <a href="/leaderboard" className="navigation-link">
-            <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
-          </a>
+                    <GlobalLeaderboard
+            trigger={
+              <div className="navigation-link">
+                <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+              </div>
+            }
+          />
+          
           {/* {parseInt(sessionStorage.getItem("userId"))>0 && (
 
           )} */}

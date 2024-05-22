@@ -8,6 +8,10 @@ import '../../styles/views/Header.scss';
 
 const Header = (props) => {
   const [isClientSettingsOpen, setIsClientSettingsOpen] = useState(false);
+  const [hotkeyInputDraw, setHotkeyInputDraw] = useState<string>("D");
+  const [hotkeyInputFill, setHotkeyInputFill] = useState<string>("F");
+  const [hotkeyInputEraser, setHotkeyInputEraser] = useState<string>("E");
+  const [hotkeyInputClear, setHotkeyInputClear] = useState<string>("C");
   // const [isGamePath, setIsGamePath] = useState(false);
   // const location = useLocation();
 
@@ -15,17 +19,19 @@ const Header = (props) => {
   const handleClientSettingsClick = () => {
     setIsClientSettingsOpen(true);
   };
+
   function refreshPage() {
     window.location.reload();
   }
 
   const handleCloseClientSettings = () => {
     setIsClientSettingsOpen(false);
-    refreshPage();
+    
   };
 
 
   // getting the link of current page
+  // const isGamePath = location.pathname.startsWith("/game");
   // useEffect (() => {
   //   if (location.pathname.startsWith("/game")){
   //     setIsGamePath(true)
@@ -37,8 +43,9 @@ const Header = (props) => {
   return (
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
       <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} title`}>
-        <h1 className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} logo`}>Freitagsmaler - Group 43</h1>
-        <ReactLogo />
+        <a href="/landingpage">
+          <img src="/logo13.png" alt="Logo" className="header logo" />
+        </a>
       </div>
       {true && (
         <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
@@ -58,12 +65,12 @@ const Header = (props) => {
           <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
             <img src="/settings.png" alt="ClientSettings Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </button>
-          <a href="/profile" className="navigation-link">
+          <a href="/profile/${user.id}" className="navigation-link">
             <img src="/profile.png" alt="Profile Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </a>
         </div>
       )}
-      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings} />
+      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings}/>
     </div>
   );
 };

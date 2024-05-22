@@ -7,6 +7,8 @@ import "styles/views/Login.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
 import { Context } from "../../context/Context"; //added
+
+
 const FormField = (props) => {
   return (
     <div className="login field">
@@ -47,8 +49,10 @@ const Login = () => {
       // Store the token into the local storage.
       sessionStorage.setItem("token", user.token);
       sessionStorage.setItem("username", user.username);
+      sessionStorage.setItem("name", user.name);
       sessionStorage.setItem("userId", user.id);
       sessionStorage.setItem("friends", user.friends);
+      sessionStorage.setItem("creation_date", user.creation_date);
       sessionStorage.setItem("isGuest", "false");
       // Login successfully worked --> navigate to the route /game in the GameRouter
       navigate("/LandingPage");
@@ -56,6 +60,20 @@ const Login = () => {
       alert(
         `Something went wrong during the login: \n${handleError(error)}`
       );
+    }
+  };
+
+  const fetchAndSaveUserSettings = async (userId) => {
+    try {
+      const settingsResponse = await api.get(`/users/${userId}`);
+      const userSettings = new User(settingsResponse.data);
+      console.log("HOTKEYS::" + userSettings.hotkeyInputDraw);
+      sessionStorage.setItem("hotkeyInputDraw", userSettings.hotkeyInputDraw);
+      sessionStorage.setItem("hotkeyInputFill", userSettings.hotkeyInputFill);
+      sessionStorage.setItem("hotkeyInputEraser", userSettings.hotkeyInputEraser);
+      sessionStorage.setItem("hotkeyInputClear", userSettings.hotkeyInputClear);
+    } catch (error) {
+      handleError(error);
     }
   };
 
@@ -69,9 +87,15 @@ const Login = () => {
       // Store the token into the local storage.
       sessionStorage.setItem("token", user.token);
       sessionStorage.setItem("username", user.username);
+      sessionStorage.setItem("name", user.name);
       sessionStorage.setItem("userId", user.id);
       sessionStorage.setItem("friends", user.friends);
+      sessionStorage.setItem("birth_date", user.birth_date);
       sessionStorage.setItem("isGuest", "false");
+      
+      await fetchAndSaveUserSettings(user.id);
+
+      
       // Login successfully worked --> navigate to the route /game in the GameRouter
       navigate("/LandingPage");
     } catch (error) {

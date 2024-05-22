@@ -10,6 +10,10 @@ import LeaderboardInGame from "./LeaderboardInGame";
 import WordSelection from "./WordSelection";
 import ReconnectPopUp from "../views/ReconnectPopUp";
 import Podium from "components/elements/game/Podium";
+import Header from "./Header";
+import ClientSettings from "./ClientSettings";
+import { api, handleError } from "helpers/api";
+
 
 
 const Game = () => {
@@ -24,6 +28,12 @@ const Game = () => {
   const [strokeSize, setStrokeSize] = useState(3);
   const [isSelectionOpen, setIsSelectionOpen] = useState(false);
   const [isChatting, setIsChatting] = useState(false);
+  const [hotkeyInputDraw, setHotkeyInputDraw] = useState<string>();
+  const [hotkeyInputFill, setHotkeyInputFill] = useState<string>();
+  const [hotkeyInputEraser, setHotkeyInputEraser] = useState<string>();
+  const [hotkeyInputClear, setHotkeyInputClear] = useState<string>();
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const context = useContext(Context);
   const {stompApi, reload, setReload} = context;  //or const stompApi = context.stompApi
@@ -51,6 +61,9 @@ const Game = () => {
   let isDrawer //true, false
   let Drawer //index in drawingOrder
   let chosenWord
+  const[chosenWord2, setChosenWord2] = useState();
+  let isCorrect;
+  const [isCorrect2, setIsCorrect2] = useState()
   let wordIndex //0,1 or 2
   let drawingOrder //List of userIds is correct order
   const [isDrawer2, setIsDrawer2] = useState<boolean>()
@@ -58,7 +71,7 @@ const Game = () => {
   role = sessionStorage.getItem("role")
   gameId = sessionStorage.getItem("gameId")
   userId = parseInt(sessionStorage.getItem("userId"))
-
+  let username = sessionStorage.getItem("username")
   const [reconnect, setReconnect] = useState(false)
   const [reconRole, setReconRole] = useState()
   const [reconGameId, setReconGameId] = useState()
@@ -76,40 +89,69 @@ const Game = () => {
     setIsSelectionOpen(false); //false
   };
 
+  const handleCloseSettings = () => {
+    setIsSettingsOpen(false);
+  };
+
+  const getHotkeys = async () => {
+    const isGuest = sessionStorage.getItem("isGuest") === "true";
+  
+    if (isGuest) {
+      setHotkeyInputDraw(sessionStorage.getItem("hotkeyInputDraw") || "D");
+      setHotkeyInputFill(sessionStorage.getItem("hotkeyInputFill") || "F");
+      setHotkeyInputEraser(sessionStorage.getItem("hotkeyInputEraser") || "E");
+      setHotkeyInputClear(sessionStorage.getItem("hotkeyInputClear") || "C");
+    } else {
+      try {
+        const response = await api.get(`/users/${sessionStorage.getItem("userId")}`);
+        const { hotkeyInputDraw, hotkeyInputFill, hotkeyInputEraser, hotkeyInputClear } = response.data;
+        setHotkeyInputDraw(hotkeyInputDraw);
+        setHotkeyInputFill(hotkeyInputFill);
+        setHotkeyInputEraser(hotkeyInputEraser);
+        setHotkeyInputClear(hotkeyInputClear);
+      } catch (error) {
+        handleError(error);
+      }
+    }
+  };
+  
   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
+    getHotkeys();
+  
+    const handleKeyPress = (event) => {
       if (isDrawer2 && !isChatting) {
-        switch (event.key) {
-          case "e":
-            handleEraserClick();
+        switch (event.key.toUpperCase()) {
+          case hotkeyInputDraw:
+            handleDrawToolClick();
             break;
-          case "c":
-            handleEraseAllClick();
-            break;
-          case "f":
+          case hotkeyInputFill:
             handleFillToolClick();
             break;
-          case "d":
-            handleDrawToolClick();
+          case hotkeyInputEraser:
+            handleEraserClick();
+            break;
+          case hotkeyInputClear:
+            handleEraseAllClick();
             break;
           default:
             break;
         }
       }
     };
-
-    document.addEventListener("keydown", handleKeyPress);
-
+  
+    window.addEventListener("keydown", handleKeyPress);
     return () => {
-      document.removeEventListener("keydown", handleKeyPress);
+      window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [isDrawer2, isChatting]);
+  }, [hotkeyInputDraw, hotkeyInputFill, hotkeyInputEraser, hotkeyInputClear, isDrawer2, isChatting]);
+  
 
   function timeout(delay: number) {
     return new Promise( res => setTimeout(res, delay) );
   };
   const connect = async ()  => {
     await stompApi.connect(() => {
+      stompApi.subscribe(`/topic/games/${gameId}/sendguess`, onHandleGeneralResponse)
       stompApi.send("/app/landing/alertreconnect/"+userId, "") //added
       stompApi.subscribe("/topic/landing/alertreconnect/"+userId, onHandleGeneralResponse, "Game") //added
       stompApi.subscribe(`/topic/games/${gameId}/general/${userId}`, onHandleGeneraluserIdResponse, "Game")
@@ -151,11 +193,13 @@ const Game = () => {
       console.log("connecting to ws!")
       connect();
     }
+    
     const token = sessionStorage.getItem("token");
     if (!token) { //remove this?
       navigate("/loginOrRegister");
     }
     if (stompApi.isConnected()) { // && !subscribed
+      stompApi.subscribe(`/topic/games/${gameId}/sendguess`, onHandleGeneralResponse)
       stompApi.subscribe(`/topic/games/${gameId}/general/${userId}`, onHandleGeneraluserIdResponse, "Game")
       stompApi.subscribe(`/topic/games/${gameId}/general`, onHandleGeneralResponse, "Game")
       stompApi.subscribe(`/topic/games/${gameId}/coordinates`, onHandleResponse, "Game");
@@ -181,6 +225,7 @@ const Game = () => {
   const sendWordChoice = (wordIndex, threeWords) => {
     
     let chosenWord = threeWords[wordIndex]
+    setChosenWord2(threeWords[wordIndex])
     const ChooseWordDTO =  {
       type: "chooseword",
       wordIndex: wordIndex,
@@ -189,6 +234,10 @@ const Game = () => {
     console.log("sending word v1")
     stompApi.send(`/app/games/${gameId}/sendchosenword`, JSON.stringify(ChooseWordDTO))
     handleEraseAllClick();
+    setIsEraserToolSelected(false);
+    setIsDrawToolSelected(true);
+    setIsFillToolSelected(false);
+
   
   }
   const getRandomInt = (max) => {
@@ -227,6 +276,7 @@ const Game = () => {
       gamePhase = body.gamePhase
       setGamePhase2(body.gamePhase)
       chosenWord = body.actualCurrentWord
+      setChosenWord2(body.actualCurrentWord)
       console.log("gamePhase: ",gamePhase)
       //body.actualCurrentWord is null if no choosing took place already,
       //if choosing is taking place right now, it is a old word and will be updated with the choosing,
@@ -243,6 +293,7 @@ const Game = () => {
     const body = JSON.parse(payload.body);
     if (body.type === "sendcanvasforrecon") {
       if (isDrawer) {
+
         /*send to this the whole canvas
       @MessageMapping("/games/{gameId}/sendcanvasforrecon/{userId}")
         public void sendcanvasforrecon(@DestinationVariable int gameId, @DestinationVariable int userId, FillCoordinates fillCoordinates) {
@@ -252,6 +303,12 @@ const Game = () => {
          */
       }
     }
+    if (body.type === "Answer" && !isDrawer && body.username === username) {
+      isCorrect = body.IsCorrect
+      setIsCorrect2(body.IsCorrect)
+    }
+
+
     if (body.type === "ReconnectionDTO") {
       console.log("reconRole: "+body.role)
       console.log("reconGameId: "+body.gameId)
@@ -262,6 +319,18 @@ const Game = () => {
     }
     if (body.type === "TimerOut"  && role === "admin" && body.gamePhase === "leaderboard" && body.time === 0 && !endGame) {
       stompApi.send(`/app/games/${gameId}/nextturn`, "")
+    }
+    if (body.type === "TimerOut" && body.gamePhase === "leaderboard") {
+      console.log("time and endGame: "+body.time +", "+ endGame)
+      if (endGame && body.time === 0) {
+        sessionStorage.removeItem("role")
+        sessionStorage.removeItem("gameId")
+        sessionStorage.removeItem("gameStarted")
+        navigate("/LandingPage")
+      }
+      gamePhase = "leaderboard"
+      setGamePhase2("leaderboard")
+      setTime(body.time)
     }
     if (body.type === "leaderboard") {
       gamePhase = "leaderboard"
@@ -293,6 +362,7 @@ const Game = () => {
       gamePhase = body.gamePhase
       setGamePhase2(body.gamePhase)
       chosenWord = body.actualCurrentWord
+      setChosenWord2(body.actualCurrentWord)
       console.log("gamePhase: ",gamePhase)
       //body.actualCurrentWord is null if no choosing took place already,
       //if choosing is taking place right now, it is a old word and will be updated with the choosing,
@@ -309,6 +379,7 @@ const Game = () => {
       setGamePhase2("drawing")
       wordIndex = body.wordIndex
       chosenWord = body.word
+      setChosenWord2(body.word)
       gamePhase = "drawing"
 
     }
@@ -325,6 +396,7 @@ const Game = () => {
       if (body.time === 0 && isDrawer && gamePhase === "choosing") { //do this in back-end
         wordIndex = getRandomInt(3)
         chosenWord = threeWords[wordIndex]
+        setChosenWord2(threeWords[wordIndex])
         const ChooseWordDTO =  {
           type: "chooseword",
           wordIndex: wordIndex,
@@ -335,11 +407,69 @@ const Game = () => {
       }
     }
   }
+  const showPhase = () => {
+    if (gamePhase2 === undefined || gamePhase2 === null) {
+      return ""
+    }
+    else {
+      if (gamePhase2 === "drawing") {
+        if (isDrawer2) {
+          return (<div> START DRAWING! </div>)
+        }
+        else {
+          return (<div> START GUESSING! </div>)
+        }
+      }
+      else if (gamePhase2 === "choosing") {
+        return ""
+      }
+      else if (gamePhase2 === "leaderboard") {
+        if (endGame2) {
+          return (<div> FINAL RESULTS </div>)
+        }
+        else {
+          return (<div> RESULTS </div>)
+        }
+      }
+    }
+  }
+  const showWord = () => {
+    console.log("showWord")
+    console.log(typeof chosenWord2)
+    console.log(chosenWord2)
+    console.log(isDrawer2)
+    if (chosenWord2 === undefined || chosenWord2 === null) {
+      return ""
+    }
+    else {
+      if (gamePhase2 === "choosing") {
+        return ""
+      }
+      let result = chosenWord2.toUpperCase().split('').join(' ')
+      if (gamePhase2 === "leaderboard") {
+        return (<div> {result.replace(/"/g, "")} </div>)
+      }
+      if (isDrawer2) {
+        return ( <div> { result.replace(/"/g,"") } </div>)
+      }
+      else {
+        if(isCorrect2) {
+          return ( <div> { result.replace(/"/g,"") } </div>)
+        }
+        else {
+          return ( <div>  {"_ ".repeat(chosenWord2.length)} ({chosenWord2.length})  </div>)
+        }
+      }
+    }
+  }
   const showtimer = (time, gamePhase2, wantedgamePhase) => {
     if (time === undefined) {
       return ""
     }
-    if (time !== undefined && gamePhase2 === wantedgamePhase) {
+    if (time !== undefined && gamePhase2 !== "leaderboard") {
+      return ( <div> Timer: { time } </div>)
+    }
+    if (time !== undefined && gamePhase2 === "leaderbaord" && endGame2){
       return ( <div> Timer: { time } </div>)
     }
   }
@@ -388,7 +518,7 @@ const Game = () => {
 
     const handleMouseDown = (event: MouseEvent) => {
       
-      if (isFillToolSelected && isDrawer2) {
+      if (isFillToolSelected && isDrawer2 && !isSelectionOpen) {
         fillArea(event.offsetX, event.offsetY, ctx);
         
       } else if (isDrawToolSelected || isEraserToolSelected) {
@@ -398,7 +528,7 @@ const Game = () => {
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      if (!isDrawing || !isDrawer2 ||isFillToolSelected || (!isDrawToolSelected && !isEraserToolSelected)) return;
+      if (!isDrawing || !isDrawer2 ||isFillToolSelected || isSelectionOpen || (!isDrawToolSelected && !isEraserToolSelected)) return;
       const { x, y } = prevPosition;
       const newX = event.offsetX;
       const newY = event.offsetY;
@@ -651,7 +781,8 @@ const Game = () => {
            <div> Round {currentRound2}/{maxRounds2} </div>
         </div>
         <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} word`}>
-          {chosenWord}
+          {showPhase()}
+          {showWord()}
         </div>
       </div>
       <div className="Game form">
@@ -850,6 +981,7 @@ const Game = () => {
           </div>
           )}
         </div>
+        <ClientSettings isOpen={isSettingsOpen} onClose={handleCloseSettings}/>
         <Chat isChatting={isChatting} setIsChatting={setIsChatting} />
       </div>
       <ReconnectPopUp reconnect={reconnect} setReconnect={setReconnect} Reconfunc={Reconfunc} userId={userId} reconRole={reconRole} reconGameId={reconGameId}/>

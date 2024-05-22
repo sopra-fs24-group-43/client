@@ -1,0 +1,36 @@
+@import "../theme";
+
+.ProfileContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  height: 100vh; 
+}
+
+.Profile {
+  text-align: center; 
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #dd9441bc;
+  border: 3px solid #2a2c2e;
+  border-radius: 8px;
+  margin-bottom: 400px;
+
+  .profile-info {
+    margin-bottom: 20px;
+  }
+
+  .profile-buttons {
+    margin-top: 15px;
+  }
+
+  .profile-form {
+    width: 100%;
+    min-height: 320px;
+    margin-left: 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

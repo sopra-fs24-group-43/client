@@ -13,7 +13,7 @@ const LogOrRegAndRulesForm = () => {
 
   registered = !(sessionStorage.getItem("username")=== null || sessionStorage.getItem("userId")=== null || sessionStorage.getItem("friends")=== null || sessionStorage.getItem("isGuest") === null)
 
-  isGuest = sessionStorage.getItem("isGuest")
+  isGuest = sessionStorage.getItem("isGuest") === "true";
   const handleResponse = (payload) => {
     var body = JSON.parse(payload.body)
     if (body.type === "createPlayerFromGuest") {
@@ -22,6 +22,10 @@ const LogOrRegAndRulesForm = () => {
       sessionStorage.setItem("userId", body.userId);
       sessionStorage.setItem("friends", "null");
       sessionStorage.setItem("isGuest", body.isGuest);
+      sessionStorage.setItem("hotkeyInputDraw", "D");
+      sessionStorage.setItem("hotkeyInputFill", "F");
+      sessionStorage.setItem("hotkeyInputEraser", "E");
+      sessionStorage.setItem("hotkeyInputClear", "C");
       isGuest = true
       setReload(!reload)
       const sessionAttributeDTO1 = {
@@ -48,24 +52,16 @@ const LogOrRegAndRulesForm = () => {
   }
   const buttonforreg = () => {
     if (registered) {
-      if (isGuest === "true") {
-        return <div> playing as guest </div>
-      }
-      if (isGuest === "false") {
-        return <div> logged in </div>
-      }
-    }
-    else {
+      return <div>{isGuest ? "playing as guest" : "logged in"}</div>;
+    } else {
       return (
-        <Button
-          width="100%"
-          onClick={() => navigate("/LoginOrRegister")}
-        >
+        <Button width="100%" onClick={() => navigate("/LoginOrRegister")}>
           Login Or Register
         </Button>
-      )
+      );
     }
-  }
+  };
+  
   const buttonforguest = () => {
     if (registered) {
       return ""

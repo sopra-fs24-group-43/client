@@ -1,6 +1,6 @@
 import StompJs from 'stompjs';
 import SockJS from 'sockjs-client';
-
+import {getDomain} from "./getDomain";
 class StompApi {
     constructor() {
         this.stompClient = null;
@@ -8,7 +8,7 @@ class StompApi {
         this.connected = false;
     }
     connect(onConnectedCallback = this.defaultOnConnectedCallback) {
-        const socket = new SockJS('http://localhost:8080/ws');
+        const socket = new SockJS(getDomain() + '/ws'); //getDomain + '/ws'
         this.stompClient = StompJs.over(socket);
         this.stompClient.connect({}, onConnectedCallback, this.onErrorCallback); //changed!!!
     }

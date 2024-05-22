@@ -11,8 +11,8 @@ import { Context } from "../../context/Context"; //added
 
 const FormField = (props) => {
   return (
-    <div className="login field">
-      <label className="login label">{props.label}</label>
+    <div className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} field`}>
+      <label className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} label`}>{props.label}</label>
       <input
         className="login input"
         placeholder="enter here.."
@@ -107,8 +107,8 @@ const Login = () => {
 
   return (
     <BaseContainer>
-      <div className="login container">
-        <div className="login form">
+      <div className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
+        <div className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
           <div className="login-column">
             <h2>Login</h2>
             <FormField
@@ -126,7 +126,7 @@ const Login = () => {
                 width="100%"
                 onClick={() => doLogin()}
               >
-                Login
+                <div>Login</div>
               </Button>
             </div>
           </div>
@@ -152,7 +152,7 @@ const Login = () => {
                 width="100%"
                 onClick={() => doRegister()}
               >
-                Register
+                <div>Register</div>
               </Button>
             </div>
           </div>

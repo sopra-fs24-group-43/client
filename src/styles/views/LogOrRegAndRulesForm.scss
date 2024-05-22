@@ -103,7 +103,7 @@
     color: $textColor;
   }
   &.label {
-    color: $textColor;
+    color: white;
     margin-bottom: 10px;
     text-transform: lowercase;
     font-weight: 300;
@@ -120,7 +120,7 @@
     margin-bottom: 1em;
     width: 100%;
     height: 216px;
-    color: $textColor;
+    color: white;
 
     display: flex;
     align-items: flex-end;

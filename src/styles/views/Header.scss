@@ -70,8 +70,27 @@
 }
 .header_dark {
   &.container {
-    background-color:#620000;
-    @include center;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 91px;
+  }
+
+  &.logo {
+    font-weight: bold;
+    color: black;
+    text-align: center;
+    padding-left: 48%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 42px;
+    width: 93%;
+    height: auto;
+    margin-left: 4%;
   }
 
   &.title {
@@ -81,14 +100,6 @@
     align-items: center;
     width: 70%;
     height: 100%;
-    color: white;
-  }
-
-  &.logo{
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    padding-left: 48%;
   }
 
   &.navigation{
@@ -99,21 +110,19 @@
     width: 30%;
     height: 100%;
     margin-right: 6px;
-    color: white;
   }
 
   &.img{
     width: 50px;
     height: 50px;
     margin-right: 15px;
-    color: white;
   }
 
   .navigation-link {
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: white;
+    color: black;
 
   }
 
@@ -125,7 +134,5 @@
     height: 50px;
     margin-right: 25px;
     margin-left: -5px;
-    color: white;
   }
 }
-

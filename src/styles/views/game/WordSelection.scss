@@ -82,8 +82,8 @@
   }
 
   &.modal-content {
-    background-color: var(--background, #000000); 
-    color: var(--textColor, #000000); 
+    background-color: var(--background, grey);
+    color: var(--textColor, white);
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     width: 100%;

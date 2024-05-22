@@ -27,7 +27,7 @@ const Header = (props) => {
 
   const handleCloseClientSettings = () => {
     setIsClientSettingsOpen(false);
-    
+    //refreshPage();
   };
 
 
@@ -43,12 +43,13 @@ const Header = (props) => {
 
   return (
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
-      <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} title`}>
+      <div className={"header title"}>
         <a href="/landingpage">
           <img src="/logo13.png" alt="Logo" className="header logo" />
         </a>
       </div>
       {true && (
+
         <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
                     <GlobalLeaderboard
             trigger={
@@ -58,6 +59,7 @@ const Header = (props) => {
             }
           />
           
+
           {/* {parseInt(sessionStorage.getItem("userId"))>0 && (
 
           )} */}
@@ -68,11 +70,12 @@ const Header = (props) => {
               </div>
             }
           />
+
           <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
-            <img src="/settings.png" alt="ClientSettings Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+            <img src="/settings.png" alt="ClientSettings Icon" className="header img" />
           </button>
           <a href="/profile/${user.id}" className="navigation-link">
-            <img src="/profile.png" alt="Profile Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+            <img src="/profile.png" alt="Profile Icon" className="header img" />
           </a>
         </div>
       )}

@@ -148,6 +148,7 @@ const Players = () => {
       // Combine the new player data with the existing player list
       const updatedPlayers = { ...players, ...newPlayersData };
 
+
       // with Popover
       const playersArray = Object.values(updatedPlayers).map(player => {
         // Check if the player is a friend
@@ -158,15 +159,17 @@ const Players = () => {
           <div key={player["userId"]}>
             <Popover
               trigger={
-                <div className="Players form">
-                  <div className="Players avatar">
-                    <img src="/painter.png" alt="Avatar" className="Players avatar"/>
+                <div className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
+                  <div className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}>
+                    <img src="/painter.png" alt="Avatar" className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}/>
                   </div>
-                  <div className="Players player">
-                    <div className="Players username">
+
+                  <div className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} player`}>
+                    <div className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} username`}>
                       {player["username"]} {sessionStorage.getItem("username") === player["username"] && " (You)"}
+
                     </div>
-                    <div className="Players points">
+                    <div className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} points`}>
                       {player["newlyEarnedPoints"]} points
                     </div>
                   </div>
@@ -188,6 +191,7 @@ const Players = () => {
           </div>
         );
       });
+
       setPlayers(updatedPlayers);
       setRenderedPlayers(playersArray); // Set the array of player components in the state
     }

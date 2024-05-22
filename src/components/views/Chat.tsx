@@ -40,7 +40,7 @@ const Chat = ({isChatting, setIsChatting}) => {
       setChatMessages([...chatMessages, newMessage]);
       
 
-      stompApi.send(`/topic/games/${gameId}/sendguess`, JSON.stringify({username, answerString}));
+      stompApi.send(`/app/games/${gameId}/sendguess`, JSON.stringify({username, answerString}));
       setCurrentMessage("");
     }
   };

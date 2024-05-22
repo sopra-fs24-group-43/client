@@ -31,7 +31,7 @@ const Header = (props) => {
   return (
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
       <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} title`}>
-        <img src="/logo12.png" alt="Logo" className="header logo" /> 
+        <img src="/logo13.png" alt="Logo" className="header logo" /> 
         
       </div>
       {!isGamePath && (

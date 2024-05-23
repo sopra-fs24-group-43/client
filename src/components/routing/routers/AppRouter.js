@@ -9,6 +9,7 @@ import Lobby from "../../views/Lobby";
 import Profile from "../../views/Profile";
 import { LocationProvider } from "./LocationContext";
 import Header from "../../views/Header";
+import GlobalLeaderboard from "../../views/GlobalLeaderboard";
 
 /**
  * Main router of your application.

@@ -3,7 +3,7 @@
 .wordSelection {
   &.container {
     display: flex;
-    margin-top: 3em;
+    margin-top: 35px;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
@@ -67,6 +67,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    margin-top: 35px;
     width: 801px; 
     height: 601px; 
     visibility: hidden;

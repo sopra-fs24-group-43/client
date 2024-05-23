@@ -52,7 +52,7 @@ const Header = (props) => {
 
         <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
 
-          <a href="/leaderboard" className="navigation-link">
+          <a href="/GlobalLeaderboard" className="navigation-link">
             <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
           </a>
           

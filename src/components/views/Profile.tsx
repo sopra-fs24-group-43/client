@@ -9,6 +9,7 @@ const Profile = () => {
   const [editMode, setEditMode] = useState(false);
   const [birthDate, setBirthDate] = useState(sessionStorage.getItem("birth_date") || "");
   const [newUsername, setNewUsername] = useState(sessionStorage.getItem("username") || "");
+  const [level, setLevel] = useState(sessionStorage.getItem("level") || "");
   const isGuest = sessionStorage.getItem("isGuest") === "true";
 
   const handleBirthDateChange = (event) => {
@@ -42,12 +43,23 @@ const Profile = () => {
   return (
     <div className="ProfileContainer">
       <div className="Profile">
-        <div className="profile-info">
-          <p>Username: {sessionStorage.getItem("username")}</p>
-          <p>Name: {sessionStorage.getItem("name")}</p>
+        <div className="left-column">
+          <img src="/profile.png" alt="Profile" className="profile-image" />
+          <div className="profile-info">
+            <p>Username: {sessionStorage.getItem("username")}</p>
+            <p>Name: {sessionStorage.getItem("name")}</p>
+            <p>Level: {sessionStorage.getItem("level")}</p>
+          </div>
+        </div>
+        <div className="right-column">
+          <div className="profile-buttons">
+          <Button onClick={() => setEditMode(true)} className="edit-profile-button">Edit Profile</Button>
+            
+            <Button>Friend Request</Button>
+          </div>
           <p>User ID: {sessionStorage.getItem("userId")}</p>
           <p>Date of Birth: {sessionStorage.getItem("birth_date")}</p>
-          <p>Accoun Creation Date: {sessionStorage.getItem("creation_date")}</p>
+          <p>Account Creation Date: {sessionStorage.getItem("creation_date")}</p>
         </div>
         {editMode ? (
           <div className="profile-form">
@@ -59,9 +71,6 @@ const Profile = () => {
           </div>
         ) : (
           <div className="profile-buttons">
-            {!isGuest && (
-              <Button onClick={() => setEditMode(true)}>Edit Profile</Button>
-            )}
             <div style={{ marginTop: "15px" }}>
               <Button onClick={() => navigate("/landingPage")}>Back to Main Page</Button>
             </div>

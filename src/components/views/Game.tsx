@@ -838,14 +838,15 @@ const Game = () => {
 
       <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
         <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} timer`}>
-
           {showtimer(time, gamePhase2, "drawing")}
         </div>
         <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} rounds`}>
            <div> Round {currentRound2}/{maxRounds2} </div>
         </div>
-        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} word`}>
+        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} phase`}>
           {showPhase()}
+        </div>
+        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} word`}>
           {showWord()}
         </div>
       </div>

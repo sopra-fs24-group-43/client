@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react"; //added
+import React, { useState, useEffect, useContext } from "react"; //added
 import { api, handleError } from "helpers/api";
 import User from "models/User";
 import { useNavigate } from "react-router-dom";
@@ -36,10 +36,12 @@ const Login = () => {
   const [name, setName] = useState<string>(null);
   const [username2, setUsername2] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
-  // adding location to the session storage
-  sessionStorage.setItem("location", "login");
 
-
+  useEffect (() => {
+    // adding location to the session storage
+    sessionStorage.setItem("location", "login");
+  }, [])
+  
   const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({ username: username2, name, password });

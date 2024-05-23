@@ -14,10 +14,15 @@ const Profile = () => {
   const handleBirthDateChange = (event) => {
     setBirthDate(event.target.value);
   };
-
+  
   const handleUsernameChange = (event) => {
     setNewUsername(event.target.value);
   };
+
+  useEffect (() => {
+    // adding location to the session storage
+    sessionStorage.setItem("location", "profile");
+  }, [])
 
   const saveProfile = async () => {
     try {

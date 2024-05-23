@@ -16,7 +16,6 @@ const Popover = ({ trigger, content, playerId }) => {
   const fetchFriendsData = async () => {
     const friendsResponse = await api.get(`/users/${userId}/friends`);
     console.log("fetching... ", friendsResponse.data.some(friend => friend.id === playerId))
-    await timeout(500);
     const dataToSet = friendsResponse.data.some(friend => friend.id === playerId)
     setIsFriend(dataToSet);
     console.log("isFriend in fetching... ", isFriend)
@@ -25,7 +24,6 @@ const Popover = ({ trigger, content, playerId }) => {
 
   const togglePopover = async () => {
     fetchFriendsData();
-    await timeout(600);
     console.log("isFriend ", isFriend)
     // console.log("disabled ", disabled)
     // if (disabled) return;

@@ -11,7 +11,7 @@ import {ContextProvider} from "./context/Context";
 const App = () => {
   return (
     <ContextProvider>
-      <Header height="100" />
+      <Header/>
       <AppRouter />
     </ContextProvider>
 

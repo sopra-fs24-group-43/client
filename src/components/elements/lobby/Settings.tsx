@@ -21,13 +21,13 @@ const Settings = ({ setIsGenreSelectionValid }) => {
   ]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [genreWordCount] = useState({
-    Science: 79,
-    Sport: 38,
-    Animal: 88,
-    Plant: 90,
-    Life: 64,
-    Human: 76,
-    Work: 75
+    Science: 73,
+    Sport: 32,
+    Animal: 82,
+    Plant: 84,
+    Life: 58,
+    Human: 70,
+    Work: 69
   });
   const [errorMessage, setErrorMessage] = useState("");
   const [playersInLobby, setPlayersInLobby] = useState();

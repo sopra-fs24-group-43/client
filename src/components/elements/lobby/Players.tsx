@@ -46,20 +46,44 @@ const Players = () => {
     });
   };
 
+  // deleting the lobby if you the creator
+  const deleteLobby = async () => {
+    stompApi.send(`/app/games/${lobbyId}/deletegame`, JSON.stringify(lobbyId));
+  }
+
+  // leaving from the lobby if you are a player
+  const leaveLobby = async () => {
+    stompApi.send(`/app/games/${lobbyId}/leavegame/${sessionStorage.getItem("userId")}`, "");
+    navigate("/LandingPage");
+  }
+
   useEffect(() => {
     //reload hadling
-    const handleBeforeUnload = (event) => {  //this gets executed when reloading the page, was commented
-      console.log("disconnecting before reloading page!")
+    const handleBeforeUnload = () => {  //this gets executed when reloading the page, was commented
       const sessionAttributeDTO2 = {
         userId: null,
         reload: true
       }
       if (stompApi.isConnected()) {
-        //stompApi.send("/app/games/sendreload", JSON.stringify(sessionAttributeDTO2))
-        //stompApi.disconnect()
+        stompApi.send("/app/games/sendreload", JSON.stringify(sessionAttributeDTO2))
+        stompApi.disconnect()
       }
     };
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // navigation arrows handling
+    // artificially added url to the history stack
+    history.pushState({}, '', `/lobby/${lobbyId}`);
+    const popstateHandler = () => {
+      console.log("User navigated using browser back/forward button");
+      if (sessionStorage.getItem("role") === "player") {
+        leaveLobby();
+      } else if (sessionStorage.getItem("role") === "admin") {
+        deleteLobby()
+      }
+    };
+
+    window.addEventListener("popstate", popstateHandler);
 
     // subscribing
     if (stompApi.isConnected()){
@@ -83,13 +107,14 @@ const Players = () => {
     };
 
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", popstateHandler);
       stompApi.unsubscribe(`/topic/games/${lobbyId}/general`, "Players");
     }
   }, [stompApi.isConnected()]); // [stompApi.isConnected()]
 
   const sendData = async () => { // needed for delaying the send function, so the connection is established
-    await timeout(500); // !!!!! needs a little bit more time!
+    await timeout(800); // !!!!! needs a little bit more time!
     // delete the event listener
     console.log("sending the message from the Players");
     stompApi.send(`/app/games/${lobbyId}/getlobbyinfo`, "");
@@ -112,29 +137,10 @@ const Players = () => {
     }
   };
 
-
   // create lists to track players in the lobby
   const [players, setPlayers] = useState({}); // before <{[key: string]: any}>
   const [renderedPlayers, setRenderedPlayers] = useState([]);
   const [lobbyName, setLobbyName] = useState([]);
-
-  // // setting friends
-  // const [friends, setFriends] = useState([]);
-  // const [isFriend, setIsFriend] = useState(false);
-  // const userId = parseInt(sessionStorage.getItem("userId"), 10);
-
-  // useEffect(() => {
-  //   const fetchFriendsData = async () => {
-  //     try {
-  //       const friendsResponse = await api.get(`/users/${userId}/friends`);
-  //       setFriends(friendsResponse.data);
-  //     } catch (error) {
-  //       console.error("Error fetching friends data: ", error);
-  //     }
-  //   };
-
-  //   fetchFriendsData();
-  // }, [userId, players]);
 
   const handleResponse = (payload) => {
     const responseData = JSON.parse(payload.body);
@@ -148,13 +154,8 @@ const Players = () => {
       // Combine the new player data with the existing player list
       const updatedPlayers = { ...players, ...newPlayersData };
 
-
       // with Popover
       const playersArray = Object.values(updatedPlayers).map(player => {
-        // Check if the player is a friend
-        // const isFriend = friends.some(friend => friend.id === player["userId"]);
-        // console.log("friends some", friends.id, player["userId"]); 
-
         return (
           <div key={player["userId"]}>
             <Popover
@@ -203,18 +204,13 @@ const Players = () => {
       console.log("reconGameId: "+responseData.gameId)
       console.log("settings recon Players")
     }
+    if (responseData.type === "lobbyIsNull") {
+      sessionStorage.removeItem("gameId");
+      sessionStorage.removeItem("role");
+      sessionStorage.removeItem("gameStarted");
+      navigate("/LandingPage");
+    }
   };
-
-  // deleting the lobby if you the creator
-  const deleteLobby = async () => {
-    stompApi.send(`/app/games/${lobbyId}/deletegame`, JSON.stringify(lobbyId));
-  }
-
-  // leaving from the lobby if you are a player
-  const leaveLobby = async () => {
-    stompApi.send(`/app/games/${lobbyId}/leavegame/${sessionStorage.getItem("userId")}`, "");
-    navigate("/LandingPage");
-  }
 
   return (
     <div className={`Players${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>

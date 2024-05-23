@@ -13,7 +13,10 @@ export const stompApi = new StompApi();
 
 const LandingPage = () => {
   // adding location to the session storage
-  sessionStorage.setItem("location", "landing");
+  useEffect (() => {
+    // adding location to the session storage
+    sessionStorage.setItem("location", "landing");
+  }, [])
 
   return (
     // <BaseContainer>

@@ -1,5 +1,5 @@
 import React from "react";
-import {Navigate, Outlet} from "react-router-dom";
+import {Navigate, Outlet, useLocation} from "react-router-dom";
 import PropTypes from "prop-types";
 
 /**
@@ -12,6 +12,18 @@ import PropTypes from "prop-types";
  * @param props
  */
 export const GameGuard = () => {
+  const location = useLocation()
+
+  // if (!sessionStorage.getItem("token") || !location.pathname.startsWith("/lobby") || sessionStorage.getItem("location") !== "lobby") {
+  //   return <Navigate to="/LandingPage" replace />;
+  // }
+
+  // if (sessionStorage.getItem("location") !== "game") {
+  //   return <Navigate to="/LandingPage" replace />;
+  // } 
+  
+  // return <Outlet />;
+
   if (sessionStorage.getItem("token")) {
     
     return <Outlet />;

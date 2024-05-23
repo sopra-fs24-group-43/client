@@ -117,7 +117,7 @@ const FriendsPopover = ({ trigger }) => {
           <div className="FriendsPopover column">
             <div className="FriendsPopover title">Pending</div>
             <div className="FriendsPopover friends-group">
-              {pending.map((pendingFriend) => (
+              {pending.filter(pendingFriend => !friends.some(friend => friend.username === pendingFriend.username)).map((pendingFriend) => (
                 <div key={pendingFriend.id} className="FriendsPopover form">
                   <div className="FriendsPopover username">
                     {pendingFriend.username}
@@ -131,7 +131,7 @@ const FriendsPopover = ({ trigger }) => {
           <div className="FriendsPopover column">
             <div className="FriendsPopover title">Requests</div>
             <div className="FriendsPopover friends-group">
-              {requests.map((requestFriend) => (
+              {requests.filter(requestFriend => !friends.some(friend => friend.username === requestFriend.username)).map((requestFriend) => (
                 <div key={requestFriend.id} className="FriendsPopover form">
                   <div className="FriendsPopover username">
                     {requestFriend.username}

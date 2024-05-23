@@ -9,9 +9,6 @@ import { useCurrentPath } from '../routing/routers/LocationContext.js';
 import Players from "components/elements/lobby/Players";
 import Settings from "components/elements/lobby/Settings";
 import StartGame from "components/elements/lobby/StartGame";
-//import { Context } from "../../context/Context";
-
-// import { stompApi } from "./LandingPage";
 
 const Lobby = () => {
   let rawUserData = useLocation()["state"];

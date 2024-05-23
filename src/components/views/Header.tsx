@@ -56,7 +56,7 @@ const Header = (props) => {
   return (
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
       <div className={"header title"}>
-        <a href="/landingpage">
+        <a href="/LandingPage" className="header a">
           <img src="/logo18.png" alt="Logo" className="header logo" />
         </a>
       </div>

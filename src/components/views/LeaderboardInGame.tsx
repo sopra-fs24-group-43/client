@@ -15,6 +15,9 @@ const LeaderboardInGame = () => {
   const {stompApi} = context;  //or const stompApi = context.stompApi
 
   useEffect(() => {
+    // adding location to the session storage
+    sessionStorage.setItem("location", "leaderboard");
+    
     // subscribing
     if (stompApi.isConnected()){
       stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "LeaderboardInGame");

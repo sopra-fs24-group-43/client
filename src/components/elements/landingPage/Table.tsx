@@ -205,11 +205,11 @@ const Table = () => {
 
 
   <div className={`Table container${sessionStorage.getItem("isDarkMode") ? "_dark" : ""}`}>
-    <h2>User Table</h2>
+    <h2>Join a Lobby</h2>
     <table>
       <thead>
       <tr>
-        <th>Lobby</th>
+        <th>Lobby Name</th>
         <th>Game ID</th>
         <th>Max Players</th>
         <th>Players</th>

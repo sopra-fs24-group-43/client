@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ReactLogo } from '../ui/ReactLogo';
 import PropTypes from 'prop-types';
 import ClientSettings from './ClientSettings';
@@ -51,13 +51,10 @@ const Header = (props) => {
       {true && (
 
         <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
-                    <GlobalLeaderboard
-            trigger={
-              <div className="navigation-link">
-                <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
-              </div>
-            }
-          />
+
+          <a href="/leaderboard" className="navigation-link">
+            <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+          </a>
           
 
           {/* {parseInt(sessionStorage.getItem("userId"))>0 && (

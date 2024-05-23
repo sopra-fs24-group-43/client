@@ -8,8 +8,8 @@
 
 .Profile {
   text-align: center;
-  width: 80%; 
-  max-width: 600px; 
+  width: 37%; 
+  height: auto;
   padding: 20px;
   border-radius: 12px;
   background: linear-gradient(135deg, #dd9441bc 40%, #ff6e53 100%);
@@ -28,7 +28,7 @@
   .left-column {
     text-align: left;
     display: inline-block;
-    width: 45%;
+    width: 35%;
     padding-right: 10px;
     vertical-align: top; 
 
@@ -49,7 +49,7 @@
   .right-column {
     text-align: left;
     display: inline-block;
-    width: 45%;
+    width: 55%;
     padding-left: 10px;
     vertical-align: top; 
 
@@ -58,20 +58,22 @@
       font-size: 20px;
       color: black;
     }
-  }
 
-  .profile-buttons {
-    margin-top: 20px;
-    
+    .profile-buttons {
+      margin-top: 2px;
+      display: flex; /* Use flexbox */
+      justify-content: left; /* Center horizontally */
+      align-items: left; /* Center vertically */
+      flex-direction: column; /* Align buttons vertically */
 
-    button {
-      margin: 0 10px;
-    }
+      button {
+        margin: 4px 0; /* Add margin between buttons */
+      }
 
-    .edit-profile-button {
-      margin-bottom: 8px;
-      padding-right: 16px;
-      padding-left: 16px;
+      .edit-profile-button {
+        padding-right: 16px;
+        padding-left: 16px;
+      }
     }
   }
 

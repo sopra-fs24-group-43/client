@@ -17,6 +17,11 @@ const Lobby = () => {
   const [isChatting, setIsChatting] = useState(true);
   console.log("this is useLocation in Lobby: " + JSON.stringify(rawUserData));
   const [isGenreSelectionValid, setIsGenreSelectionValid] = useState(true)
+
+  useEffect (() => {
+    // adding location to the session storage
+    sessionStorage.setItem("location", "lobby");
+  }, [])
   
   return (
     <div className="Lobby container">

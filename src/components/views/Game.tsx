@@ -551,6 +551,9 @@ const Game = () => {
   }
 
   useEffect(() => {
+    // adding location to the session storage
+    sessionStorage.setItem("location", "game");
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");

@@ -1,12 +1,15 @@
 import React from "react";
-import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
-import {GameGuard} from "../routeProtectors/GameGuard";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { GameGuard } from "../routeProtectors/GameGuard";
 import GameRouter from "./GameRouter";
-import {LoginGuard} from "../routeProtectors/LoginGuard";
+import { LoginGuard } from "../routeProtectors/LoginGuard";
 import LoginOrRegister from "../../views/LoginOrRegister";
-import LandingPage from "../../views/LandingPage"
+import LandingPage from "../../views/LandingPage";
 import Lobby from "../../views/Lobby";
 import Profile from "../../views/Profile";
+import { LocationProvider } from "./LocationContext";
+import Header from "../../views/Header";
+import GlobalLeaderboard from "../../views/GlobalLeaderboard";
 
 /**
  * Main router of your application.
@@ -20,26 +23,23 @@ import Profile from "../../views/Profile";
 const AppRouter = () => {
   return (
     <BrowserRouter>
-      <Routes>
+      <LocationProvider>
+        <Header height="100" />
+        <Routes>
+          <Route path="/game/:gameId" element={<GameGuard />}>
+            <Route path="/game/:gameId" element={<GameRouter base="/game" />} />
+          </Route>
 
-        <Route path="/game/:gameId" element={<GameGuard />}>
-          <Route path="/game/:gameId" element={<GameRouter base="/game"/>} />
-        </Route>
+          <Route path="/loginOrRegister" element={<LoginGuard />}>
+            <Route path="/loginOrRegister" element={<LoginOrRegister />} />
+          </Route>
 
-        <Route path="/loginOrRegister" element={<LoginGuard />}>
-          <Route path="/loginOrRegister" element={<LoginOrRegister/>} />
-        </Route>
-
-        <Route path="/" element={<Navigate to="LandingPage" replace />}/>
-
-        <Route path="/LandingPage" element={<LandingPage/>} />
-
-        <Route path="/lobby/:gameId" element={<Lobby/>} />
-
-        <Route path="/profile/:userId" element={<Profile/>} />
-
-      </Routes>
-
+          <Route path="/" element={<Navigate to="LandingPage" replace />} />
+          <Route path="/LandingPage" element={<LandingPage />} />
+          <Route path="/lobby/:gameId" element={<Lobby />} />
+          <Route path="/profile/:userId" element={<Profile />} />
+        </Routes>
+      </LocationProvider>
     </BrowserRouter>
   );
 };

@@ -13,6 +13,7 @@ import Podium from "components/elements/game/Podium";
 import Header from "./Header";
 import ClientSettings from "./ClientSettings";
 import { api, handleError } from "helpers/api";
+import { useCurrentPath } from '../routing/routers/LocationContext.js';
 
 
 
@@ -32,6 +33,7 @@ const Game = () => {
   const [hotkeyInputFill, setHotkeyInputFill] = useState<string>();
   const [hotkeyInputEraser, setHotkeyInputEraser] = useState<string>();
   const [hotkeyInputClear, setHotkeyInputClear] = useState<string>();
+  const { updateCurrentPath } = useCurrentPath();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -551,8 +553,8 @@ const Game = () => {
   }
 
   useEffect(() => {
-    // adding location to the session storage
-    sessionStorage.setItem("location", "game");
+    
+    updateCurrentPath("lobby");
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -620,7 +622,7 @@ const Game = () => {
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDrawing, prevPosition, selectedColor, isFillToolSelected, isDrawToolSelected, isEraserToolSelected, strokeSize]);
+  }, [isDrawing, prevPosition, selectedColor, isFillToolSelected, isDrawToolSelected, isEraserToolSelected, strokeSize, updateCurrentPath]);
 
   const onHandleEraserResponse = (payload) => {
     const renderCanvas = canvasRef.current;

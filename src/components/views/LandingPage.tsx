@@ -12,6 +12,8 @@ import StompApi from "../../helpers/StompApi";
 export const stompApi = new StompApi();
 
 const LandingPage = () => {
+  // adding location to the session storage
+  sessionStorage.setItem("location", "landing");
 
   return (
     // <BaseContainer>

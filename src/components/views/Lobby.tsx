@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "../../styles/views/lobby/Lobby.scss"
 import Chat from "./Chat";
+import { useCurrentPath } from '../routing/routers/LocationContext.js'; 
 
 
 import Players from "components/elements/lobby/Players";
@@ -15,12 +16,18 @@ import StartGame from "components/elements/lobby/StartGame";
 const Lobby = () => {
   let rawUserData = useLocation()["state"];
   const [isChatting, setIsChatting] = useState(true);
+  const [isGenreSelectionValid, setIsGenreSelectionValid] = useState(true);
+  const { updateCurrentPath } = useCurrentPath();
+
   console.log("this is useLocation in Lobby: " + JSON.stringify(rawUserData));
-  const [isGenreSelectionValid, setIsGenreSelectionValid] = useState(true)
-  
+
+  useEffect(() => {
+    updateCurrentPath("lobby");
+  }, [updateCurrentPath]);
+
   return (
     <div className="Lobby container">
-      <Players/>
+      <Players />
       <div className="Lobby form">
         <Settings setIsGenreSelectionValid={setIsGenreSelectionValid} />
         <StartGame isGenreSelectionValid={isGenreSelectionValid} />
@@ -29,5 +36,5 @@ const Lobby = () => {
     </div>
   );
 };
-  
+
 export default Lobby;

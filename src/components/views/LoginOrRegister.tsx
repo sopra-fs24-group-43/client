@@ -36,6 +36,8 @@ const Login = () => {
   const [name, setName] = useState<string>(null);
   const [username2, setUsername2] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
+  // adding location to the session storage
+  sessionStorage.setItem("location", "login");
 
 
   const doRegister = async () => {

@@ -381,6 +381,13 @@ const Game = () => {
       endGame = body.endGame
       setEndGame2(body.endGame)
       setGamePhase2("leaderboard")
+      if(body.endGame){
+        console.log("sending points to server")
+        console.log(body.totalPoints[userId]);
+        api.put(`users/${userId}/updatePoints`, null, {
+          params: {points: body.totalPoints[userId]}
+        });
+      }
     }
     if (body.type === "GameStateDTO") {
       //sets everything except for role, gameId, userId, subscribed

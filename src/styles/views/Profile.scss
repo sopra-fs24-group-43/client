@@ -3,34 +3,105 @@
 .ProfileContainer {
   display: flex;
   justify-content: center;
-  align-items: center; 
-  height: 100vh; 
+  align-items: center;
 }
 
 .Profile {
-  text-align: center; 
+  text-align: center;
+  width: 37%; 
+  height: auto;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #dd9441bc;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #dd9441bc 40%, #ff6e53 100%);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: black;
   border: 3px solid #2a2c2e;
   border-radius: 8px;
-  margin-bottom: 400px;
+  margin-top: 8em;
 
-  .profile-info {
-    margin-bottom: 20px;
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   }
 
-  .profile-buttons {
-    margin-top: 15px;
+  .left-column {
+    text-align: left;
+    display: inline-block;
+    width: 35%;
+    padding-right: 10px;
+    vertical-align: top; 
+
+    p {
+      margin: 10px 0;
+      font-size: 20px;
+      color: black;
+    }
+
+    .profile-image {
+      width: 100px; 
+      height: 100px; 
+      border-radius: 50%; 
+      margin-bottom: 10px; 
+    }
+  }
+
+  .right-column {
+    text-align: left;
+    display: inline-block;
+    width: 55%;
+    padding-left: 10px;
+    vertical-align: top; 
+
+    p {
+      margin: 10px 0;
+      font-size: 20px;
+      color: black;
+    }
+
+    .profile-buttons {
+      margin-top: 2px;
+      display: flex; /* Use flexbox */
+      justify-content: left; /* Center horizontally */
+      align-items: left; /* Center vertically */
+      flex-direction: column; /* Align buttons vertically */
+
+      button {
+        margin: 4px 0; /* Add margin between buttons */
+      }
+
+      .edit-profile-button {
+        padding-right: 16px;
+        padding-left: 16px;
+      }
+    }
   }
 
   .profile-form {
     width: 100%;
     min-height: 320px;
-    margin-left: 3px;
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+
+    label {
+      font-size: 20px;
+      color: black;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #2a2c2e;
+      border-radius: 6px;
+      font-size: 20px;
+      color: black;
+    }
+
+    button {
+      margin-top: 20px;
+    }
   }
 }

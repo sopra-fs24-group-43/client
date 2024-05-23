@@ -38,6 +38,7 @@ const AppRouter = () => {
           <Route path="/LandingPage" element={<LandingPage />} />
           <Route path="/lobby/:gameId" element={<Lobby />} />
           <Route path="/profile/:userId" element={<Profile />} />
+          <Route path="/GlobalLeaderboard" element={<GlobalLeaderboard/>} />
         </Routes>
       </LocationProvider>
     </BrowserRouter>

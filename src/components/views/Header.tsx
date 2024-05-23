@@ -63,13 +63,9 @@ const Header = (props) => {
       <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
         
         {enableLeaderboard && ( 
-          <GlobalLeaderboard
-            trigger={
-              <div className="navigation-link">
-                <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
-              </div>
-            }
-          />
+          <a href="/GlobalLeaderboard" className="navigation-link">
+          <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+        </a>
         )}
         {parseInt(sessionStorage.getItem("userId")) > 0 && (
           <FriendsPopover

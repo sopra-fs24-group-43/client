@@ -60,32 +60,32 @@ const Header = (props) => {
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
       <div className={"header title"}>
         <a href="/LandingPage" className="header a">
-        <img src={`${process.env.PUBLIC_URL}/logo18.png`} alt="Logo" />
+          <img src="/logo18.png" alt="Logo" className="header logo" />
         </a>
       </div>
       <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
         
         {enableLeaderboard && ( 
           <a href="/GlobalLeaderboard" className="navigation-link">
-          <img src={`${process.env.PUBLIC_URL}/leaderboard.png`} alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+          <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
         </a>
         )}
         {parseInt(sessionStorage.getItem("userId")) > 0 && (
           <FriendsPopover
             trigger={
               <div className="navigation-link">
-                <img src={`${process.env.PUBLIC_URL}/friends.png`} alt="Friends Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+                <img src="/friends.png" alt="Friends Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
               </div>
             }
           />
         )}
         <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
-          <img src={`${process.env.PUBLIC_URL}/settings.png`} alt="ClientSettings Icon" className="header img" />
+          <img src="/settings.png" alt="ClientSettings Icon" className="header img" />
         </button>
 
         {parseInt(sessionStorage.getItem("userId")) > 0 && enableProfile && (
           <a href={`/profile/${userId}`} className="navigation-link">
-            <img src={`${process.env.PUBLIC_URL}/profile.png`} alt="Profile Icon" className="header img" />
+            <img src="/profile.png" alt="Profile Icon" className="header img" />
           </a>
         )}
       </div>

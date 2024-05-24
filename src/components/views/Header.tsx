@@ -7,6 +7,7 @@ import FriendsPopover from './FriendsPopover';
 import GlobalLeaderboard from './GlobalLeaderboard';
 import { useCurrentPath } from '../routing/routers/LocationContext';
 import '../../styles/views/Header.scss';
+import 'public';
 
 const Header = (props) => {
   const [isClientSettingsOpen, setIsClientSettingsOpen] = useState(false);

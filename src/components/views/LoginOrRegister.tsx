@@ -14,6 +14,7 @@ const FormField = (props) => {
     <div className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} field`}>
       <label className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} label`}>{props.label}</label>
       <input
+        type={props.type}
         className="login input"
         placeholder="enter here.."
         value={props.value}
@@ -122,6 +123,7 @@ const Login = () => {
             />
             <FormField
               label="Password"
+              type="password"
               value={loginPassword}
               onChange={(un: string) => setLoginPassword(un)}
             />
@@ -148,6 +150,7 @@ const Login = () => {
             />
             <FormField
               label="Password"
+              type="password"
               value={password}
               onChange={(n) => setPassword(n)}
             />

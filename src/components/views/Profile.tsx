@@ -13,6 +13,7 @@ const Profile = () => {
   const [editMode, setEditMode] = useState(false);
   const [userProfile, setUserProfile] = useState<User | null>(null);
   const isGuest = sessionStorage.getItem("isGuest") === "true";
+  const [showPassword, setShowPassword] = useState(false);
 
   const gameUserId = location.state?.key?.id;
   const isOwnProfile = userId === loggedInUserId;
@@ -90,12 +91,20 @@ const Profile = () => {
           <div className="profile-info">
             <p>Username: {userProfile.username}</p>
             {isOwnProfile && (
-              <p>Password: {userProfile.password}</p>
+              <div>
+                <p>Password: {showPassword ? userProfile.password : userProfile.password.replace(/./g, "•")}</p>
+              </div>
             )}
             <p>Name: {userProfile.name}</p>
             <p>Level: {userProfile.level}</p>
             <p>Total XP: {userProfile.xp}</p>
-
+            {isOwnProfile && (
+              <div>
+                <Button onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? "Hide Password" : "Show Password"}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
         <div className="right-column">
@@ -117,7 +126,7 @@ const Profile = () => {
             <label>Edit Username:</label>
             <input type="text" value={userProfile.username} onChange={handleUsernameChange} />
             <label>Change Password:</label>
-            <input type="text" value={userProfile.password} onChange={handlePasswordChange} />
+            <input type="password" value={userProfile.password} onChange={handlePasswordChange} />
             <Button onClick={saveProfile}>Save Profile</Button>
           </div>
         )}

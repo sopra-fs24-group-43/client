@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ReactLogo } from '../ui/ReactLogo';
 import PropTypes from 'prop-types';
 import ClientSettings from './ClientSettings';
@@ -16,11 +16,14 @@ const Header = (props) => {
   const [hotkeyInputFill, setHotkeyInputFill] = useState<string>("F");
   const [hotkeyInputEraser, setHotkeyInputEraser] = useState<string>("E");
   const [hotkeyInputClear, setHotkeyInputClear] = useState<string>("C");
+  const [userId, setUserId] = useState<string>("");
+ 
 
   const { currentPath } = useCurrentPath();
 
   useEffect(() => {
     if (currentPath) {
+      setUserId(sessionStorage.getItem("userId"));
       if (currentPath.includes("lobby") || currentPath.includes("game")) {
         setEnableProfile(false);
         setEnableLeaderboard(false); 
@@ -81,7 +84,7 @@ const Header = (props) => {
         </button>
 
         {parseInt(sessionStorage.getItem("userId")) > 0 && enableProfile && (
-          <a href="/profile/${user.id}" className="navigation-link">
+          <a href={`/profile/${userId}`} className="navigation-link">
             <img src="/profile.png" alt="Profile Icon" className="header img" />
           </a>
         )}

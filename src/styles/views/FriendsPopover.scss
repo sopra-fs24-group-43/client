@@ -68,8 +68,17 @@
     width: 100%;
   }
 
-  &.check, &.cross {
+  &.check, &.cross, &.invite {
     cursor: pointer;
+  }
+
+  &.img {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 24px;
   }
 
   // &.requester {

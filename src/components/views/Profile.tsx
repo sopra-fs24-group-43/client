@@ -114,7 +114,7 @@ const Profile = () => {
             {isOwnProfile && (
               <Button onClick={() => setEditMode(true)} className="edit-profile-button">Edit Profile</Button>
             )}
-            <Button style={{ marginBottom: '32px' }}>Friend Request</Button>
+            
           </div>
           <p>User ID: {userProfile.id}</p>
           <p>Date of Birth: {userProfile.birth_date}</p>

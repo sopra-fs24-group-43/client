@@ -27,6 +27,7 @@
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
+    @include gradientBackground;
   }
   &.header{
     display: flex;

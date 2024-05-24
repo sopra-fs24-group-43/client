@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import "../../../styles/views/game/Podium.scss"
+import logoPic3 from './painter.png';
 
 import { Context } from "../../../context/Context";
 
@@ -61,7 +62,7 @@ const Podium = () => {
 
       const afterTop3Players = playerEntries.map(([key, player]) => (
         <div key={player["userId"]} className="Podium other-player">
-          <img src="/painter.png" alt="Avatar" className="Podium other-avatar"/>
+          <img src={logoPic3} alt="Avatar" className="Podium other-avatar"/>
           <div className="Podium player-info">
             <div className="Podium other-username">
               {"#" + player["podiumPosition"] + "   "+ player["username"]}

@@ -4,6 +4,7 @@ import { Button } from "components/ui/Button";
 import { api, handleError } from "../../../helpers/api.js";
 import Popover from "components/ui/Popover";
 import "../../../styles/views/lobby/Players.scss"
+import logoPic3 from './painter.png';
 
 import { Context } from "../../../context/Context";
 
@@ -168,7 +169,7 @@ const Players = () => {
               trigger={
                 <div className={`Players${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
                   <div className={`Players${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}>
-                    <img src="/painter.png" alt="Avatar" className={`Players${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}/>
+                    <img src={logoPic3} alt="Avatar" className={`Players${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}/>
                   </div>
 
                   <div className={`Players${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} player`}>

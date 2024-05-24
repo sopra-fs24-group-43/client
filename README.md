@@ -119,7 +119,7 @@ existing account here.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Podium%20TODO%20REPLACE.png" height="400"></a>
+  <img src="/ReadMeImages/Podium.png" height="400"></a>
   <br>
   Podium - At the end of the game, the final ranking is displayed for all.
   <br>

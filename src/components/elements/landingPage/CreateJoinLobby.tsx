@@ -18,7 +18,7 @@ const CreateJoinLobby = () => {
 
 
 
-
+  
   const context = useContext(Context)
   const {stompApi} = context
   registered = (!(sessionStorage.getItem("username")=== null || sessionStorage.getItem("userId")=== null || sessionStorage.getItem("friends")=== null || sessionStorage.getItem("isGuest") === null))
@@ -85,12 +85,14 @@ const CreateJoinLobby = () => {
 
       <div className="CreateJoinLobby button-container">
 
-        <Button
-          width="100%"
-          onClick={creategame}
-        >
-          Create lobby
-        </Button>
+      {userId && (
+      <Button
+        width="100%"
+        onClick={creategame}
+      >
+        Create lobby
+      </Button>
+    )}
       </div>
     </div>
   );

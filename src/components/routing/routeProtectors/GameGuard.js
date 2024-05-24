@@ -14,24 +14,17 @@ import PropTypes from "prop-types";
 export const GameGuard = () => {
   const location = useLocation()
 
-  // if (!sessionStorage.getItem("token") || !location.pathname.startsWith("/lobby") || sessionStorage.getItem("location") !== "lobby") {
-  //   return <Navigate to="/LandingPage" replace />;
-  // }
+  const gameId = sessionStorage.getItem("gameId");
+  const role = sessionStorage.getItem("role");
 
-  // if (sessionStorage.getItem("location") !== "game") {
-  //   return <Navigate to="/LandingPage" replace />;
-  // } 
-  
-  // return <Outlet />;
-
-  if (sessionStorage.getItem("token")) {
-    
+  if (gameId && role) {
     return <Outlet />;
   }
-  
-  return <Navigate to="/login" replace />;
+
+  return <Navigate to="/landingPage" replace />;
 };
 
 GameGuard.propTypes = {
-  children: PropTypes.node
+  gameId: PropTypes.string.isRequired,
+  role: PropTypes.string.isRequired
 };

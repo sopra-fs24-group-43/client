@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react"; //added
+import React, { useState, useEffect } from "react";
 import { api, handleError } from "helpers/api";
 import User from "models/User";
 import { useNavigate } from "react-router-dom";
@@ -6,19 +6,33 @@ import { Button } from "components/ui/Button";
 import "styles/views/Login.scss";
 import BaseContainer from "components/ui/BaseContainer";
 import PropTypes from "prop-types";
-import { Context } from "../../context/Context"; //added
-
 
 const FormField = (props) => {
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleChange = (e) => {
+    const { value } = e.target;
+    if (value.length >= 18) {
+      setErrorMessage(`${props.label} cannot exceed 18 characters`);
+    } else {
+      setErrorMessage("");
+    }
+    props.onChange(value);
+  };
+
   return (
     <div className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} field`}>
       <label className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} label`}>{props.label}</label>
       <input
+        type={props.type}
         className="login input"
         placeholder="enter here.."
         value={props.value}
-        onChange={(e) => props.onChange(e.target.value)}
+        onChange={handleChange}
+        maxLength={18}
       />
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
+      {props.errorMessage && <p className="error-message">{props.errorMessage}</p>}
     </div>
   );
 };
@@ -27,30 +41,31 @@ FormField.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  type: PropTypes.string,
+  errorMessage: PropTypes.string,
 };
 
 const Login = () => {
   const navigate = useNavigate();
-  const [loginUsername, setLoginUsername] = useState<string>(null);
-  const [loginPassword, setLoginPassword] = useState<string>(null);
-  const [name, setName] = useState<string>(null);
-  const [username2, setUsername2] = useState<string>(null);
-  const [password, setPassword] = useState<string>(null);
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [name, setName] = useState("");
+  const [username2, setUsername2] = useState("");
+  const [password, setPassword] = useState("");
+  const [registrationError, setRegistrationError] = useState("");
+  const [loginError, setLoginError] = useState("");
 
-  useEffect (() => {
-    // adding location to the session storage
+  useEffect(() => {
     sessionStorage.setItem("location", "login");
-  }, [])
-  
+  }, []);
+
   const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({ username: username2, name, password });
       const response = await api.post("/users", requestBody);
-      // Get the returned user and update a new object.
 
       const user = new User(response.data);
 
-      // Store the token into the local storage.
       sessionStorage.setItem("token", user.token);
       sessionStorage.setItem("username", user.username);
       sessionStorage.setItem("name", user.name);
@@ -58,12 +73,10 @@ const Login = () => {
       sessionStorage.setItem("friends", user.friends);
       sessionStorage.setItem("creation_date", user.creation_date);
       sessionStorage.setItem("isGuest", "false");
-      // Login successfully worked --> navigate to the route /game in the GameRouter
+
       navigate("/LandingPage");
     } catch (error) {
-      alert(
-        `Something went wrong during the login: \n${handleError(error)}`
-      );
+      setRegistrationError("The username provided is already taken.");
     }
   };
 
@@ -85,10 +98,9 @@ const Login = () => {
     try {
       const requestBody = JSON.stringify({ username: loginUsername, password: loginPassword });
       const response = await api.put("/users", requestBody);
-      // Get the returned user and update a new object.
+
       const user = new User(response.data);
 
-      // Store the token into the local storage.
       sessionStorage.setItem("token", user.token);
       sessionStorage.setItem("username", user.username);
       sessionStorage.setItem("name", user.name);
@@ -96,16 +108,12 @@ const Login = () => {
       sessionStorage.setItem("friends", user.friends);
       sessionStorage.setItem("birth_date", user.birth_date);
       sessionStorage.setItem("isGuest", "false");
-      
+
       await fetchAndSaveUserSettings(user.id);
 
-      
-      // Login successfully worked --> navigate to the route /game in the GameRouter
       navigate("/LandingPage");
     } catch (error) {
-      alert(
-        `Something went wrong during the login: \n${handleError(error)}`
-      );
+      setLoginError("Invalid Credentials");
     }
   };
 
@@ -118,12 +126,15 @@ const Login = () => {
             <FormField
               label="Username"
               value={loginUsername}
-              onChange={(un: string) => setLoginUsername(un)}
+              onChange={(un) => setLoginUsername(un)}
+              
             />
             <FormField
               label="Password"
+              type="password"
               value={loginPassword}
-              onChange={(un: string) => setLoginPassword(un)}
+              onChange={(pw) => setLoginPassword(pw)}
+              errorMessage={loginError}
             />
             <div className="login button-container">
               <Button
@@ -139,7 +150,7 @@ const Login = () => {
             <FormField
               label="Username"
               value={username2}
-              onChange={(un: string) => setUsername2(un)}
+              onChange={(un) => setUsername2(un)}
             />
             <FormField
               label="Name"
@@ -148,8 +159,10 @@ const Login = () => {
             />
             <FormField
               label="Password"
+              type="password"
               value={password}
-              onChange={(n) => setPassword(n)}
+              onChange={(pw) => setPassword(pw)}
+              errorMessage={registrationError}
             />
             <div className="login button-container">
               <Button

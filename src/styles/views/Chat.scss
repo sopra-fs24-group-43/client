@@ -6,7 +6,7 @@
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-
+    @include gradientBackground;
     height: 670px;
     min-width: 30%;
     margin-left: 3px;

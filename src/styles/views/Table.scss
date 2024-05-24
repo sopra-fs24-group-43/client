@@ -1,5 +1,7 @@
 @import "../theme";
 
+
+
 .Table {
  
   &.container {
@@ -13,6 +15,7 @@
     padding-left: 37px;
     padding-right: 37px;
     border-radius: 0.75em;
+    @include gradientBackground;
     background-color: $background;
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: $dropShadow;

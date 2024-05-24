@@ -4,6 +4,7 @@ import {useNavigate} from "react-router-dom";
 import {Button} from "../../ui/Button";
 import { Context } from "../../../context/Context";
 import ReconnectPopUp from "../../views/ReconnectPopUp"
+import InvitePopover from "components/ui/InvitePopover";
 
 
 const Table = () => {
@@ -23,6 +24,10 @@ const Table = () => {
   const [reconnect, setReconnect] = useState(false)
   const [reconRole, setReconRole] = useState()
   const [reconGameId, setReconGameId] = useState()
+  const [enableInviting, setEnableInviting] = useState(false)
+  const [gameIdToJoin, setGameIdToJoin] = useState()
+  let startGameId;
+  const [friendUserId, setFriendUserId] = useState()
 
   registered = !(sessionStorage.getItem("username")=== null || sessionStorage.getItem("userId")=== null || sessionStorage.getItem("friends")=== null || sessionStorage.getItem("isGuest") === null)
   //const [time, setTime] = useState(new Date());
@@ -145,6 +150,13 @@ const Table = () => {
       }    }
     if (body.type === "startgame" && registered) {
       console.log("receiving startgame inside Table -> getallgames")
+      console.log("receiving startgame inside Players -> checkfriend")
+      startGameId = body.gameId;  //added mark
+      console.log("checcking if startGameId === gameIdToJoin", startGameId, gameIdToJoin)
+      if (startGameId === gameIdToJoin) {
+        console.log("checcking if startGameId === gameIdToJoin", startGameId, gameIdToJoin)
+        // setEnableInviting(false);
+      }
       if (stompApi.isConnected()){
         stompApi.send("/app/landing/" + userId + "/getallgames", "");
       }    }
@@ -181,15 +193,34 @@ const Table = () => {
       console.log("games (below):")
       console.log(games)
       console.log(templist)
-    }
+    } 
     else if (body.type === "gamesDTO" && registered && body.lobbyName.length === 0 && registered) {
       setgames([])
       setcheckedgames(true)
     }
+
     else {
       console.log("not gamesDTO")
     }
+    if (body.type === "invitefriend") {
+      stompApi.subscribe(`/topic/landing/${body.gameId}`, handleResponse2, "Table")
+      console.log("correct body type", body);
+      setFriendUserId(body.userId)
+      setEnableInviting(true);
+      setGameIdToJoin(body.gameId);
+
+    }
   }
+
+  const handleResponse2 = (payload) => {
+    const responseData = JSON.parse(payload.body);
+    if (responseData.type === "startgame") {
+      console.log("receiving startgame inside Players -> checkfriend")
+      startGameId = responseData.gameId;  //added mark
+      setEnableInviting(false);
+    }
+  }
+
   const connect = async ()  => {
     await stompApi.connect(() => {
       stompApi.send("/app/landing/alertreconnect/"+userId, "") //added
@@ -274,6 +305,9 @@ const Table = () => {
       </tbody>
     </table>
     <ReconnectPopUp reconnect={reconnect} setReconnect={setReconnect} Reconfunc={Reconfunc} userId={userId} reconRole={reconRole} reconGameId={reconGameId}/>
+    {enableInviting && (
+      <InvitePopover gameId={gameIdToJoin} friendUserId={friendUserId}/>
+    )}
   </div>
 )
   ;

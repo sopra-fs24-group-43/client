@@ -7,15 +7,21 @@
     min-height: 300px;
     @include center;
     flex-direction: column;
-    
   }
+
+  .error-message {
+    color: rgb(145, 14, 14);
+    font-weight: bold;
+  }
+
   &.form {
     display: flex;
     flex-direction: row;
     justify-content: space-between; 
     width: 90%; 
     max-width: 800px; 
-    height: 30em; 
+    
+    padding-bottom: 20px; 
     font-size: 16px;
     font-weight: 300;
     padding-left: 37px;
@@ -26,6 +32,7 @@
     box-shadow: $dropShadow;
     border: 3px solid #2a2c2e;
     border-radius: 8px;
+    @include gradientBackground;
   }
   &.form_dark {
     display: flex;

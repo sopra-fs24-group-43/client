@@ -8,14 +8,19 @@ import PropTypes from "prop-types";
  * instead of 'export default' at the end of the file.
  */
 export const LoginGuard = () => {
-  if (!sessionStorage.getItem("token")) {
-    
+
+  const userId = sessionStorage.getItem("userId");
+  const username = sessionStorage.getItem("username");
+
+  if (!userId && !username) {
+
     return <Outlet />;
   }
   
-  return <Navigate to="/game" replace />;
+  return <Navigate to="/landingPage" replace />;
 };
 
 LoginGuard.propTypes = {
-  children: PropTypes.node
+  userId: PropTypes.string.isRequired,
+  username: PropTypes.string.isRequired
 }

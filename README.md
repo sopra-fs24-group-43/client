@@ -2,7 +2,7 @@
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Logo16.png" alt="RaveWave" height="200"></a>
+  <img src="/ReadMeImages/Logo18.png" alt="RaveWave" height="200"></a>
 </h3>
 
 ## Introduction

@@ -72,7 +72,7 @@ const LogOrRegAndRulesForm = () => {
       console.log("disconnecting when logging out!")
       stompApi.disconnect()
     }
-    navigate("/loginOrRegister");
+    navigate("/landingPage");
   };
   const deleteguest = (): void => { //remove this?
     if (stompApi.isConnected()) {
@@ -95,23 +95,29 @@ const LogOrRegAndRulesForm = () => {
     sessionStorage.removeItem("name")
     sessionStorage.removeItem("creation_date")
 
-    navigate("/landingpage");
+    navigate("/landingPage");
   };
   const buttonlogout = () => {
     console.log("buttonlogout: ", registered, isGuest2 )
     if (registered) {
       if (isGuest2) {
         return (
-          <Button width="100%" onClick={()=> deleteguest()}
-                  Delete Temporary Guest Account
-          ></Button>
+          <Button 
+              width="100%" 
+              onClick={()=> deleteguest()}
+          >
+              Logout
+          </Button>
         )
       }
       else {
         return (
-          <Button width="100%" onClick={()=> logout()}
-                  Log Out
-          ></Button>
+          <Button 
+              width="100%" 
+              onClick={()=> logout()}
+          >
+              Logout
+          </Button>
         )
       }
     }
@@ -121,12 +127,16 @@ const LogOrRegAndRulesForm = () => {
   }
   const buttonforreg = () => {
     if (registered) {
-      return <div>{isGuest ? "playing as guest" : ""}</div>;
+      return <div>{isGuest ? "playing as guest" : "Welcome back, " + sessionStorage.getItem("username")+ "!"}</div>;
     } else {
       return (
         <div>
-          <Button width="100%" onClick={() => navigate("/LoginOrRegister")}>
-            Login Or Register
+          <Button 
+              width="100%" 
+              onClick={() => navigate("/LoginOrRegister")}
+              style={{ marginBottom: '6px' }}
+          >
+              Login Or Register
           </Button>
           <Button
             width="100%"

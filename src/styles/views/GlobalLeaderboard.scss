@@ -19,6 +19,14 @@
     border-radius: 8px;
   }
 
+  .profile-buttons {
+    margin-top: 2px;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    flex-direction: column; 
+  }
+
   .username-link {
     text-decoration: underline;
     cursor: pointer;

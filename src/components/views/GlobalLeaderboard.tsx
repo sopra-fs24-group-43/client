@@ -47,7 +47,7 @@ const GlobalLeaderboard = () => {
                   {entry.username}
                 </span>
               </td>
-              <td>{entry.XP}</td>
+              <td>{entry.xp}</td>
               <td>{entry.level}</td>
             </tr>
           ))}

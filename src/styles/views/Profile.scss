@@ -66,13 +66,13 @@
 
     .profile-buttons {
       margin-top: 2px;
-      display: flex; /* Use flexbox */
-      justify-content: left; /* Center horizontally */
-      align-items: left; /* Center vertically */
-      flex-direction: column; /* Align buttons vertically */
+      display: flex;
+      justify-content: left; 
+      align-items: left; 
+      flex-direction: column; 
 
       button {
-        margin: 4px 0; /* Add margin between buttons */
+        margin: 4px 0; 
       }
 
       .edit-profile-button {

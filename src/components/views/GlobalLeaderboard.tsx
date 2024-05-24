@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api, handleError } from "../../helpers/api.js"
 import "../../styles/views/GlobalLeaderboard.scss";
 import User from "models/User";
+import { Button } from "components/ui/Button";
 
 const GlobalLeaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState([]);
@@ -50,9 +51,17 @@ const GlobalLeaderboard = () => {
               <td>{entry.xp}</td>
               <td>{entry.level}</td>
             </tr>
+            
           ))}
+
         </tbody>
       </table>
+      <div className="profile-buttons">
+            
+            <div style={{ marginTop: "20px" }}>
+              <Button onClick={() => navigate("/landingPage")}>Back to Main Page</Button>
+            </div>
+          </div>
     </div>
   );
 };

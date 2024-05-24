@@ -226,6 +226,7 @@ const Game = () => {
 
     }
   }, [navigate]);
+
   const sendWordChoice = (wordIndex, threeWords) => {
     
     let chosenWord = threeWords[wordIndex]
@@ -237,12 +238,6 @@ const Game = () => {
     }
     console.log("sending word v1")
     stompApi.send(`/app/games/${gameId}/sendchosenword`, JSON.stringify(ChooseWordDTO))
-    handleEraseAllClick();
-    setIsEraserToolSelected(false);
-    setIsDrawToolSelected(true);
-    setIsFillToolSelected(false);
-
-  
   }
   const getRandomInt = (max) => {
     return Math.floor(Math.random()*3)
@@ -434,6 +429,11 @@ const Game = () => {
       chosenWord = body.word
       setChosenWord2(body.word)
       gamePhase = "drawing"
+      handleEraseAllClick();
+      setIsEraserToolSelected(false);
+      setIsDrawToolSelected(true);
+      setIsFillToolSelected(false);
+
 
     }
     if (body.type === "TimerOut" && body.gamePhase === "drawing") {
@@ -447,6 +447,7 @@ const Game = () => {
       setTime(body.time)
 
       if (body.time === 0 && isDrawer && gamePhase === "choosing") { //do this in back-end
+
         wordIndex = getRandomInt(3)
         chosenWord = threeWords[wordIndex]
         setChosenWord2(threeWords[wordIndex])

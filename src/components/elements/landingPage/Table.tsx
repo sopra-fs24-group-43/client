@@ -30,7 +30,7 @@ const Table = () => {
   const [friendUserId, setFriendUserId] = useState()
 
   registered = !(sessionStorage.getItem("username")=== null || sessionStorage.getItem("userId")=== null || sessionStorage.getItem("friends")=== null || sessionStorage.getItem("isGuest") === null)
-
+  //const [time, setTime] = useState(new Date());
 
 
   if (registered) {
@@ -66,7 +66,6 @@ const Table = () => {
           sessionStorage.setItem("gameId", inboundPlayer.gameId)
           navigate(`/lobby/${gameId}`,{state: {username: inboundPlayer.username, userId: inboundPlayer.userId, friends: inboundPlayer.friends, gameId: inboundPlayer.gameId, role: inboundPlayer.role}})
         }
-
       }
       games.forEach((game, index) => {
         const inboundPlayer = {
@@ -78,6 +77,26 @@ const Table = () => {
           friends: [],
           role: "player"
         }
+        if (game[3].length >= game[2]) {
+          gamesList.push(
+            <tr>
+              <td>{game[0]}</td>
+              <td>{game[1]}</td>
+              <td>{game[2]}</td>
+              <td>{game[3].length}/{game[3].length}</td>
+            </tr>)
+        }
+        else {
+          gamesList.push(
+            <tr>
+              <td>{game[0]}</td>
+              <td>{game[1]}</td>
+              <td>{game[2]}</td>
+              <td>{game[3].length}/{game[2]}</td>
+              <td> <Button width="100%" onClick={() => joingame(game[1],inboundPlayer)}>join</Button></td>
+            </tr>)
+        }
+        /*
         gamesList.push(
           <tr>
             <td>{game[0]}</td>
@@ -86,18 +105,21 @@ const Table = () => {
             <td>{game[3].length}/{game[2]}</td>
             <td> <Button width="100%" onClick={() => joingame(game[1],inboundPlayer)}>join</Button></td>
           </tr>)
+
+         */
       });
       return gamesList
     }
   }
 
   const Reconfunc = (userId, reconRole, reconGameId) => {
-    if (stompApi.isConncted) {
+    if (stompApi.isConnected()) {
+      console.log("reconfunc")
       sessionStorage.setItem("role", reconRole)
       sessionStorage.setItem("gameId", reconGameId)
       stompApi.send(`/app/landing/reconnect/${userId}`, "") //added
-      setReconnect(false)
       navigate(`/game/${reconGameId}`)
+      setReconnect(false)
     }
   }
   const handleResponse = (payload) => {
@@ -116,6 +138,11 @@ const Table = () => {
         stompApi.send("/app/landing/" + userId + "/getallgames", "");
       }
     }
+    if (body.type === "updategamesettings" && registered) {
+      console.log("receiving updategamesettings inside Table -> getallgames")
+      if (stompApi.isConnected()){
+        stompApi.send("/app/landing/" + userId + "/getallgames", "");
+      }    }
     if (body.type === "creategame" && registered) {
       console.log("receiving creategame inside Table -> getallgames")
       if (stompApi.isConnected()){
@@ -171,6 +198,7 @@ const Table = () => {
       setgames([])
       setcheckedgames(true)
     }
+
     else {
       console.log("not gamesDTO")
     }
@@ -180,6 +208,7 @@ const Table = () => {
       setFriendUserId(body.userId)
       setEnableInviting(true);
       setGameIdToJoin(body.gameId);
+
     }
   }
 
@@ -203,9 +232,18 @@ const Table = () => {
       stompApi.send("/app/landing/" + userId + "/getallgames" , "");
     });
   }
+  /*
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(new Date());
+    }, 10000);
+    console.log("new setTime: ", time)
+    return () => clearInterval(interval);
+  }, [])
+  */
 
   useEffect(() => {
-
+    console.log("doing useEffect in Table")
     const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
       console.log("disconnecting before reloading page!")
       const sessionAttributeDTO2 = {
@@ -243,7 +281,7 @@ const Table = () => {
       stompApi.unsubscribe("/topic/landing/" + userId, "Table")
       stompApi.unsubscribe("/topic/landing", "Table")
     }
-  }, [registered]);
+  }, [registered]);  //, stompApi.isConnected()
   return (
 
 

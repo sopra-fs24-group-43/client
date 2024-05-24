@@ -169,15 +169,17 @@ const LogOrRegAndRulesForm = () => {
         <img src="rules.png" alt="Rule Icon"
              className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} img`}/>
       </div>
-      <div className="LogOrRegAndRulesForm game-rules">
+      <div className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} game-rules`}>
         <div>
-          Freitagsmaler is a free online multiplayer drawing and guessing pictionary game.
-          A normal game consists of a few rounds, where every round a player has to draw their chosen word and others
-          have to guess it to gain points!
-          The person with the most points at the end of the game, will then be crowned as the winner!
-          <br/>
-          <br/>
-          Have fun!
+
+          <div>
+            Freitagsmaler is a free online multiplayer drawing and guessing pictionary game. 
+            A normal game consists of a few rounds, where every round a player has to draw their chosen word and others have to guess it to gain points! 
+            The person with the most points at the end of the game, will then be crowned as the winner!
+          </div>
+          <br />
+          <br />
+            <div>Have fun!</div>
         </div>
       </div>
     </div>

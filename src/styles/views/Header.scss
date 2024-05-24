@@ -7,41 +7,46 @@
     justify-content: flex-start;
     align-items: center;
     width: 100%;
-    height: 91px;
+    height: 110px;
   }
 
   &.logo {
     font-weight: bold;
     color: black;
     text-align: center;
-    padding-left: 48%; 
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    margin-top: 42px;
-    width: 93%;
-    height: auto;
-    margin-left: 4%;
+    height: 106px;
   }
 
-  &.title {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 70%;
-    height: 100%;
-  }
-
-  &.navigation{
+  &.a {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    width: 30%;
+    width: 471px;
+  }
+
+  &.title {
+    padding-top: 8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    width: 67%;
     height: 100%;
-    margin-right: 6px;
+  }
+
+  &.navigation{
+    padding-top: 18px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    width: 35%;
+    height: 100%;
   }
 
   &.img{
@@ -70,62 +75,74 @@
 }
 .header_dark {
   &.container {
-    background-color:#620000;
-    @include center;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 110px;
   }
 
-  &.title {
+  &.logo {
+    font-weight: bold;
+    color: black;
+    text-align: center;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    width: 70%;
-    height: 100%;
-    color: white;
+    height: 106px;
   }
 
-  &.logo{
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    padding-left: 48%;
-  }
-
-  &.navigation{
+  &.a {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    width: 30%;
+    width: 471px;
+  }
+
+  &.title {
+    padding-top: 8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    width: 67%;
     height: 100%;
-    margin-right: 6px;
-    color: white;
+  }
+
+  &.navigation{
+    padding-top: 18px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    width: 35%;
+    height: 100%;
   }
 
   &.img{
     width: 50px;
     height: 50px;
     margin-right: 15px;
-    color: white;
   }
-
+  
   .navigation-link {
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: white;
-
+    color: black;
+    
   }
 
   .settings-button {
     background: none;
     border: none;
     cursor: pointer;
-    width: 50px;
+    width: 50px; 
     height: 50px;
     margin-right: 25px;
     margin-left: -5px;
-    color: white;
   }
 }
-

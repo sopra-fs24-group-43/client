@@ -13,6 +13,7 @@ import Podium from "components/elements/game/Podium";
 import Header from "./Header";
 import ClientSettings from "./ClientSettings";
 import { api, handleError } from "helpers/api";
+import { useCurrentPath } from '../routing/routers/LocationContext.js';
 
 
 
@@ -32,6 +33,7 @@ const Game = () => {
   const [hotkeyInputFill, setHotkeyInputFill] = useState<string>();
   const [hotkeyInputEraser, setHotkeyInputEraser] = useState<string>();
   const [hotkeyInputClear, setHotkeyInputClear] = useState<string>();
+  const { updateCurrentPath } = useCurrentPath();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -162,6 +164,8 @@ const Game = () => {
       stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/general`, onHandleGeneralResponse, "Game")
+      stompApi.subscribe(`/topic/games/${gameId}/fill/${userId}`, onHandleCanvasReco, "Game")
+
       subscribed = true
       stompApi.connected = true //important!!! needs to be set during the onConnectedCallback, otherwise it might happen that it connected gets set true before the ws
                                 //is fully setup
@@ -207,6 +211,7 @@ const Game = () => {
       stompApi.subscribe(`/topic/games/${gameId}/eraser`, onHandleEraserResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/draw`, onHandleDrawResponse, "Game");
       stompApi.subscribe(`/topic/games/${gameId}/fillTool`, onHandleFillToolResponse, "Game");
+      stompApi.subscribe(`/topic/games/${gameId}/fill/${userId}`, onHandleCanvasReco, "Game")
       subscribed = true
       stompApi.send(`/app/games/${gameId}/getgamestate/${userId}`, "")
       /*
@@ -288,11 +293,48 @@ const Game = () => {
       }
     }
   }
+
+  const onHandleCanvasReco = (payload) => {
+    console.log("IT ARRIVED AT THIS FUNCTION")
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+  
+    const payloadData = JSON.parse(payload.body);
+    const { imageDataBuffer } = payloadData;
+  
+    const img = new Image();
+    
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0); 
+    };
+  
+    img.src = imageDataBuffer;
+  };
+  
+  const sendCanvas = (ctx, userId) => {
+    const canvas = ctx.canvas;
+    const imageData = canvas.toDataURL();
+    console.log("THE IMAGE DATA IS" + imageData)
+    stompApi.send(`/app/games/${gameId}/sendcanvasforrecon/${userId}`, JSON.stringify({ imageDataBuffer: imageData }));
+  };
+
+
   const onHandleGeneralResponse = (payload) => {
     const body = JSON.parse(payload.body);
     if (body.type === "sendcanvasforrecon") {
-      console.log("sendcanvasforrecon")
-      if (isDrawer) {
+      console.log("TEST TEST TET TESTsendcanvasforrecon")
+      console.log("::::::" + body.userId + userId)
+      if (body.userId === userId) return;
+
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      sendCanvas(ctx, body.userId);
+
+
+
 
         /*send to this the whole canvas
       @MessageMapping("/games/{gameId}/sendcanvasforrecon/{userId}")
@@ -301,8 +343,12 @@ const Game = () => {
       }
 
          */
-      }
+      
     }
+
+
+
+
     if (body.type === "Answer" && !isDrawer && body.username === username) {
       isCorrect = body.IsCorrect
       setIsCorrect2(body.IsCorrect)
@@ -337,6 +383,13 @@ const Game = () => {
       endGame = body.endGame
       setEndGame2(body.endGame)
       setGamePhase2("leaderboard")
+      if(body.endGame){
+        console.log("sending points to server")
+        console.log(body.totalPoints[userId]);
+        api.put(`users/${userId}/updatePoints`, null, {
+          params: {points: body.totalPoints[userId]}
+        });
+      }
     }
     if (body.type === "GameStateDTO") {
       //sets everything except for role, gameId, userId, subscribed
@@ -507,6 +560,9 @@ const Game = () => {
   }
 
   useEffect(() => {
+    
+    updateCurrentPath("lobby");
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -573,7 +629,7 @@ const Game = () => {
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDrawing, prevPosition, selectedColor, isFillToolSelected, isDrawToolSelected, isEraserToolSelected, strokeSize]);
+  }, [isDrawing, prevPosition, selectedColor, isFillToolSelected, isDrawToolSelected, isEraserToolSelected, strokeSize, updateCurrentPath]);
 
   const onHandleEraserResponse = (payload) => {
     const renderCanvas = canvasRef.current;
@@ -782,14 +838,15 @@ const Game = () => {
 
       <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
         <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} timer`}>
-
           {showtimer(time, gamePhase2, "drawing")}
         </div>
         <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} rounds`}>
            <div> Round {currentRound2}/{maxRounds2} </div>
         </div>
-        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} word`}>
+        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} phase`}>
           {showPhase()}
+        </div>
+        <div className={`Tracker${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} word`}>
           {showWord()}
         </div>
       </div>

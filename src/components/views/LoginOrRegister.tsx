@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react"; //added
+import React, { useState, useEffect, useContext } from "react"; //added
 import { api, handleError } from "helpers/api";
 import User from "models/User";
 import { useNavigate } from "react-router-dom";
@@ -11,8 +11,8 @@ import { Context } from "../../context/Context"; //added
 
 const FormField = (props) => {
   return (
-    <div className="login field">
-      <label className="login label">{props.label}</label>
+    <div className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} field`}>
+      <label className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} label`}>{props.label}</label>
       <input
         className="login input"
         placeholder="enter here.."
@@ -37,7 +37,11 @@ const Login = () => {
   const [username2, setUsername2] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
 
-
+  useEffect (() => {
+    // adding location to the session storage
+    sessionStorage.setItem("location", "login");
+  }, [])
+  
   const doRegister = async () => {
     try {
       const requestBody = JSON.stringify({ username: username2, name, password });
@@ -107,8 +111,8 @@ const Login = () => {
 
   return (
     <BaseContainer>
-      <div className="login container">
-        <div className="login form">
+      <div className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
+        <div className={`login${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
           <div className="login-column">
             <h2>Login</h2>
             <FormField
@@ -126,7 +130,7 @@ const Login = () => {
                 width="100%"
                 onClick={() => doLogin()}
               >
-                Login
+                <div>Login</div>
               </Button>
             </div>
           </div>
@@ -152,7 +156,7 @@ const Login = () => {
                 width="100%"
                 onClick={() => doRegister()}
               >
-                Register
+                <div>Register</div>
               </Button>
             </div>
           </div>

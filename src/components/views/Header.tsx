@@ -1,34 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ReactLogo } from '../ui/ReactLogo';
 import PropTypes from 'prop-types';
 import ClientSettings from './ClientSettings';
 import FriendsPopover from './FriendsPopover';
+import GlobalLeaderboard from './GlobalLeaderboard';
+import { useCurrentPath } from '../routing/routers/LocationContext';
 import '../../styles/views/Header.scss';
 
 const Header = (props) => {
   const [isClientSettingsOpen, setIsClientSettingsOpen] = useState(false);
+  const [enableProfile, setEnableProfile] = useState(true);
+  const [enableLeaderboard, setEnableLeaderboard] = useState(true); 
   const [hotkeyInputDraw, setHotkeyInputDraw] = useState<string>("D");
   const [hotkeyInputFill, setHotkeyInputFill] = useState<string>("F");
   const [hotkeyInputEraser, setHotkeyInputEraser] = useState<string>("E");
   const [hotkeyInputClear, setHotkeyInputClear] = useState<string>("C");
-  // const [isGamePath, setIsGamePath] = useState(false);
-  // const location = useLocation();
 
+  const { currentPath } = useCurrentPath();
 
-  const handleClientSettingsClick = () => {
-    setIsClientSettingsOpen(true);
-  };
+  useEffect(() => {
+    if (currentPath) {
+      if (currentPath.includes("lobby") || currentPath.includes("game")) {
+        setEnableProfile(false);
+        setEnableLeaderboard(false); 
+      } else {
+        setEnableProfile(true);
+        setEnableLeaderboard(true); 
+      }
+    }
+  }, [currentPath]);
 
   function refreshPage() {
     window.location.reload();
   }
 
-  const handleCloseClientSettings = () => {
-    setIsClientSettingsOpen(false);
-    
+  const handleClientSettingsClick = () => {
+    setIsClientSettingsOpen(true);
   };
 
+  const handleCloseClientSettings = () => {
+    setIsClientSettingsOpen(false);
+  };
 
   // getting the link of current page
   // const isGamePath = location.pathname.startsWith("/game");
@@ -42,19 +55,19 @@ const Header = (props) => {
 
   return (
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
-      <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} title`}>
-        <a href="/landingpage">
-          <img src="/logo13.png" alt="Logo" className="header logo" />
+      <div className={"header title"}>
+        <a href="/LandingPage" className="header a">
+          <img src="/logo18.png" alt="Logo" className="header logo" />
         </a>
       </div>
-      {true && (
-        <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
-          <a href="/leaderboard" className="navigation-link">
-            <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
-          </a>
-          {/* {parseInt(sessionStorage.getItem("userId"))>0 && (
-
-          )} */}
+      <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
+        
+        {enableLeaderboard && ( 
+          <a href="/GlobalLeaderboard" className="navigation-link">
+          <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+        </a>
+        )}
+        {parseInt(sessionStorage.getItem("userId")) > 0 && (
           <FriendsPopover
             trigger={
               <div className="navigation-link">
@@ -62,15 +75,18 @@ const Header = (props) => {
               </div>
             }
           />
-          <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
-            <img src="/settings.png" alt="ClientSettings Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
-          </button>
+        )}
+        <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
+          <img src="/settings.png" alt="ClientSettings Icon" className="header img" />
+        </button>
+
+        {parseInt(sessionStorage.getItem("userId")) > 0 && enableProfile && (
           <a href="/profile/${user.id}" className="navigation-link">
-            <img src="/profile.png" alt="Profile Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+            <img src="/profile.png" alt="Profile Icon" className="header img" />
           </a>
-        </div>
-      )}
-      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings}/>
+        )}
+      </div>
+      <ClientSettings isOpen={isClientSettingsOpen} onClose={handleCloseClientSettings} />
     </div>
   );
 };

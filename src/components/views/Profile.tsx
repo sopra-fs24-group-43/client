@@ -94,6 +94,7 @@ const Profile = () => {
             )}
             <p>Name: {userProfile.name}</p>
             <p>Level: {userProfile.level}</p>
+            <p>Total XP: {userProfile.XP}</p>
 
           </div>
         </div>
@@ -102,7 +103,7 @@ const Profile = () => {
             {isOwnProfile && (
               <Button onClick={() => setEditMode(true)} className="edit-profile-button">Edit Profile</Button>
             )}
-            <Button>Friend Request</Button>
+            <Button style={{ marginBottom: '32px' }}>Friend Request</Button>
           </div>
           <p>User ID: {userProfile.id}</p>
           <p>Date of Birth: {userProfile.birth_date}</p>

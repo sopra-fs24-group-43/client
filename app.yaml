@@ -24,3 +24,7 @@ handlers:
     mime_type: image/png
     static_files: public/\1
     upload: public/(.*\.png)
+  - url: /(.*\.png)
+    mime_type: image/png
+    static_files: build/\1
+    upload: build/.*\.(.*\.png)

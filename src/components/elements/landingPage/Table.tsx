@@ -23,6 +23,7 @@ const Table = () => {
   const [reconnect, setReconnect] = useState(false)
   const [reconRole, setReconRole] = useState()
   const [reconGameId, setReconGameId] = useState()
+
   registered = !(sessionStorage.getItem("username")=== null || sessionStorage.getItem("userId")=== null || sessionStorage.getItem("friends")=== null || sessionStorage.getItem("isGuest") === null)
 
 
@@ -41,23 +42,25 @@ const Table = () => {
 
 
     if (registered === false){
-      return "log in to view and join available lobbies!"
+      return "Log In To View And Join Available Lobbies!"
     }
     else if (checkedgames === false) {
       return ""
     }
     else if (games === null || games.length === 0)  {
-      return "no lobbies have been created yet!"
+      return "No Lobbies Have Been Created Yet!"
     }
     else {
-      console.log("rendering Lobbies!")
+      console.log("Rendering Lobbies!")
       let gamesList = [];
       const joingame = (gameId, inboundPlayer) => {
         console.log(inboundPlayer)
-        stompApi.send("/app/games/" + gameId + "/joingame", JSON.stringify(inboundPlayer))
-        sessionStorage.setItem("role", inboundPlayer.role)
-        sessionStorage.setItem("gameId", inboundPlayer.gameId)
-        navigate(`/lobby/${gameId}`,{state: {username: inboundPlayer.username, userId: inboundPlayer.userId, friends: inboundPlayer.friends, gameId: inboundPlayer.gameId, role: inboundPlayer.role}})
+        if (stompApi.isConnected()) {
+          stompApi.send("/app/games/" + gameId + "/joingame", JSON.stringify(inboundPlayer))
+          sessionStorage.setItem("role", inboundPlayer.role)
+          sessionStorage.setItem("gameId", inboundPlayer.gameId)
+          navigate(`/lobby/${gameId}`,{state: {username: inboundPlayer.username, userId: inboundPlayer.userId, friends: inboundPlayer.friends, gameId: inboundPlayer.gameId, role: inboundPlayer.role}})
+        }
 
       }
       games.forEach((game, index) => {
@@ -84,11 +87,13 @@ const Table = () => {
   }
 
   const Reconfunc = (userId, reconRole, reconGameId) => {
-    sessionStorage.setItem("role", reconRole)
-    sessionStorage.setItem("gameId", reconGameId)
-    stompApi.send(`/app/landing/reconnect/${userId}`, "") //added
-    setReconnect(false)
-    navigate(`/game/${reconGameId}`)
+    if (stompApi.isConncted) {
+      sessionStorage.setItem("role", reconRole)
+      sessionStorage.setItem("gameId", reconGameId)
+      stompApi.send(`/app/landing/reconnect/${userId}`, "") //added
+      setReconnect(false)
+      navigate(`/game/${reconGameId}`)
+    }
   }
   const handleResponse = (payload) => {
     var body = JSON.parse(payload.body)
@@ -102,24 +107,30 @@ const Table = () => {
     }
     if (body.type === "deletegame" && registered) {  //trigger a request of getallgames because some game changed
       console.log("receiving deletegame inside Table -> getallgames")
-      stompApi.send("/app/landing/" + userId + "/getallgames" , "");
+      if (stompApi.isConnected()){
+        stompApi.send("/app/landing/" + userId + "/getallgames", "");
+      }
     }
     if (body.type === "creategame" && registered) {
       console.log("receiving creategame inside Table -> getallgames")
-      stompApi.send("/app/landing/" + userId + "/getallgames" , "");
-    }
+      if (stompApi.isConnected()){
+        stompApi.send("/app/landing/" + userId + "/getallgames", "");
+      }    }
     if (body.type === "startgame" && registered) {
       console.log("receiving startgame inside Table -> getallgames")
-      stompApi.send("/app/landing/" + userId + "/getallgames" , "");
-    }
+      if (stompApi.isConnected()){
+        stompApi.send("/app/landing/" + userId + "/getallgames", "");
+      }    }
     if (body.type === "leavegame" && registered) {
       console.log("receiving leavegame inside Table -> getallgames")
-      stompApi.send("/app/landing/" + userId + "/getallgames" , "");
-    }
+      if (stompApi.isConnected()){
+        stompApi.send("/app/landing/" + userId + "/getallgames", "");
+      }    }
     if (body.type === "joingame" && registered) {
       console.log("receiving joingame inside Table -> getallgames")
-      stompApi.send("/app/landing/" + userId + "/getallgames" , "");
-    }
+      if (stompApi.isConnected()){
+        stompApi.send("/app/landing/" + userId + "/getallgames", "");
+      }    }
     if (body.type === "gamesDTO" && body.lobbyName.length !== 0 && registered) {  //handle the getallgames message
       console.log("body.lobbyNamelength:"+body.lobbyName.length)
       var lobbyNames = body.lobbyName
@@ -161,6 +172,7 @@ const Table = () => {
       stompApi.send("/app/landing/" + userId + "/getallgames" , "");
     });
   }
+
   useEffect(() => {
 
     const handleBeforeUnload = (event) => {  //this gets executed when reloading the page
@@ -193,6 +205,7 @@ const Table = () => {
       }
       stompApi.send("/app/landing/" + userId + "/getallgames" , "");
     }
+
     return () => {  //this gets executed when navigating another page
       console.log("unsubscribing and cleaning up when navigating to different view from Table!")
       window.removeEventListener('beforeunload', handleBeforeUnload);

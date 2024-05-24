@@ -22,8 +22,8 @@ const GlobalLeaderboard = () => {
   }, []);
 
   return (
-    <div className={`GlobalLeaderboard container${sessionStorage.getItem("isDarkMode") ? "_dark" : ""}`}>
-      <div className="GlobalLeaderboard header">All Time Leaderboard</div>
+    <div className={`GlobalLeaderboard${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
+      <div className={`GlobalLeaderboard${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""}`}>All Time Leaderboard</div>
       <table>
         <thead>
           <tr>

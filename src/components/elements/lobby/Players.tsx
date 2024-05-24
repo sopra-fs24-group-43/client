@@ -166,17 +166,17 @@ const Players = () => {
           <div key={player["userId"]}>
             <Popover
               trigger={
-                <div className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
-                  <div className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}>
-                    <img src="/painter.png" alt="Avatar" className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}/>
+                <div className={`Players${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
+                  <div className={`Players${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}>
+                    <img src="/painter.png" alt="Avatar" className={`Players${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}/>
                   </div>
 
-                  <div className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} player`}>
-                    <div className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} username`}>
+                  <div className={`Players${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} player`}>
+                    <div className={`Players${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} username`}>
                       {player["username"]} {sessionStorage.getItem("username") === player["username"] && " (You)"}
 
                     </div>
-                    <div className={`Players${localStorage.getItem("isDarkMode") ? "_dark" : ""} points`}>
+                    <div className={`Players${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} points`}>
                       {player["newlyEarnedPoints"]} points
                     </div>
                   </div>

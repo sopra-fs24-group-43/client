@@ -211,7 +211,7 @@ const Settings = ({ setIsGenreSelectionValid }) => {
       <div className="Settings menu-form">
         <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} menu-label`}>Genre</div>
         <div className="Settings multi-select-warn-group">
-          {errorMessage && <div className="Settings warn">{errorMessage}</div>}
+          {errorMessage && <div className={`Settings${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} warn`}>{errorMessage}</div>}
           <div className="Settings multi-select">
             <Multiselect
               options={genres}

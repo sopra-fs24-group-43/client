@@ -32,3 +32,6 @@ handlers:
     static_files: build/index.html
     upload: build/index.html
     secure: always
+  - url: /(.*\.(gif|png|jpg))$
+    static_files: static/\1
+    upload: static/.*\.(gif|png|jpg)$

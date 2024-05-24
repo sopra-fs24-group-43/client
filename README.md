@@ -1,65 +1,184 @@
-# SoPra FS24 - Client Template with build pack
+# SoPra FS24 Group 43: Freitagsmaler
 
-## Getting started
+## Introduction
 
-Read and go through these Tutorials. It will make your life easier:)
+Freitagsmaler is a game where one user draws a word, while the other players try to guess what word they
+are drawing, similar to games such as Pictionary. Users can either create an account or play as a guest user.
+In order to play, players must either create or join a lobby, where they can change the game settings, such
+as number of rounds or turn duration. The guessers see what the drawer is drawing in real time, and can use the
+chat window to both just chat and guess the word. Once the time has run out or all players have guessed correctly,
+each player gets points, and at the end of the game a final leaderboard is displayed, showing who won.
 
-- Read the React [Docs](https://react.dev/learn)
-- Do this React [Getting Started](https://react.dev/learn/tutorial-tic-tac-toe) Tutorial (it doesn't assume any existing React knowledge)
-- Get an Understanding of [CSS](https://www.w3schools.com/Css/), [SCSS](https://sass-lang.com/documentation/syntax), and [HTML](https://www.w3schools.com/html/html_intro.asp)!
+This is the repository for the frontend part of the implementation. The backend can be found
+[here](https://github.com/sopra-fs24-group-43/server).
 
-Next, there are two other technologies that you should look at:
+## Technolgies
 
-* [react-router-dom](https://reactrouter.com/en/main/start/concepts) offers declarative routing for React. It is a collection of navigational components that fit nicely with the application. 
-* [react-hooks](https://blog.logrocket.com/using-hooks-react-router/) let you access the router's state and perform navigation from inside your components.
+The frontend is written using TypeScript and uses REACT, while scss is used for styling.
 
-## Prerequisites and Installation
-For your local development environment, you will need Node.js.\
-We urge you to install the exact version **v20.11.0** which comes with the npm package manager. You can download it [here](https://nodejs.org/download/release/v20.11.0/).\
-If you are confused about which download to choose, feel free to use these direct links:
+For general client to server communication REST API is used. Within a game and for inviting players, as well as 
+retrieving the list of active games, a websocket connection is established using STOMP.
 
-- **MacOS:** [node-v20.11.0.pkg](https://nodejs.org/download/release/v20.11.0/node-v20.11.0.pkg)
-- **Windows 32-bit:** [node-v20.11.0-x86.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x86.msi)
-- **Windows 64-bit:** [node-v20.11.0-x64.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x64.msi)
-- **Linux:** [node-v20.11.0.tar.xz](https://nodejs.org/dist/v20.11.0/node-v20.11.0.tar.xz) (use this [installation guide](https://medium.com/@tgmarinho/how-to-install-node-js-via-binary-archive-on-linux-ab9bbe1dd0c2) if you are new to Linux)
+## High-Level Components
 
-If you happen to have a package manager the following commands can be used:
+### Landing Page
 
-- **Homebrew:** `brew install node@20.11.0`
-- **Chocolatey:** `choco install nodejs-lts --version=20.11.0`
+From the landing page users can reach the login page, as well as join an active game. A list displaying all currently
+active games is updated here using a websocket connection whenever a player joins a lobby or a new lobby is opened or
+deleted, etc.
 
-After the installation, update the npm package manager to **10.4.0** by running ```npm install -g npm@10.4.0```\
-You can ensure the correct version of node and npm by running ```node -v``` and ```npm --version```, which should give you **v20.11.0** and **10.4.0** respectively.\
-Before you start your application for the first time, run this command to install all other dependencies, including React:
+### Lobby
 
-```npm install```
+Within the lobby, players can see the games current settings, see who else is in the lobby with them, and use the chat
+to speak with the other players. One user (the one who created the game) is the admin, and only they can change 
+settings and start the game. All information here is communicated using websockets.
 
-Next, you can start the app with:
+### Game
 
-```npm run dev```
+The game consists of a leaderboard, showing which player has how many points, a chat window, which is also used for 
+guessing the correct word, and the canvas, which is used for drawing. Only the user designated as drawer can use it, 
+and what he draws is sent to each other user using websockets. Between each turn, the drawer can choose one of three
+words to draw, and at the end a leaderboard is displayed, showing the final point totals and rankings.
 
-Now you can open [http://localhost:3000](http://localhost:3000) to view it in the browser.\
-Notice that the page will reload if you make any edits. You will also see any lint errors in the console (use a Chrome-based browser).\
-The client will send HTTP requests to the server which can be found [here](https://github.com/HASEL-UZH/sopra-fs24-template-server).\
-In order for these requests to work, you need to install and start the server as well.
+## Launch & Deployment
 
-### Testing
-Testing is optional, and you can run the tests with `npm run test`\
-This launches the test runner in an interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Development mode
 
-> For macOS user running into a 'fsevents' error: https://github.com/jest-community/vscode-jest/issues/423
+    npm run dev
+
+This runs the app in development mode. Open [localhost:3000](http://localhost:3000) to view it in the browser.
 
 ### Build
-Finally, `npm run build` builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance:\
-The build is minified, and the filenames include hashes.<br>
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+    npm run build
 
-## Learn More
+## Illustrations
 
-To learn React, check out the [React documentation](https://react.dev/).
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Landing Page - What every user sees when they first visit the website.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Login and Register Page - If a user does not wish to play as guest, they can create an account or login to an 
+existing account here.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  View open lobbies - Once logged in (either with account or as guest), a user can see all open lobbies from the landing page.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Create Lobby - A user that creates a lobby will have permissions to change the game's settings.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Word selection - When a game starts, and before every turn, the drawer needs to choose a word.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Drawer view - The drawer has access to all drawing tools.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Guesser view - As a guesser, you see what the drawer is drawing and use the chat to guess the word.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Podium - At the end of the game, the final ranking is displayed for all.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Global leaderboard - Here, you can see how many points players have accrued over the games they played, and how
+they compare to other players.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Profile view - Here, a user can view their own profile.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Settings menu - Allows a user to change the hotkeys to be used while drawing, as well as change the color scheme of 
+of the site to darkmode.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Darkmode Landing Page - The color scheme of the dark mode.
+  <br>
+</h3>
+
+<h3 align="center">
+  <br>
+  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <br>
+  Friends list - A user's friends list appears as a popup window next to the button.
+  <br>
+</h3>
 
 
-> Thanks to Lucas Pelloni Kyrill Hux and Marco Leder for working on the template.
+
+
+
+## Roadmap
+
+- Custom word lists
+- Audio Feedback on events such as a correct guess, turn end, etc.
+- An achievements system
+
+## Authors and acknowledgement
+
+SoPra FS24 Group 43 consists of  [Markiian Dobosh](https://github.com/MarkiianDobosh),
+[Dominique Heller](https://github.com/dominiqueheller), [Simon Klipp](https://github.com/simonkli),
+[FLorian Mattmüller](https://github.com/FloMatt12), and [Robin Stirnimann](https://github.com/RobinStirnimann)
+
+Special thanks to our teaching assistant [Marco Leder](https://github.com/marcoleder).
+
+## License
+
+Apache-2.0 license

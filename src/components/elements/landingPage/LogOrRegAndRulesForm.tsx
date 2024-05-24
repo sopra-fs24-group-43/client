@@ -3,6 +3,8 @@ import {useNavigate} from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "styles/views/LogOrRegAndRulesForm.scss"
 import {Context} from "../../../context/Context";
+import logoPic3 from './rules.png';
+
 const LogOrRegAndRulesForm = () => {
   const navigate = useNavigate();
   const context = useContext(Context)
@@ -178,7 +180,7 @@ const LogOrRegAndRulesForm = () => {
       </div>
 
       <div className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} img-form`}>
-        <img src="rules.png" alt="Rule Icon"
+        <img src={logoPic3} alt="Rule Icon"
              className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} img`}/>
       </div>
       <div className={`LogOrRegAndRulesForm${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} game-rules`}>

@@ -14,6 +14,8 @@ const Profile = () => {
   const [userProfile, setUserProfile] = useState<User | null>(null);
   const isGuest = sessionStorage.getItem("isGuest") === "true";
   const [showPassword, setShowPassword] = useState(false);
+  const [usernameError, setUsernameError] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
 
   const gameUserId = location.state?.key?.id;
   const isOwnProfile = userId === loggedInUserId;
@@ -124,9 +126,21 @@ const Profile = () => {
             <label>Edit Date of Birth:</label>
             <input type="date" value={userProfile.dateOfBirth} onChange={handleBirthDateChange} />
             <label>Edit Username:</label>
-            <input type="text" value={userProfile.username} onChange={handleUsernameChange} />
+            <input
+              type="text"
+              value={userProfile.username}
+              onChange={handleUsernameChange}
+              maxLength={18}
+            />
+            {usernameError && <p className="error-message">{usernameError}</p>}
             <label>Change Password:</label>
-            <input type="password" value={userProfile.password} onChange={handlePasswordChange} />
+            <input
+              type="password"
+              value={userProfile.password}
+              onChange={handlePasswordChange}
+              maxLength={18}
+            />
+            {passwordError && <p className="error-message">{passwordError}</p>}
             <Button onClick={saveProfile}>Save Profile</Button>
           </div>
         )}

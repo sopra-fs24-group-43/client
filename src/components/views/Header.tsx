@@ -7,7 +7,6 @@ import FriendsPopover from './FriendsPopover';
 import GlobalLeaderboard from './GlobalLeaderboard';
 import { useCurrentPath } from '../routing/routers/LocationContext';
 import '../../styles/views/Header.scss';
-import 'public';
 
 const Header = (props) => {
   const [isClientSettingsOpen, setIsClientSettingsOpen] = useState(false);
@@ -61,7 +60,7 @@ const Header = (props) => {
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
       <div className={"header title"}>
         <a href="/LandingPage" className="header a">
-          <img src={`${process.env.PUBLIC_URL}/logo18.png`} alt="Logo" className="logo" />
+          <img src="/logo18.png" alt="Logo" className="header logo" />
         </a>
       </div>
       <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>

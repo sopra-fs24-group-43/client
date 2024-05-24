@@ -1,4 +1,4 @@
-# https://cloud.google.com/appengine/docs/flexible/reference/app-yaml?tab=node.js#top s
+# https://cloud.google.com/appengine/docs/flexible/reference/app-yaml?tab=node.js#top
 runtime: nodejs20
 
 handlers:
@@ -20,20 +20,3 @@ handlers:
   - url: /.*
     static_files: build/index.html
     upload: build/index.html
-  - url: /(.*\.png)
-    mime_type: image/png
-    static_files: public/\1
-    upload: public/(.*\.png)
-  - url: /(.*)
-    static_files: public/\1
-    upload: public/(.*)
-    secure: always
-  - url: /.*
-    static_files: build/index.html
-    upload: build/index.html
-    secure: always
-  - url: /(.*\.(gif|png|jpg))$
-    static_files: static/\1
-    upload: static/.*\.(gif|png|jpg)$
-  - url: /public
-    static_dir: assets/images

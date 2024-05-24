@@ -13,7 +13,6 @@ const FormField = (props) => {
   const handleChange = (e) => {
     const { value } = e.target;
     if (value.length >= 18) {
-      
       setErrorMessage(`${props.label} cannot exceed 18 characters`);
     } else {
       setErrorMessage("");
@@ -29,10 +28,11 @@ const FormField = (props) => {
         className="login input"
         placeholder="enter here.."
         value={props.value}
-        onChange={handleChange} 
-        maxLength={18} 
+        onChange={handleChange}
+        maxLength={18}
       />
       {errorMessage && <p className="error-message">{errorMessage}</p>}
+      {props.errorMessage && <p className="error-message">{props.errorMessage}</p>}
     </div>
   );
 };
@@ -41,6 +41,8 @@ FormField.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  type: PropTypes.string,
+  errorMessage: PropTypes.string,
 };
 
 const Login = () => {
@@ -50,9 +52,10 @@ const Login = () => {
   const [name, setName] = useState("");
   const [username2, setUsername2] = useState("");
   const [password, setPassword] = useState("");
+  const [registrationError, setRegistrationError] = useState("");
+  const [loginError, setLoginError] = useState("");
 
   useEffect(() => {
-   
     sessionStorage.setItem("location", "login");
   }, []);
 
@@ -60,11 +63,9 @@ const Login = () => {
     try {
       const requestBody = JSON.stringify({ username: username2, name, password });
       const response = await api.post("/users", requestBody);
-      
 
       const user = new User(response.data);
 
-      
       sessionStorage.setItem("token", user.token);
       sessionStorage.setItem("username", user.username);
       sessionStorage.setItem("name", user.name);
@@ -72,10 +73,10 @@ const Login = () => {
       sessionStorage.setItem("friends", user.friends);
       sessionStorage.setItem("creation_date", user.creation_date);
       sessionStorage.setItem("isGuest", "false");
-      
+
       navigate("/LandingPage");
     } catch (error) {
-      alert(`Something went wrong during the login: \n${handleError(error)}`);
+      setRegistrationError("The username provided is already taken.");
     }
   };
 
@@ -97,10 +98,9 @@ const Login = () => {
     try {
       const requestBody = JSON.stringify({ username: loginUsername, password: loginPassword });
       const response = await api.put("/users", requestBody);
-      
+
       const user = new User(response.data);
 
-      // Store the token into the local storage.
       sessionStorage.setItem("token", user.token);
       sessionStorage.setItem("username", user.username);
       sessionStorage.setItem("name", user.name);
@@ -111,10 +111,9 @@ const Login = () => {
 
       await fetchAndSaveUserSettings(user.id);
 
-      // Login successfully worked --> navigate to the route /game in the GameRouter
       navigate("/LandingPage");
     } catch (error) {
-      alert(`Something went wrong during the login: \n${handleError(error)}`);
+      setLoginError("Invalid Credentials");
     }
   };
 
@@ -127,13 +126,15 @@ const Login = () => {
             <FormField
               label="Username"
               value={loginUsername}
-              onChange={(un: string) => setLoginUsername(un)}
+              onChange={(un) => setLoginUsername(un)}
+              
             />
             <FormField
               label="Password"
               type="password"
               value={loginPassword}
-              onChange={(un: string) => setLoginPassword(un)}
+              onChange={(pw) => setLoginPassword(pw)}
+              errorMessage={loginError}
             />
             <div className="login button-container">
               <Button
@@ -149,7 +150,7 @@ const Login = () => {
             <FormField
               label="Username"
               value={username2}
-              onChange={(un: string) => setUsername2(un)}
+              onChange={(un) => setUsername2(un)}
             />
             <FormField
               label="Name"
@@ -160,7 +161,8 @@ const Login = () => {
               label="Password"
               type="password"
               value={password}
-              onChange={(n) => setPassword(n)}
+              onChange={(pw) => setPassword(pw)}
+              errorMessage={registrationError}
             />
             <div className="login button-container">
               <Button

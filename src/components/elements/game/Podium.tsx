@@ -44,22 +44,22 @@ const Podium = () => {
       console.log("IsEndGamae === ", responseData.endGame, isEndGame);
       // convert the updated player list to an array of player components
       const playerEntries = Object.entries(responseData.userIdToPlayerSorted);
-      const top3Players = playerEntries.slice(0, 3).map(([key, player]) => (
-        <div key={player["userId"]} className={`Podium top${player["podiumPosition"]}-player`}>
-          <img src="/painter.png" alt="Avatar" className="Podium top-avatar"/>
-          <div className="Podium player-info">
-            <div className="Podium top-username">
-              {"#" + player["podiumPosition"] + "   "+ player["username"]}
-            </div>
-            <div className="Podium top-points">
-              {player["totalPoints"]} points
-            </div>
-          </div>
-        </div>
-      ));
-      setPodiumPlayers(top3Players);
+      // const top3Players = playerEntries.slice(0, 3).map(([key, player]) => (
+      //   <div key={player["userId"]} className={`Podium top${player["podiumPosition"]}-player`}>
+      //     <img src="/painter.png" alt="Avatar" className="Podium top-avatar"/>
+      //     <div className="Podium player-info">
+      //       <div className="Podium top-username">
+      //         {"#" + player["podiumPosition"] + "   "+ player["username"]}
+      //       </div>
+      //       <div className="Podium top-points">
+      //         {player["totalPoints"]} points
+      //       </div>
+      //     </div>
+      //   </div>
+      // ));
+      // setPodiumPlayers(top3Players);
 
-      const afterTop3Players = playerEntries.slice(3).map(([key, player]) => (
+      const afterTop3Players = playerEntries.map(([key, player]) => (
         <div key={player["userId"]} className="Podium other-player">
           <img src="/painter.png" alt="Avatar" className="Podium other-avatar"/>
           <div className="Podium player-info">
@@ -87,9 +87,9 @@ const Podium = () => {
           <div className="Podium title">
             {winner} is the winner!
           </div>
-          <div className="Podium podium-players">
+          {/* <div className="Podium podium-players">
             {podiumPlayers}
-          </div>
+          </div> */}
           <div className="Podium other-players">
             {otherPlayers}
           </div>

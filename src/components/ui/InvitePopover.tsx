@@ -53,7 +53,7 @@ const InvitePopover = ({ gameId, friendUserId }) => {
         <div className="InvitePopover popover-container">
           <div className="InvitePopover popover-content">
             <div className="InvitePopover title">
-              {friendUserId} has invited you to the lobby {gameId}
+              You have invited you to the lobby {gameId}
             </div>
             <div className="InvitePopover buttons">
               <Button className="InvitePopover accept-button" onClick={joinLobby}>

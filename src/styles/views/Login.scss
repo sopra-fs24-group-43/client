@@ -8,6 +8,7 @@
     @include center;
     flex-direction: column;
     
+    
   }
   &.form {
     display: flex;
@@ -26,6 +27,7 @@
     box-shadow: $dropShadow;
     border: 3px solid #2a2c2e;
     border-radius: 8px;
+    @include gradientBackground;
   }
   &.form_dark {
     display: flex;

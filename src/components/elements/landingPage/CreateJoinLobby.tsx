@@ -1,4 +1,4 @@
-import React, {useEffect, useContext} from "react";
+import React, {useEffect, useContext, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import "styles/views/CreateJoinLobby.scss";
 
@@ -18,7 +18,7 @@ const CreateJoinLobby = () => {
 
 
 
-
+  //const [time, setTime] = useState(new Date());
   const context = useContext(Context)
   const {stompApi} = context
   registered = (!(sessionStorage.getItem("username")=== null || sessionStorage.getItem("userId")=== null || sessionStorage.getItem("friends")=== null || sessionStorage.getItem("isGuest") === null))
@@ -52,7 +52,6 @@ const CreateJoinLobby = () => {
 
 
   }
-
   useEffect(() => {
 
     return () => {  //this gets executed when navigating another page
@@ -60,7 +59,16 @@ const CreateJoinLobby = () => {
       stompApi.unsubscribe("/topic/landing", "CreateJoinLobby")
     }
   }, [registered]);
+  /*
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(new Date());
+    }, 10000);
+    console.log("new setTime: ", time)
+    return () => clearInterval(interval);
+  }, [])
 
+   */
   const creategame = () => {
     const inboundPlayer = {
       type: "inboundPlayer",

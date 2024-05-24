@@ -19,11 +19,13 @@ class StompApi {
     defaultOnConnectedCallback = () => {};
 
     onErrorCallback = (err) => {
+        this.connected = false;
         console.log("Error: ", err);
     };
 
     subscribe(destination, onMessageReceived, filename = "") {
         if (!this.stompClient) {
+            this.connected = false;
             throw new Error('WebSocket is not connected');
         }
         const subscription = this.stompClient.subscribe(destination, (payload) => onMessageReceived(payload));
@@ -52,10 +54,13 @@ class StompApi {
 
     send(destination, body ) {
         if (!this.stompClient || !this.stompClient.connected) {
+            this.connected = false;
             throw new Error(`WebSocket is not connected, the StompClient = ${JSON.stringify(this.stompClient)}`);
         }
-        if (body === ""){this.stompClient.send(destination);}
-        else{this.stompClient.send(destination, {}, body);}
+        if (body === "") {
+            this.stompClient.send(destination);}
+        else{
+            this.stompClient.send(destination, {}, body);}
 
     }
 
@@ -66,8 +71,8 @@ class StompApi {
                 subscription.unsubscribe();
             });
             this.stompClient.disconnect();
-            this.connected = false;
         }
+        this.connected = false;
     }
 }
 

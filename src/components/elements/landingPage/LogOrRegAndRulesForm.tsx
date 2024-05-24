@@ -121,7 +121,7 @@ const LogOrRegAndRulesForm = () => {
   }
   const buttonforreg = () => {
     if (registered) {
-      return <div>{isGuest ? "playing as guest" : ""}</div>;
+      return <div>{isGuest ? "Playing As Guest" : "Logged In"}</div>;
     } else {
       return (
         <div>

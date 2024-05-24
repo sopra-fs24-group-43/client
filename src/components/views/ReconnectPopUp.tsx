@@ -4,6 +4,9 @@ import '../../styles/views/game/WordSelection.scss';
 import WordSelection from "./WordSelection";
 
 const ReconnPopUp = ({reconnect, setReconnect, Reconfunc, userId, reconRole, reconGameId}) => {
+  let userId2 = userId
+  let reconRole2 = reconRole
+  let reconGameId2 = reconGameId
   if (!reconnect) {
     console.log("not showing recon")
     return null;
@@ -19,7 +22,7 @@ const ReconnPopUp = ({reconnect, setReconnect, Reconfunc, userId, reconRole, rec
         </div>
         <div className="wordSelection words-container">
           <div className="wordSelection words">
-            <button onClick={() => {Reconfunc(userId, reconRole, reconGameId)}}>
+            <button onClick={() => Reconfunc(userId2, reconRole2, reconGameId2)}>
               Yes
             </button>
           </div>

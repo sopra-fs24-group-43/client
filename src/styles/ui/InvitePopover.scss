@@ -1,0 +1,47 @@
+@import "../theme";
+
+.InvitePopover {
+  &.popover-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  &.popover-content {
+    position: fixed;
+    z-index: 1;
+    top: 2vh; 
+    left: 2vw; 
+    background-color: rgba(221, 148, 65, 0.737254902);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    border-radius: 5px;
+    border: 3px solid #2a2c2e;
+    min-width: 300px;
+    height: 98px;
+    display: flex;
+    flex-direction: column;
+  }
+  &.title {
+    font-size: 18px;
+    font-weight: bold; 
+    color: black;
+    width: 100%;
+  }
+  &.buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  &.accept-button {
+    width: 90px;
+    order: 1;
+  }
+
+  &.deny-button {
+    width: 90px;
+    order: 2;
+  }
+}

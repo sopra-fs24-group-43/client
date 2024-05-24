@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
+import { useLocation } from "react-router-dom";
 import { api, handleError } from "../../helpers/api.js"
-import InviteFriend from "../../hooks/InviteFriend.js";
-import { useCurrentPath } from "../routing/routers/LocationContext.js"; 
+import InviteFriend from "../../hooks/InviteFriend";
+import { useCurrentPath } from "../routing/routers/LocationContext.js";
+import { Context } from "../../context/Context";
 import "../../styles/views/FriendsPopover.scss";
 
 const FriendsPopover = ({ trigger }) => {
@@ -13,6 +15,13 @@ const FriendsPopover = ({ trigger }) => {
   const [requests, setRequests] = useState([]);
   const userId = parseInt(sessionStorage.getItem("userId"), 10);
   const { currentPath } = useCurrentPath();
+  const context = useContext(Context);
+  const {stompApi} = context;  
+
+  // getting the gameId from the url
+  const location = useLocation();
+  const pathname = location.pathname;
+  const gameId = pathname.split("/")[2];
 
   const togglePopover = () => {
     setIsOpen(!isOpen);
@@ -58,9 +67,9 @@ const FriendsPopover = ({ trigger }) => {
     }
   }, [isOpen]); // friends, pending, requests, 
  
-  const invite = (friendUsername) => {
-    console.log("username", friendUsername);
-    const props = { friendUsername: friendUsername, friendId: 123 };
+  const invite = (friendId) => {
+    console.log("friendId = ", friendId, "stompApi = ", stompApi, "gameId = ", gameId);
+    const props = { friendId: friendId, gameId: gameId, stompApi: stompApi };
     InviteFriend(props)
   };
 
@@ -120,7 +129,7 @@ const FriendsPopover = ({ trigger }) => {
                   </div>
                   {currentPath.includes("lobby") && (
                     <div className="FriendsPopover invite">
-                      <img className="FriendsPopover img" src="/plus.png" onClick={() => invite(friend.username)}/>
+                      <img className="FriendsPopover img" src="/plus.png" onClick={() => invite(friend.id)}/>
                     </div>
                   )}
                   <div className="FriendsPopover cross" onClick={() => deleteFriend(friend.username)}>❌</div>

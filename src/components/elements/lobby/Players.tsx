@@ -35,24 +35,28 @@ const Players = () => {
   };
 
   const connect = async ()=>{
+    await timeout(700);
     await stompApi.connect(() => {
       const userId = sessionStorage.getItem("userId");
       stompApi.connected = true;
-
+      console.log("sending data from the Players when connecting");
       stompApi.send("/app/landing/alertreconnect/"+userId, "") //added
       stompApi.subscribe("/topic/landing/alertreconnect/"+userId, handleResponse, "Players") //added
       console.log("subscribed when was NOT connected to the websocket in Players");
       stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Players");
+      console.log(`invite in players /topic/games/${lobbyId}/general/${sessionStorage.getItem("userId")}`);
     });
   };
 
   // deleting the lobby if you the creator
   const deleteLobby = async () => {
+    sessionStorage.removeItem("gameId");
     stompApi.send(`/app/games/${lobbyId}/deletegame`, JSON.stringify(lobbyId));
   }
 
   // leaving from the lobby if you are a player
   const leaveLobby = async () => {
+    sessionStorage.removeItem("gameId");
     stompApi.send(`/app/games/${lobbyId}/leavegame/${sessionStorage.getItem("userId")}`, "");
     navigate("/LandingPage");
   }
@@ -65,6 +69,7 @@ const Players = () => {
         reload: true
       }
       if (stompApi.isConnected()) {
+        console.log("sending data from the Players when is connected");
         stompApi.send("/app/games/sendreload", JSON.stringify(sessionAttributeDTO2))
         stompApi.disconnect()
       }
@@ -88,6 +93,7 @@ const Players = () => {
     // subscribing
     if (stompApi.isConnected()){
       stompApi.subscribe(`/topic/games/${lobbyId}/general`, handleResponse, "Players");
+      console.log(`invite in players /topic/games/${lobbyId}/general/${sessionStorage.getItem("userId")}`);
       console.log("subscribed when was connected to the websocket in Players");
     };
 
@@ -98,7 +104,7 @@ const Players = () => {
       // stompApi.send(`/app/games/${lobbyId}/getlobbyinfo`, JSON.stringify(lobbyId));
       console.log("connected");
 
-      console.log("sending data from the Players");
+      console.log("sending data from the Players when not connected");
       sendData();
     };
 

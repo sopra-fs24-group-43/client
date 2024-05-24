@@ -2,7 +2,7 @@
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Logo18.png" alt="RaveWave" height="200"></a>
+  <img src="/ReadMeImages/Logo18.png" height="200"></a>
 </h3>
 
 ## Introduction
@@ -26,24 +26,25 @@ retrieving the list of active games, a websocket connection is established using
 
 ## High-Level Components
 
-### Landing Page
+### [Landing Page](https://github.com/sopra-fs24-group-43/client/blob/main/src/components/views/LandingPage.tsx)
 
 From the landing page users can reach the login page, as well as join an active game. A list displaying all currently
 active games is updated here using a websocket connection whenever a player joins a lobby or a new lobby is opened or
 deleted, etc.
 
-### Lobby
+### [Lobby](https://github.com/sopra-fs24-group-43/client/blob/main/src/components/views/Lobby.tsx)
 
 Within the lobby, players can see the games current settings, see who else is in the lobby with them, and use the chat
 to speak with the other players. One user (the one who created the game) is the admin, and only they can change 
 settings and start the game. All information here is communicated using websockets.
 
-### Game
+### [Game](https://github.com/sopra-fs24-group-43/client/blob/main/src/components/views/Game.tsx)
 
 The game consists of a leaderboard, showing which player has how many points, a chat window, which is also used for 
 guessing the correct word, and the canvas, which is used for drawing. Only the user designated as drawer can use it, 
 and what he draws is sent to each other user using websockets. Between each turn, the drawer can choose one of three
-words to draw, and at the end a leaderboard is displayed, showing the final point totals and rankings.
+words to draw, and at the end a leaderboard is displayed, showing the final point totals and rankings. Here as well, 
+all communication happens through websockets.
 
 ## Launch & Deployment
 
@@ -61,7 +62,7 @@ This runs the app in development mode. Open [localhost:3000](http://localhost:30
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Landing%20Page%201.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Landing%20Page%201.png" height="400"></a>
   <br>
   Landing Page - What every user sees when they first visit the website.
   <br>
@@ -69,7 +70,7 @@ This runs the app in development mode. Open [localhost:3000](http://localhost:30
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Login%20and%20Register.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Login%20and%20Register.png" height="400"></a>
   <br>
   Login and Register Page - If a user does not wish to play as guest, they can create an account or login to an 
 existing account here.
@@ -78,7 +79,7 @@ existing account here.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Landing%20Page%202.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Landing%20Page%202.png" height="400"></a>
   <br>
   View open lobbies - Once logged in (either with account or as guest), a user can see all open lobbies from the landing page.
   <br>
@@ -86,7 +87,7 @@ existing account here.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Create%20Lobby.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Create%20Lobby.png" height="400"></a>
   <br>
   Create Lobby - A user that creates a lobby will have permissions to change the game's settings.
   <br>
@@ -94,7 +95,7 @@ existing account here.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Select%20Word%201.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Select%20Word%201.png" height="400"></a>
   <br>
   Word selection - When a game starts, and before every turn, the drawer needs to choose a word.
   <br>
@@ -102,7 +103,7 @@ existing account here.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Drawer%20View.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Drawer%20View.png" height="400"></a>
   <br>
   Drawer view - The drawer has access to all drawing tools.
   <br>
@@ -110,7 +111,7 @@ existing account here.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Guesser%20View.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Guesser%20View.png" height="400"></a>
   <br>
   Guesser view - As a guesser, you see what the drawer is drawing and use the chat to guess the word.
   <br>
@@ -118,7 +119,7 @@ existing account here.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Podium%20TODO%20REPLACE.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Podium%20TODO%20REPLACE.png" height="400"></a>
   <br>
   Podium - At the end of the game, the final ranking is displayed for all.
   <br>
@@ -126,7 +127,7 @@ existing account here.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Global%20Leaderboard.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Global%20Leaderboard.png" height="400"></a>
   <br>
   Global leaderboard - Here, you can see how many points players have accrued over the games they played, and how
 they compare to other players.
@@ -135,7 +136,7 @@ they compare to other players.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Profile%20View.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Profile%20View.png" height="400"></a>
   <br>
   Profile view - Here, a user can view their own profile.
   <br>
@@ -143,7 +144,7 @@ they compare to other players.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Settings%20popup.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Settings%20popup.png" height="400"></a>
   <br>
   Settings menu - Allows a user to change the hotkeys to be used while drawing, as well as change the color scheme of 
 of the site to darkmode.
@@ -152,7 +153,7 @@ of the site to darkmode.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/Darkmode.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/Darkmode.png" height="400"></a>
   <br>
   Darkmode Landing Page - The color scheme of the dark mode.
   <br>
@@ -160,7 +161,7 @@ of the site to darkmode.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/testImage.png" alt="RaveWave" height="400"></a>
+  <img src="/ReadMeImages/testImage.png" height="400"></a>
   <br>
   Friends list - A user's friends list appears as a popup window next to the button.
   <br>

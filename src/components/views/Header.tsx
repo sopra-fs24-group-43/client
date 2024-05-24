@@ -7,6 +7,12 @@ import FriendsPopover from './FriendsPopover';
 import GlobalLeaderboard from './GlobalLeaderboard';
 import { useCurrentPath } from '../routing/routers/LocationContext';
 import '../../styles/views/Header.scss';
+import logoPic from './logo18.png';
+import logoPic2 from './friends.png';
+import logoPic3 from './profile.png';
+import logoPic4 from './leaderboard.png';
+import logoPic5 from './settings.png';
+
 
 const Header = (props) => {
   const [isClientSettingsOpen, setIsClientSettingsOpen] = useState(false);
@@ -55,37 +61,37 @@ const Header = (props) => {
   //     setIsGamePath(false)
   //   }
   // }, [])
-
+ 
   return (
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
       <div className={"header title"}>
         <a href="/LandingPage" className="header a">
-          <img src="/logo18.png" alt="Logo" className="header logo" />
+          <img src={logoPic} alt="Logo" className="header logo" />
         </a>
       </div>
       <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>
         
         {enableLeaderboard && ( 
           <a href="/GlobalLeaderboard" className="navigation-link">
-          <img src="/leaderboard.png" alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+          <img src={logoPic4} alt="Leaderboard Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
         </a>
         )}
         {parseInt(sessionStorage.getItem("userId")) > 0 && (
           <FriendsPopover
             trigger={
               <div className="navigation-link">
-                <img src="/friends.png" alt="Friends Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
+                <img src={logoPic2} alt="Friends Icon" className={`header${localStorage.getItem("isDarkMode") ? "_dark" : ""} img`} />
               </div>
             }
           />
         )}
         <button onClick={handleClientSettingsClick} className="navigation-link settings-button">
-          <img src="/settings.png" alt="ClientSettings Icon" className="header img" />
+          <img src={logoPic5} alt="ClientSettings Icon" className="header img" />
         </button>
 
         {parseInt(sessionStorage.getItem("userId")) > 0 && enableProfile && (
           <a href={`/profile/${userId}`} className="navigation-link">
-            <img src="/profile.png" alt="Profile Icon" className="header img" />
+            <img src={logoPic3} alt="Profile Icon" className="header img" />
           </a>
         )}
       </div>

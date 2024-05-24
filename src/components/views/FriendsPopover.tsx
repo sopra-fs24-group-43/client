@@ -5,6 +5,7 @@ import InviteFriend from "../../hooks/InviteFriend";
 import { useCurrentPath } from "../routing/routers/LocationContext.js";
 import { Context } from "../../context/Context";
 import "../../styles/views/FriendsPopover.scss";
+import logoPic3 from './plus.png';
 
 const FriendsPopover = ({ trigger }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -129,7 +130,7 @@ const FriendsPopover = ({ trigger }) => {
                   </div>
                   {currentPath.includes("lobby") && (
                     <div className="FriendsPopover invite">
-                      <img className="FriendsPopover img" src="/plus.png" onClick={() => invite(friend.id)}/>
+                      <img className="FriendsPopover img" src={logoPic3} onClick={() => invite(friend.id)}/>
                     </div>
                   )}
                   <div className="FriendsPopover cross" onClick={() => deleteFriend(friend.username)}>❌</div>

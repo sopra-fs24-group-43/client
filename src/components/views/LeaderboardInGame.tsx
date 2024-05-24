@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "components/ui/Button";
 import "../../styles/views/game/LeaderboardInGame.scss"
+import logoPic3 from './painter.png';
 
 import { Context } from "../../context/Context";
 
@@ -51,7 +52,7 @@ const LeaderboardInGame = () => {
       const playersArray = Object.values(updatedPlayers).map(player => (
         <div key={player["userId"]} className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} form`}>
           <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}>
-            <img src="/painter.png" alt="Avatar" className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}/>
+            <img src={logoPic3} alt="Avatar" className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} avatar`}/>
           </div>
           <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} player`}>
             <div className={`LeaderboardInGame${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} username`}>

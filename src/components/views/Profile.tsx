@@ -4,6 +4,7 @@ import { Button } from "components/ui/Button";
 import "../../styles/views/Profile.scss";
 import { api, handleError } from "helpers/api";
 import { User } from "types";
+import logoPic3 from './profile.png';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -89,7 +90,7 @@ const Profile = () => {
     <div className="ProfileContainer">
       <div className={`Profile${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} points`}>
         <div className="left-column">
-          <img src="/profile.png" alt="Profile" className="profile-image" />
+          <img src={logoPic3} alt="Profile" className="profile-image" />
           <div className="profile-info">
             <p>Username: {userProfile.username}</p>
             {isOwnProfile && (
@@ -114,7 +115,7 @@ const Profile = () => {
             {isOwnProfile && (
               <Button onClick={() => setEditMode(true)} className="edit-profile-button">Edit Profile</Button>
             )}
-            <Button style={{ marginBottom: '32px' }}>Friend Request</Button>
+            
           </div>
           <p>User ID: {userProfile.id}</p>
           <p>Date of Birth: {userProfile.birth_date}</p>

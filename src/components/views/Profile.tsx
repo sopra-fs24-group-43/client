@@ -87,7 +87,7 @@ const Profile = () => {
 
   return (
     <div className="ProfileContainer">
-      <div className="Profile_dark">
+      <div className={`Profile${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} points`}>
         <div className="left-column">
           <img src="/profile.png" alt="Profile" className="profile-image" />
           <div className="profile-info">

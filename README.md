@@ -161,7 +161,7 @@ of the site to darkmode.
 
 <h3 align="center">
   <br>
-  <img src="/ReadMeImages/testImage.png" height="400"></a>
+  <img src="/ReadMeImages/Friends%20List.png" height="400"></a>
   <br>
   Friends list - A user's friends list appears as a popup window next to the button.
   <br>

@@ -7,6 +7,7 @@ import FriendsPopover from './FriendsPopover';
 import GlobalLeaderboard from './GlobalLeaderboard';
 import { useCurrentPath } from '../routing/routers/LocationContext';
 import '../../styles/views/Header.scss';
+import logoPic from "./logo18.png"
 
 const Header = (props) => {
   const [isClientSettingsOpen, setIsClientSettingsOpen] = useState(false);
@@ -55,12 +56,12 @@ const Header = (props) => {
   //     setIsGamePath(false)
   //   }
   // }, [])
-
+ 
   return (
     <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} container`}>
       <div className={"header title"}>
         <a href="/LandingPage" className="header a">
-          <img src="/logo18.PNG" alt="Logo" className="header logo" />
+          <img src={logoPic} alt="Logo" className="header logo" />
         </a>
       </div>
       <div className={`header${sessionStorage.getItem("isDarkMode") ? "_dark" : ""} navigation`}>

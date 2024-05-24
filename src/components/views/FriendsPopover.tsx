@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { api, handleError } from "../../helpers/api.js"
+import InviteFriend from "../../hooks/InviteFriend.js";
+import { useCurrentPath } from "../routing/routers/LocationContext.js"; 
 import "../../styles/views/FriendsPopover.scss";
 
 const FriendsPopover = ({ trigger }) => {
@@ -10,6 +12,7 @@ const FriendsPopover = ({ trigger }) => {
   const [pending, setPending] = useState([]);
   const [requests, setRequests] = useState([]);
   const userId = parseInt(sessionStorage.getItem("userId"), 10);
+  const { currentPath } = useCurrentPath();
 
   const togglePopover = () => {
     setIsOpen(!isOpen);
@@ -54,6 +57,12 @@ const FriendsPopover = ({ trigger }) => {
       fetchFriendsData();
     }
   }, [isOpen]); // friends, pending, requests, 
+ 
+  const invite = (friendUsername) => {
+    console.log("username", friendUsername);
+    const props = { friendUsername: friendUsername, friendId: 123 };
+    InviteFriend(props)
+  };
 
   const deleteFriend = async (friendUsername) => {
     try {
@@ -109,6 +118,11 @@ const FriendsPopover = ({ trigger }) => {
                   <div className="FriendsPopover username">
                     {friend.username}
                   </div>
+                  {currentPath.includes("lobby") && (
+                    <div className="FriendsPopover invite">
+                      <img className="FriendsPopover img" src="/plus.png" onClick={() => invite(friend.username)}/>
+                    </div>
+                  )}
                   <div className="FriendsPopover cross" onClick={() => deleteFriend(friend.username)}>❌</div>
                 </div>
               ))}

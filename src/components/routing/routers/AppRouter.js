@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { GameGuard } from "../routeProtectors/GameGuard";
 import GameRouter from "./GameRouter";
 import { LoginGuard } from "../routeProtectors/LoginGuard";
+import { LobbyGuard } from "../routeProtectors/LobbyGuard";
 import LoginOrRegister from "../../views/LoginOrRegister";
 import LandingPage from "../../views/LandingPage";
 import Lobby from "../../views/Lobby";
@@ -36,7 +37,11 @@ const AppRouter = () => {
 
           <Route path="/" element={<Navigate to="LandingPage" replace />} />
           <Route path="/LandingPage" element={<LandingPage />} />
-          <Route path="/lobby/:gameId" element={<Lobby />} />
+
+          <Route path="/lobby/:gameId" element={<LobbyGuard />}>
+            <Route path="/lobby/:gameId" element={<Lobby />} />
+          </Route>
+          
           <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/GlobalLeaderboard" element={<GlobalLeaderboard/>} />
         </Routes>

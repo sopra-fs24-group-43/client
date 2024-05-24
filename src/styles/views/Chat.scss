@@ -18,6 +18,12 @@
     border-bottom-right-radius: 8px;
     border-top-right-radius: 8px;
   }
+
+  .notification {
+    color: green;
+    font-weight: bold;
+  }
+  
   &.title{
     display: flex;
     align-items: center;

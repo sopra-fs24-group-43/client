@@ -34,29 +34,30 @@ const Chat = ({isChatting, setIsChatting}) => {
 
   const handleSendMessage = () => {
     if (currentMessage.trim() !== "") {
-      const newMessage = sessionStorage.username +": "+ `${currentMessage}`;
+      const newMessage = sessionStorage.username + ": " + `${currentMessage}`;
       const username = sessionStorage.username;
       const answerString = currentMessage;
-      setChatMessages([...chatMessages, newMessage]);
-      
+      setChatMessages([...chatMessages, { message: newMessage, type: "message" }]);
 
-      stompApi.send(`/app/games/${gameId}/sendguess`, JSON.stringify({username, answerString}));
+      stompApi.send(`/app/games/${gameId}/sendguess`, JSON.stringify({ username, answerString }));
       setCurrentMessage("");
     }
   };
 
- const onHandleMessage = (payload) => {
-  const payloadData = JSON.parse(payload.body);
-  const { username, answerString } = payloadData;
+  const onHandleMessage = (payload) => {
+    const payloadData = JSON.parse(payload.body);
+    const { username, answerString, type } = payloadData;
 
-  
-  if (username !== sessionStorage.username) {
-    const newMessage = `${username}: ${answerString}`;
-
-    
-    setChatMessages((currentMessage) => [...currentMessage, newMessage]);
-  }
-};
+    if (type === "notification") {
+      setChatMessages((prevMessages) => [...prevMessages, { message: answerString, type }]);
+    } else if (username !== sessionStorage.username) {
+      const newMessage = `${username}: ${answerString}`;
+      
+      if (!(type === "Answer" && answerString.endsWith("has guessed the word correctly!") && username !== sessionStorage.username)) {
+        setChatMessages((prevMessages) => [...prevMessages, { message: newMessage, type }]);
+      }
+    }
+  };
 
   useEffect(() => {
     if (chatMessagesRef.current) {
@@ -76,17 +77,22 @@ const Chat = ({isChatting, setIsChatting}) => {
   };
 
   const handleClose = () => {
-    setIsChatting(false); 
+    setIsChatting(false);
   };
-  
+
   return (
     <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} container`}>
       <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} title`}>Chat</div>
-        <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} messages`} ref={chatMessagesRef}>
-          {chatMessages.map((message, index) => (
-            <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} message`} key={index}>{message}</div>
-          ))}
-        </div>
+      <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} messages`} ref={chatMessagesRef}>
+        {chatMessages.map((messageObj, index) => (
+          <div
+            className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} message ${messageObj.type === 'notification' ? 'notification' : ''}`}
+            key={index}
+          >
+            {messageObj.message}
+          </div>
+        ))}
+      </div>
       <div className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} input-form`}>
         <input
           className={`Chat${sessionStorage.getItem("isDarkMode") ? '_dark' : ''} input`}
@@ -95,7 +101,7 @@ const Chat = ({isChatting, setIsChatting}) => {
           onChange={(e) => setCurrentMessage(e.target.value)}
           onFocus={handleFocus}
           onBlur={handleClose}
-          onKeyDown={handleKeyPress} 
+          onKeyDown={handleKeyPress}
           placeholder="Type your guess here..."
         />
       </div>

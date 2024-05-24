@@ -94,7 +94,7 @@ const Profile = () => {
             )}
             <p>Name: {userProfile.name}</p>
             <p>Level: {userProfile.level}</p>
-            <p>Total XP: {userProfile.XP}</p>
+            <p>Total XP: {userProfile.xp}</p>
 
           </div>
         </div>

@@ -18,7 +18,8 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    height: 106px;
+    height: 125px;
+    width: auto;
   }
 
   &.a {
@@ -30,7 +31,7 @@
   }
 
   &.title {
-    padding-top: 45px;
+    padding-top: 48px;
     padding-right: 55px;
     display: flex;
     flex-direction: row;
@@ -38,7 +39,7 @@
     align-items: center;
     width: 67%;
     height: 100%;
-    margin-left: 20px;
+    margin-left: 150px;
   }
 
   &.navigation{
